@@ -1,0 +1,15 @@
+version: 1
+disable_existing_loggers: false
+formatters:
+  simple:
+    format: '[%(levelname)s][%(filename)s:%(lineno)d] %(message)s'
+handlers:
+  console:
+    class: logging.StreamHandler
+    level: "INFO"
+    stream: ext://sys.stdout
+    formatter: simple
+root:
+  level: "INFO"
+  formatter: simple
+  handlers: [console]

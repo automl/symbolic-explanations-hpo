@@ -1,0 +1,19 @@
+name: hpo_symb
+channels:
+  - conda-forge
+dependencies:
+  - python=3.9
+  - gxx_linux-64
+  - gcc_linux-64
+  - swig
+  - pip
+  - pandas
+  - numpy
+  - scikit-learn
+  - jupyter
+  - matplotlib
+  - gplearn
+  - sympy
+  - black
+  - pip:
+    - smac==v2.0.0a2
