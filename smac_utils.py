@@ -67,11 +67,16 @@ def run_smac_optimization(
     # get hyperparameter settings and corresponding function values from smac runhistory
     conf_hp, conf_res = [], []
     for hp_name in hp_space.keys():
-        conf_hp.append([i[hp_name] for i in smac.runhistory.ids_config.values()])
+        conf_hp.append(
+            [
+                config.get_dictionary()[hp_name]
+                for config in smac.runhistory.get_configs()
+            ]
+        )
         conf_res.append(
             [
                 smac.runhistory.get_cost(config)
-                for config in smac.runhistory.config_ids.keys()
+                for config in smac.runhistory.get_configs()
             ]
         )
 
