@@ -49,18 +49,15 @@ if __name__ == "__main__":
         function_set = ["add", "sub", "mul", "div", "sqrt", "log", "sin", "cos"]
         # TODO: log symb regression logs?
         symb_params = dict(
-            population_size=5000,
-            generations=5,
+            population_size=1000,
+            generations=50,
             stopping_criteria=0.001,
-            p_crossover=0.7,
-            p_subtree_mutation=0.1,
+            p_crossover=0.9,
+            p_subtree_mutation=0.01,
             p_hoist_mutation=0.05,
-            p_point_mutation=0.1,
-            max_samples=0.9,
-            parsimony_coefficient=0.01,
+            p_point_mutation=0.01,
             function_set=function_set,
             metric="mean absolute error",
-            random_state=0,
             verbose=0,
         )
 
