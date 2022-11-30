@@ -5,6 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from gplearn.genetic import SymbolicRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
+import configparser as cfgparse
 
 plt.style.use("tableau-colorblind10")
 
@@ -186,3 +187,14 @@ def plot_symb(
     else:
         plt.show()
     return fig
+
+
+def write_dict_to_cfg_file(dictionary: dict, target_file_path: str):
+    parser = cfgparse.ConfigParser()
+    section = 'symbolic_regression'
+    parser.add_section(section)
+
+    for key in dictionary.keys():
+        parser.set(section, key, str(dictionary[key]))
+    with open(target_file_path, 'w') as f:
+        parser.write(f)

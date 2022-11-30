@@ -1,9 +1,11 @@
 import logging
+from os import path
 import numpy as np
 import pandas as pd
 from gplearn.genetic import SymbolicRegressor
+from gplearn.functions import make_function
 
-from utils import get_output_dirs, convert_symb, append_scores, plot_symb
+from utils import get_output_dirs, convert_symb, append_scores, plot_symb, write_dict_to_cfg_file
 from smac_utils import run_smac_optimization
 from functions import get_functions
 
@@ -45,21 +47,35 @@ if __name__ == "__main__":
         X_test = np.linspace(x_min, x_max, 100).reshape(-1, 1)
         y_test = function.apply(X_test).reshape(-1)
 
+        # Create a safe exp function which does not cause problems
+        def exp(x):
+            with np.errstate(all='ignore'):
+                # TODO: We maybe want to set a larger upper limit
+                max_value = np.full(shape=x.shape, fill_value=100000)
+                return np.minimum(np.exp(x), max_value)
+
+        exp_func = make_function(function=exp, arity=1, name="exp")
+
         # SR settings
-        function_set = ["add", "sub", "mul", "div", "sqrt", "log", "sin", "cos"]
+        function_set = ["add", "sub", "mul", "div", "sqrt", "log", "sin", "cos", exp_func]
         # TODO: log symb regression logs?
         symb_params = dict(
             population_size=1000,
             generations=50,
             stopping_criteria=0.001,
-            p_crossover=0.9,
-            p_subtree_mutation=0.01,
+            p_crossover=0.7,
+            p_subtree_mutation=0.1,
             p_hoist_mutation=0.05,
-            p_point_mutation=0.01,
+            p_point_mutation=0.1,
+            max_samples=0.9,
+            parsimony_coefficient=0.01,
             function_set=function_set,
             metric="mean absolute error",
-            verbose=0,
+            random_state=0,
+            verbose=0
         )
+
+        write_dict_to_cfg_file(dictionary=symb_params, target_file_path=path.join(run_dir, 'symbolic_regression_params.cfg'))
 
         # run SR on SMAC samples
         symb_smac = SymbolicRegressor(**symb_params)
