@@ -2,7 +2,7 @@ name: hpo_symb
 channels:
   - conda-forge
 dependencies:
-  - python=3.9
+  - python=3.10
   - gxx_linux-64
   - gcc_linux-64
   - swig
