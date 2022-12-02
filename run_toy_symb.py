@@ -3,6 +3,7 @@ from os import path
 import numpy as np
 import pandas as pd
 from gplearn.genetic import SymbolicRegressor
+from symbolic_metamodeling.symbolic_meta_model_wrapper import SymbolicMetaModelWrapper
 from gplearn.functions import make_function
 
 from utils import get_output_dirs, convert_symb, append_scores, plot_symb, write_dict_to_cfg_file
@@ -81,9 +82,17 @@ if __name__ == "__main__":
         symb_smac = SymbolicRegressor(**symb_params)
         symb_smac.fit(X_train_smac, y_train_smac)
 
+        # run symbolic metamodels on SMAC samples
+        symb_meta_smac = SymbolicMetaModelWrapper()
+        symb_meta_smac.fit(X_train_smac, y_train_smac)
+
         # run SR on random samples
         symb_rand = SymbolicRegressor(**symb_params)
         symb_rand.fit(X_train_rand, y_train_rand)
+
+        # run symbolic metamodels on random samples
+        symb_meta_rand = SymbolicMetaModelWrapper()
+        symb_meta_rand.fit(X_train_rand, y_train_rand)
 
         # write results to csv files
         df_scores = append_scores(
@@ -101,9 +110,19 @@ if __name__ == "__main__":
         df_expr[function.expression] = {
             "symb_smac": convert_symb(symb_smac),
             "symb_rand": convert_symb(symb_rand),
+            "symb_meta_smac": convert_symb(symb_meta_smac),
+            "symb_meta_rand": convert_symb(symb_meta_rand)
         }
         df_scores.to_csv(f"{res_dir}/scores.csv")
         df_expr.to_csv(f"{res_dir}/functions.csv")
+
+        symbolic_models = {
+            "symb_smac": symb_smac,
+            "symb_rand": symb_rand,
+            "symb_meta_smac": symb_meta_smac,
+            "symb_meta_rand": symb_meta_rand
+        }
+
 
         # plot results
         plot = plot_symb(
@@ -113,8 +132,7 @@ if __name__ == "__main__":
             y_train_rand,
             X_test,
             y_test,
-            symb_smac,
-            symb_rand,
+            symbolic_models,
             function,
             plot_dir=plot_dir,
         )

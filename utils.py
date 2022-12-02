@@ -4,6 +4,7 @@ import sympy
 import numpy as np
 import matplotlib.pyplot as plt
 from gplearn.genetic import SymbolicRegressor
+from symbolic_metamodeling.symbolic_meta_model_wrapper import SymbolicMetaModelWrapper
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 import configparser as cfgparse
 
@@ -35,7 +36,7 @@ def sort(x: np.ndarray, y: np.ndarray) -> [np.ndarray, np.ndarray]:
     return x, y
 
 
-def convert_symb(symb: SymbolicRegressor, n_decimals: int = None) -> sympy.core.expr:
+def convert_symb(symb, n_decimals: int = None) -> sympy.core.expr:
     """
     Convert a fitted symbolic regression to a simplified and potentially rounded mathematical expression.
     Warning: eval is used in this function, thus it should not be used on unsanitized input (see
@@ -50,8 +51,12 @@ def convert_symb(symb: SymbolicRegressor, n_decimals: int = None) -> sympy.core.
     -------
     symb_conv: Converted mathematical expression.
     """
-
-    symb = str(symb._program)
+    if isinstance(symb, SymbolicRegressor):
+        symb = str(symb._program)
+    elif isinstance(symb, SymbolicMetaModelWrapper):
+        symb = symb.expression()
+    else:
+        raise Exception("Unknown symbolic model")
 
     converter = {
         "sub": lambda x, y: x - y,
@@ -110,8 +115,7 @@ def plot_symb(
     y_train_rand,
     X_test,
     y_test,
-    symb_smac,
-    symb_rand,
+    symbolic_models,
     function,
     plot_dir=None,
 ):
@@ -131,32 +135,37 @@ def plot_symb(
         linewidth=3,
         label=f"True function: {function.expression}",
     )
-    conv_smac = convert_symb(symb_smac, n_decimals=3)
-    if len(str(conv_smac)) < 30:
-        label_smac = f"Predicted function (SMAC sampling): {conv_smac}"
-    else:
-        label_smac = "Predicted function (SMAC sampling)"
-    plt.plot(
-        X_test,
-        symb_smac.predict(X_test),
-        color="C1",
-        linewidth=2,
-        linestyle="--",
-        label=label_smac,
-    )
-    conv_rand = convert_symb(symb_rand, n_decimals=3)
-    if len(str(conv_rand)) < 30:
-        label_rand = f"Predicted function (random sampling): {conv_rand}"
-    else:
-        label_rand = "Predicted function (random sampling)"
-    plt.plot(
-        X_test,
-        symb_rand.predict(X_test),
-        color="C2",
-        linewidth=2,
-        linestyle="-.",
-        label=label_rand,
-    )
+
+    for model_name in symbolic_models:
+        symbolic_model = symbolic_models[model_name]
+
+        conv = convert_symb(symbolic_model, n_decimals=3)
+        if len(str(conv)) < 30:
+            label = f"Predicted function ({model_name}): {conv}"
+        else:
+            label = f"Predicted function ({model_name})"
+        plt.plot(
+            X_test,
+            symbolic_model.predict(X_test),
+            #color="C1",
+            linewidth=2,
+            #linestyle="--",
+            label=label
+        )
+
+    # conv_rand = convert_symb(symb_rand, n_decimals=3)
+    # if len(str(conv_rand)) < 30:
+    #     label_rand = f"Predicted function (random sampling): {conv_rand}"
+    # else:
+    #     label_rand = "Predicted function (random sampling)"
+    # plt.plot(
+    #     X_test,
+    #     symb_rand.predict(X_test),
+    #     color="C2",
+    #     linewidth=2,
+    #     linestyle="-.",
+    #     label=label_rand,
+    # )
     plt.scatter(
         X_train_smac,
         y_train_smac,
