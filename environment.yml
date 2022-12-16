@@ -14,6 +14,7 @@ dependencies:
   - matplotlib
   - gplearn
   - sympy
+  - xgboost
   - black
   - pip:
     - smac==v2.0.0a2

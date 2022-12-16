@@ -15,6 +15,8 @@ if __name__ == "__main__":
     x_min = 0.01
     x_max = 1.00
     n_eval = 10
+    symb_reg = True
+    symb_meta = False
 
     functions = get_functions()
     run_dir, res_dir, plot_dir = get_output_dirs()
@@ -22,7 +24,9 @@ if __name__ == "__main__":
     # setup logging
     logger = logging.getLogger(__name__)
 
-    df_scores, df_expr = pd.DataFrame(), pd.DataFrame()
+    df_scores_symb_reg = pd.DataFrame() if symb_reg else None
+    df_scores_symb_meta = pd.DataFrame() if symb_meta else None
+    df_expr = pd.DataFrame()
 
     for function in functions:
         # get train samples for SR from SMAC sampling
@@ -55,74 +59,86 @@ if __name__ == "__main__":
                 max_value = np.full(shape=x.shape, fill_value=100000)
                 return np.minimum(np.exp(x), max_value)
 
-        exp_func = make_function(function=exp, arity=1, name="exp")
+        symbolic_models = {}
 
-        # SR settings
-        function_set = ["add", "sub", "mul", "div", "sqrt", "log", "sin", "cos", exp_func]
-        # TODO: log symb regression logs?
-        symb_params = dict(
-            population_size=1000,
-            generations=50,
-            stopping_criteria=0.001,
-            p_crossover=0.7,
-            p_subtree_mutation=0.1,
-            p_hoist_mutation=0.05,
-            p_point_mutation=0.1,
-            max_samples=0.9,
-            parsimony_coefficient=0.01,
-            function_set=function_set,
-            metric="mean absolute error",
-            random_state=0,
-            verbose=0
-        )
+        if symb_reg:
+            # SR settings
+            exp_func = make_function(function=exp, arity=1, name="exp")
+            function_set = ["add", "sub", "mul", "div", "sqrt", "log", "sin", "cos", exp_func]
+            # TODO: log symb regression logs?
+            symb_params = dict(
+                population_size=1000,
+                generations=50,
+                stopping_criteria=0.001,
+                p_crossover=0.7,
+                p_subtree_mutation=0.1,
+                p_hoist_mutation=0.05,
+                p_point_mutation=0.1,
+                max_samples=0.9,
+                parsimony_coefficient=0.01,
+                function_set=function_set,
+                metric="mean absolute error",
+                random_state=0,
+                verbose=0
+            )
 
-        write_dict_to_cfg_file(dictionary=symb_params, target_file_path=path.join(run_dir, 'symbolic_regression_params.cfg'))
+            write_dict_to_cfg_file(dictionary=symb_params, target_file_path=path.join(run_dir, 'symbolic_regression_params.cfg'))
 
-        # run SR on SMAC samples
-        symb_smac = SymbolicRegressor(**symb_params)
-        symb_smac.fit(X_train_smac, y_train_smac)
+            # run SR on SMAC samples
+            symb_smac = SymbolicRegressor(**symb_params)
+            symb_smac.fit(X_train_smac, y_train_smac)
 
-        # run symbolic metamodels on SMAC samples
-        symb_meta_smac = SymbolicMetaModelWrapper()
-        symb_meta_smac.fit(X_train_smac, y_train_smac)
+            # run SR on random samples
+            symb_rand = SymbolicRegressor(**symb_params)
+            symb_rand.fit(X_train_rand, y_train_rand)
 
-        # run SR on random samples
-        symb_rand = SymbolicRegressor(**symb_params)
-        symb_rand.fit(X_train_rand, y_train_rand)
+            symbolic_models["symb_smac"] = symb_smac
+            symbolic_models["symb_rand"] = symb_rand
 
-        # run symbolic metamodels on random samples
-        symb_meta_rand = SymbolicMetaModelWrapper()
-        symb_meta_rand.fit(X_train_rand, y_train_rand)
+            # write results to csv files
+            df_scores_symb_reg = append_scores(
+                df_scores_symb_reg,
+                function,
+                symb_smac,
+                symb_rand,
+                X_train_smac,
+                y_train_smac,
+                X_train_rand,
+                y_train_rand,
+                X_test,
+                y_test,
+            )
+            df_scores_symb_reg.to_csv(f"{res_dir}/scores_symb_reg.csv")
 
-        # write results to csv files
-        df_scores = append_scores(
-            df_scores,
-            function,
-            symb_smac,
-            symb_rand,
-            X_train_smac,
-            y_train_smac,
-            X_train_rand,
-            y_train_rand,
-            X_test,
-            y_test,
-        )
-        df_expr[function.expression] = {
-            "symb_smac": convert_symb(symb_smac),
-            "symb_rand": convert_symb(symb_rand),
-            "symb_meta_smac": convert_symb(symb_meta_smac),
-            "symb_meta_rand": convert_symb(symb_meta_rand)
-        }
-        df_scores.to_csv(f"{res_dir}/scores.csv")
+        if symb_meta:
+            # run symbolic metamodels on SMAC samples
+            symb_meta_smac = SymbolicMetaModelWrapper()
+            symb_meta_smac.fit(X_train_smac, y_train_smac)
+
+            # run symbolic metamodels on random samples
+            symb_meta_rand = SymbolicMetaModelWrapper()
+            symb_meta_rand.fit(X_train_rand, y_train_rand)
+
+            symbolic_models["symb_meta_smac"] = symb_meta_smac
+            symbolic_models["symb_meta_rand"] = symb_meta_rand
+
+            # write results to csv files
+            df_scores_symb_meta = append_scores(
+                df_scores_symb_meta,
+                function,
+                symb_meta_smac,
+                symb_meta_rand,
+                X_train_smac,
+                y_train_smac,
+                X_train_rand,
+                y_train_rand,
+                X_test,
+                y_test,
+            )
+            df_scores_symb_meta.to_csv(f"{res_dir}/scores_symb_meta.csv")
+
+        df_expr[function.expression] = {k: convert_symb(v) for k, v in symbolic_models.items()}
         df_expr.to_csv(f"{res_dir}/functions.csv")
-
-        symbolic_models = {
-            "symb_smac": symb_smac,
-            "symb_rand": symb_rand,
-            "symb_meta_smac": symb_meta_smac,
-            "symb_meta_rand": symb_meta_rand
-        }
-
 
         # plot results
         plot = plot_symb(
