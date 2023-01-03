@@ -45,7 +45,7 @@ class SymbolicMetaModelWrapper:
         memorizing_model = MemorizingModel()
         memorizing_model.fit(X=X, y=y)
         self.metamodel = symbolic_metamodel(model=memorizing_model, X=X, mode='regression')
-        self.metamodel.fit(num_iter=1, batch_size=X.shape[0], learning_rate=.01)
+        self.metamodel.fit(num_iter=1, batch_size=1, learning_rate=.01)
         return self
 
     def predict(self, X):
@@ -54,3 +54,14 @@ class SymbolicMetaModelWrapper:
     def expression(self):
         exact_expression, approx_expression = self.metamodel.symbolic_expression()
         return approx_expression
+
+
+class SymbolicMetaExpressionWrapper:
+    def __init__(self, model):
+        self.metaexpression = model
+
+    def predict(self, X):
+        return self.metaexpression.evaluate(X)
+
+    def expression(self):
+        return self.metaexpression.expression()

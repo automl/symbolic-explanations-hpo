@@ -4,7 +4,7 @@ import sympy
 import numpy as np
 import matplotlib.pyplot as plt
 from gplearn.genetic import SymbolicRegressor
-from symbolic_metamodeling.symbolic_meta_model_wrapper import SymbolicMetaModelWrapper
+from symbolic_metamodeling.symbolic_meta_model_wrapper import SymbolicMetaModelWrapper, SymbolicMetaExpressionWrapper
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 import configparser as cfgparse
 
@@ -133,17 +133,20 @@ def plot_symb(
         y_test,
         color="C4",
         linewidth=3,
-        label=f"True function: {function.expression}",
+        label=f"True: {function.expression}",
     )
 
     for model_name in symbolic_models:
         symbolic_model = symbolic_models[model_name]
 
-        conv = convert_symb(symbolic_model, n_decimals=3)
+        conv = symbolic_model.expression() if isinstance(symbolic_model,
+                                                         SymbolicMetaExpressionWrapper) else convert_symb(
+            symbolic_model, n_decimals=3)
+
         if len(str(conv)) < 30:
-            label = f"Predicted function ({model_name}): {conv}"
+            label = f"{model_name}: {conv}"
         else:
-            label = f"Predicted function ({model_name})"
+            label = f"{model_name}: -"
         plt.plot(
             X_test,
             symbolic_model.predict(X_test),
@@ -152,20 +155,6 @@ def plot_symb(
             #linestyle="--",
             label=label
         )
-
-    # conv_rand = convert_symb(symb_rand, n_decimals=3)
-    # if len(str(conv_rand)) < 30:
-    #     label_rand = f"Predicted function (random sampling): {conv_rand}"
-    # else:
-    #     label_rand = "Predicted function (random sampling)"
-    # plt.plot(
-    #     X_test,
-    #     symb_rand.predict(X_test),
-    #     color="C2",
-    #     linewidth=2,
-    #     linestyle="-.",
-    #     label=label_rand,
-    # )
     plt.scatter(
         X_train_smac,
         y_train_smac,
@@ -173,7 +162,7 @@ def plot_symb(
         zorder=2,
         marker="^",
         s=40,
-        label=f"Train points (SMAC sampling)",
+        label=f"Train points (smac)",
     )
     plt.scatter(
         X_train_rand,
@@ -182,7 +171,7 @@ def plot_symb(
         zorder=2,
         marker="P",
         s=40,
-        label="Train points (random sampling)",
+        label="Train points (random)",
     )
     epsilon = (X_test.max() - X_test.min()) / 100
     plt.xlim(X_test.min() - epsilon, X_test.max() + epsilon)
@@ -192,9 +181,10 @@ def plot_symb(
     leg.get_frame().set_linewidth(0.0)
     plt.tight_layout()
     if plot_dir:
-        plt.savefig(f"{plot_dir}/{function.name.lower().replace(' ', '_')}", dpi=300)
+        plt.savefig(f"{plot_dir}/{function.name.lower().replace(' ', '_')}", dpi=800)
     else:
         plt.show()
+    plt.close()
     return fig
 
 

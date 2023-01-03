@@ -3,7 +3,8 @@ from os import path
 import numpy as np
 import pandas as pd
 from gplearn.genetic import SymbolicRegressor
-from symbolic_metamodeling.symbolic_meta_model_wrapper import SymbolicMetaModelWrapper
+from symbolic_metamodeling.symbolic_meta_model_wrapper import SymbolicMetaModelWrapper, SymbolicMetaExpressionWrapper
+from symbolic_metamodeling.pysymbolic.algorithms.symbolic_expressions import get_symbolic_model
 from gplearn.functions import make_function
 
 from utils import get_output_dirs, convert_symb, append_scores, plot_symb, write_dict_to_cfg_file
@@ -16,7 +17,7 @@ if __name__ == "__main__":
     x_max = 1.00
     n_eval = 10
     symb_reg = True
-    symb_meta = False
+    symb_meta = True
 
     functions = get_functions()
     run_dir, res_dir, plot_dir = get_output_dirs()
@@ -92,8 +93,8 @@ if __name__ == "__main__":
             symb_rand = SymbolicRegressor(**symb_params)
             symb_rand.fit(X_train_rand, y_train_rand)
 
-            symbolic_models["symb_smac"] = symb_smac
-            symbolic_models["symb_rand"] = symb_rand
+            symbolic_models["Symb-smac"] = symb_smac
+            symbolic_models["Symb-rand"] = symb_rand
 
             # write results to csv files
             df_scores_symb_reg = append_scores(
@@ -114,13 +115,19 @@ if __name__ == "__main__":
             # run symbolic metamodels on SMAC samples
             symb_meta_smac = SymbolicMetaModelWrapper()
             symb_meta_smac.fit(X_train_smac, y_train_smac)
+            # or run symbolic metaexpressions on SMAC samples
+            #symb_meta_smac, _ = get_symbolic_model(function.apply, X_train_smac)
+            #symb_meta_smac = SymbolicMetaExpressionWrapper(symb_meta_smac)
 
             # run symbolic metamodels on random samples
             symb_meta_rand = SymbolicMetaModelWrapper()
             symb_meta_rand.fit(X_train_rand, y_train_rand)
+            # or run symbolic metaexpressions on SMAC samples
+            #symb_meta_rand, _ = get_symbolic_model(function.apply, X_train_rand)
+            #symb_meta_rand = SymbolicMetaExpressionWrapper(symb_meta_rand)
 
-            symbolic_models["symb_meta_smac"] = symb_meta_smac
-            symbolic_models["symb_meta_rand"] = symb_meta_rand
+            symbolic_models["Meta-smac"] = symb_meta_smac
+            symbolic_models["Meta-rand"] = symb_meta_rand
 
             # write results to csv files
             df_scores_symb_meta = append_scores(
@@ -137,7 +144,9 @@ if __name__ == "__main__":
             )
             df_scores_symb_meta.to_csv(f"{res_dir}/scores_symb_meta.csv")
 
-        df_expr[function.expression] = {k: convert_symb(v) for k, v in symbolic_models.items()}
+        df_expr[function.expression] = {
+            k: v.expression() if isinstance(v, SymbolicMetaExpressionWrapper) else convert_symb(v) for k, v in
+            symbolic_models.items()}
         df_expr.to_csv(f"{res_dir}/functions.csv")
 
         # plot results

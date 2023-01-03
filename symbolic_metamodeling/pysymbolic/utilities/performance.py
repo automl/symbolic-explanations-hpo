@@ -19,7 +19,7 @@ warnings.filterwarnings("ignore")
 if not sys.warnoptions:
     warnings.simplefilter("ignore")
 
-from pysymbolic.models.special_functions import MeijerG
+from symbolic_metamodeling.pysymbolic.models.special_functions import MeijerG
 
 def compute_Rsquared(f_true, f_est):
 

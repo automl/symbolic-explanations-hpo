@@ -19,8 +19,8 @@ warnings.filterwarnings("ignore")
 if not sys.warnoptions:
     warnings.simplefilter("ignore")
 
-from pysymbolic.models.special_functions import MeijerG
-from pysymbolic.utilities.performance import compute_Rsquared
+from symbolic_metamodeling.pysymbolic.models.special_functions import MeijerG
+from symbolic_metamodeling.pysymbolic.utilities.performance import compute_Rsquared
 
 #from sympy.printing.theanocode import theano_function
 from sympy.utilities.autowrap import ufuncify
@@ -48,8 +48,7 @@ def Optimize(Loss, theta_0):
     return theta_opt, Loss_ 
 
 
-def symbolic_modeling(f, G_order, theta_0, npoints, xrange):
-    X         = np.linspace(xrange[0], xrange[1], npoints)
+def symbolic_modeling(f, G_order, theta_0, X):
 
     def Loss(theta):
         
@@ -65,7 +64,7 @@ def symbolic_modeling(f, G_order, theta_0, npoints, xrange):
 
     return symbolic_model, Loss_ 
 
-def get_symbolic_model(f, npoints, xrange):
+def get_symbolic_model(f, X):
 
     hyperparameter_space = load_hyperparameter_config() 
     loss_threshold       = 10e-5
@@ -76,7 +75,7 @@ def get_symbolic_model(f, npoints, xrange):
     for k in range(len(hyperparameter_space)):
 
         symbolic_model, Loss_ = symbolic_modeling(f, hyperparameter_space['hyper_'+str(k+1)][1], 
-                                                  hyperparameter_space['hyper_'+str(k+1)][0], npoints, xrange)
+                                                  hyperparameter_space['hyper_'+str(k+1)][0], X)
 
         symbol_exprs.append(symbolic_model)
         losses_.append(Loss_)
@@ -86,8 +85,6 @@ def get_symbolic_model(f, npoints, xrange):
 
     best_model = np.argmin(np.array(losses_))
 
-    X          = np.linspace(xrange[0], xrange[1], npoints).reshape((-1,1))
-    
     Y_true     = f(X).reshape((-1,1))
     Y_est      = symbol_exprs[best_model].evaluate(X).reshape((-1,1))
 

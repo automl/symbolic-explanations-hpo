@@ -33,6 +33,7 @@ from xgboost import XGBClassifier
 from sklearn.linear_model import LinearRegression, LogisticRegression, Ridge
 from sympy import Integral, Symbol
 from sympy.abc import x, y
+import matplotlib.pyplot as plt
 
 from sklearn.metrics import roc_auc_score
 from sklearn.model_selection import train_test_split
@@ -101,7 +102,7 @@ def basis_grad(a, b, c, x, hyper_order=[1, 2, 2, 2]):
 
 
 
-def tune_single_dim(lr, n_iter, x, y, verbosity=False):
+def tune_single_dim(lr, n_iter, batch_size, x, y, tqdm_mode, verbosity=False, plotting=False):
     
     epsilon   = 0.001
     x         = x + epsilon
@@ -109,29 +110,51 @@ def tune_single_dim(lr, n_iter, x, y, verbosity=False):
     a         = 2
     b         = 1
     c         = 1
-    
-    batch_size  = np.min((x.shape[0], 500)) 
-    
-    for u in range(n_iter):
-        
+
+    all_grads = []
+    all_losses = []
+ 
+    for u in tqdm_mode(range(n_iter)):
         batch_index = np.random.choice(list(range(x.shape[0])), size=batch_size)
         
         new_grads   = basis_grad(a, b, c, x[batch_index])
         func_true   = basis(a, b, c, x[batch_index])
+
+        overall_loss = float(np.mean((basis(a, b, c, x, hyper_order=[1, 2, 2, 2]) - y.T)**2))
+        all_losses.append(overall_loss)
+
+        if verbosity and (u+1) % 50 == 0:
         
-        loss        =  np.mean((func_true - y[batch_index])**2)
-        
-        if verbosity:
-        
-            print("Iteration: %d \t--- Loss: %.3f" % (u, loss))
-        
+            print("\n Iteration: %d \t--- Loss: %.5f" % (u, overall_loss))
+
         grads_a   = np.mean(2 * new_grads[0] * (func_true - y[batch_index]))
         grads_b   = np.mean(2 * new_grads[1] * (func_true - y[batch_index]))
         grads_c   = np.mean(2 * new_grads[2] * (func_true - y[batch_index]))
+
+        all_grads.append([grads_a, grads_b, grads_c])
         
+        # c becoming negative sometimes happens for certain functions (e.g 1/(1+x)**2)
+        if c - lr * grads_c <= 0:
+            print("Update would lead to negative value of c, continue with next batch.")
+            continue
+
         a         = a - lr * grads_a
         b         = b - lr * grads_b
         c         = c - lr * grads_c
+
+    if plotting:
+        all_grads = np.array(all_grads)
+        plt.plot(all_grads[:, 0], label="Gradient of a")
+        plt.plot(all_grads[:, 1], label="Gradient of b")
+        plt.plot(all_grads[:, 2], label="Gradient of c")
+        plt.legend()
+        plt.show()
+        plt.close()
+        
+        plt.plot(all_losses, label="Loss")
+        plt.legend()
+        plt.show()
+        plt.close()
         
     return a, b, c 
 
@@ -152,8 +175,9 @@ class symbolic_metamodel:
         self.X                = X
         self.X_new            = self.feature_expander.fit_transform(X) 
         self.X_names          = self.feature_expander.get_feature_names()
+        self.mode             = mode
         
-        if mode == "classification": 
+        if self.mode == "classification": 
         
             self.Y                = model.predict_proba(self.X)[:, 1]
             self.Y_r              = np.log(self.Y/(1 - self.Y))
@@ -161,6 +185,8 @@ class symbolic_metamodel:
         else:
             
             self.Y_r              = model.predict(self.X)
+            self.scaler = MinMaxScaler()
+            self.Y_r = self.scaler.fit_transform(self.Y_r)
         
         
         self.num_basis        = self.X_new.shape[1]
@@ -236,9 +262,12 @@ class symbolic_metamodel:
         
         print("---- Tuning the basis functions ----")
         
-        for u in self.tqdm_mode(range(self.X.shape[1])):
+        for u in range(self.X.shape[1]):
+
+            print(f"Tuning dimension {u}:")
             
-            self.params[u, :] = tune_single_dim(lr=0.1, n_iter=500, x=self.X_new[:, u], y=self.Y_r)
+            self.params[u, :] = tune_single_dim(lr=0.1, n_iter=100, batch_size=1, x=self.X_new[:, u], y=self.Y_r,
+                                                tqdm_mode=self.tqdm_mode)
             
         self.set_equation(reset_init_model=True)
 
@@ -254,7 +283,16 @@ class symbolic_metamodel:
             
             self.metamodel_loss.append(self.loss(self.Y_r[batch_index], curr_func))
             
+            overall_loss = float(self.loss(self.Y_r, self.init_model.predict(self.X_init)))
+            print("Iteration: %d \t--- Loss: %.5f" % (_, overall_loss))
+
             param_grads  = self.get_gradients(self.Y_r[batch_index], curr_func, batch_index)
+
+            # c becoming negative sometimes happens for certain functions (e.g 1/(1+x)**2)
+            if any(isnan(self.params[i, 2]) for i in range(len(self.params))):
+                print("Update would lead to negative value of c, continue with next batch.")
+                continue
+
             self.params  = self.params - learning_rate * param_grads
             
             coef_grads            = [self.loss_grad_coeff(self.Y_r[batch_index], curr_func, self.X_init[batch_index, k]) for k in range(self.X_init.shape[1])]
@@ -269,9 +307,12 @@ class symbolic_metamodel:
         X_modified  = self.feature_expander.fit_transform(X)
         X_modified_ = compose_features(self.params, X_modified)
         Y_pred_r    = self.init_model.predict(X_modified_)
-        Y_pred      = 1 / (1 + np.exp(-1 * Y_pred_r))
-        
-        return Y_pred 
+        Y_pred_r      = self.scaler.inverse_transform(Y_pred_r)
+        if self.mode == "classification":
+            Y_pred      = 1 / (1 + np.exp(-1 * Y_pred_r))
+            return Y_pred
+        else:
+            return Y_pred_r
     
     def symbolic_expression(self):
     
