@@ -144,9 +144,7 @@ if __name__ == "__main__":
             )
             df_scores_symb_meta.to_csv(f"{res_dir}/scores_symb_meta.csv")
 
-        df_expr[function.expression] = {
-            k: v.expression() if isinstance(v, SymbolicMetaExpressionWrapper) else convert_symb(v) for k, v in
-            symbolic_models.items()}
+        df_expr[function.expression] = {k: convert_symb(v, n_decimals=3) for k, v in symbolic_models.items()}
         df_expr.to_csv(f"{res_dir}/functions.csv")
 
         # plot results

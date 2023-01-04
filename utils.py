@@ -54,7 +54,7 @@ def convert_symb(symb, n_decimals: int = None) -> sympy.core.expr:
     if isinstance(symb, SymbolicRegressor):
         symb = str(symb._program)
     elif isinstance(symb, SymbolicMetaModelWrapper):
-        symb = symb.expression()
+        symb = str(symb.expression())
     else:
         raise Exception("Unknown symbolic model")
 
@@ -72,6 +72,10 @@ def convert_symb(symb, n_decimals: int = None) -> sympy.core.expr:
     symb_conv = symb_conv.subs(X0, x)
     if n_decimals:
         symb_conv = symb_conv.evalf(n_decimals)
+        # Make sure also floats deeper in the expression tree are rounded
+        for a in sympy.preorder_traversal(symb_conv):
+            if isinstance(a, sympy.core.numbers.Float):
+                symb_conv = symb_conv.subs(a, round(a, n_decimals))
 
     return symb_conv
 
@@ -139,14 +143,12 @@ def plot_symb(
     for model_name in symbolic_models:
         symbolic_model = symbolic_models[model_name]
 
-        conv = symbolic_model.expression() if isinstance(symbolic_model,
-                                                         SymbolicMetaExpressionWrapper) else convert_symb(
-            symbolic_model, n_decimals=3)
+        conv = convert_symb(symbolic_model, n_decimals=3)
 
-        if len(str(conv)) < 30:
+        if len(str(conv)) < 50:
             label = f"{model_name}: {conv}"
         else:
-            label = f"{model_name}: -"
+            label = f"{model_name}:"
         plt.plot(
             X_test,
             symbolic_model.predict(X_test),
