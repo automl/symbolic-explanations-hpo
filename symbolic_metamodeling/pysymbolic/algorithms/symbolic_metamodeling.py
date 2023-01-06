@@ -352,7 +352,10 @@ class symbolic_metamodel:
             sym_exact  += sympify(str(self.init_model.coef_[v] * re(f_curr.expression())))[0].subs(x, dims_[v])
             sym_approx += sympify(str(self.init_model.coef_[v] * re(f_curr.approx_expression())))[0].subs(x, dims_[v])
         
-        return 1/(1 + exp(-1*sym_exact)), 1/(1 + exp(-1*sym_approx))   
+        if self.mode == "classification":
+            return 1/(1 + exp(-1*sym_exact)), 1/(1 + exp(-1*sym_approx))  
+        else:
+            return sym_exact, sym_approx
     
     
     def get_gradient_expression(self):
