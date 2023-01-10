@@ -36,7 +36,7 @@ def sort(x: np.ndarray, y: np.ndarray) -> [np.ndarray, np.ndarray]:
     return x, y
 
 
-def convert_symb(symb, n_decimals: int = None) -> sympy.core.expr:
+def convert_symb(symb, n_dim: int = None, n_decimals: int = None) -> sympy.core.expr:
     """
     Convert a fitted symbolic regression to a simplified and potentially rounded mathematical expression.
     Warning: eval is used in this function, thus it should not be used on unsanitized input (see
@@ -45,6 +45,7 @@ def convert_symb(symb, n_decimals: int = None) -> sympy.core.expr:
     Parameters
     ----------
     symb: Fitted symbolic regressor to find a simplified expression for.
+    n_dim: Number of input dimensions. If input has only a single dimension, X0 in expression is exchanged by x.
     n_decimals: If set, round floats in the expression to this number of decimals.
 
     Returns
@@ -52,9 +53,9 @@ def convert_symb(symb, n_decimals: int = None) -> sympy.core.expr:
     symb_conv: Converted mathematical expression.
     """
     if isinstance(symb, SymbolicRegressor):
-        symb = str(symb._program)
+        symb_str = str(symb._program)
     elif isinstance(symb, SymbolicMetaModelWrapper):
-        symb = str(symb.expression())
+        symb_str = str(symb.expression())
     else:
         raise Exception("Unknown symbolic model")
 
@@ -67,11 +68,11 @@ def convert_symb(symb, n_decimals: int = None) -> sympy.core.expr:
         "pow": lambda x, y: x**y,
     }
 
-    x, X0 = sympy.symbols("x X0")
-    symb_conv = sympy.simplify(sympy.sympify(symb, locals=converter))
-    symb_conv = symb_conv.subs(X0, x)
+    symb_conv = sympy.simplify(sympy.sympify(symb_str, locals=converter))
+    if n_dim == 1:
+        x, X0 = sympy.symbols("x X0")
+        symb_conv = symb_conv.subs(X0, x)
     if n_decimals:
-        symb_conv = symb_conv.evalf(n_decimals)
         # Make sure also floats deeper in the expression tree are rounded
         for a in sympy.preorder_traversal(symb_conv):
             if isinstance(a, sympy.core.numbers.Float):
@@ -112,7 +113,18 @@ def append_scores(
     return df_scores
 
 
-def plot_symb(
+def write_dict_to_cfg_file(dictionary: dict, target_file_path: str):
+    parser = cfgparse.ConfigParser()
+    section = 'symbolic_regression'
+    parser.add_section(section)
+
+    for key in dictionary.keys():
+        parser.set(section, key, str(dictionary[key]))
+    with open(target_file_path, 'w') as f:
+        parser.write(f)
+
+
+def plot_symb1d(
     X_train_smac,
     y_train_smac,
     X_train_rand,
@@ -124,8 +136,8 @@ def plot_symb(
     plot_dir=None,
 ):
     """
-    Create a plot showing the training points from SMAC and random sampling, as well as the true function and the
-    two functions fitted by symbolic regression.
+    In the 1D setting, create a plot showing the training points from SMAC and random sampling, as well as the true 
+    function and the functions fitted by symbolic models.
     """
     X_train_smac, y_train_smac = sort(X_train_smac, y_train_smac)
     X_train_rand, y_train_rand = sort(X_train_rand, y_train_rand)
@@ -135,26 +147,30 @@ def plot_symb(
     plt.plot(
         X_test,
         y_test,
-        color="C4",
+        color="C0",
         linewidth=3,
         label=f"True: {function.expression}",
     )
 
-    for model_name in symbolic_models:
+    colors = ["C1", "C8", "C6", "C9"]
+    for i, model_name in enumerate(symbolic_models):
         symbolic_model = symbolic_models[model_name]
 
-        conv = convert_symb(symbolic_model, n_decimals=3)
+        conv = convert_symb(symbolic_model, n_dim=1, n_decimals=1)
 
-        if len(str(conv)) < 50:
+        if len(str(conv)) < 70:
             label = f"{model_name}: {conv}"
         else:
-            label = f"{model_name}:"
+            conv = convert_symb(symbolic_model, n_dim=1, n_decimals=1)
+            if len(str(conv)) < 70:
+                label = f"{model_name}: {conv}"
+            else:
+                label = f"{model_name}:"
         plt.plot(
             X_test,
             symbolic_model.predict(X_test),
-            #color="C1",
+            color=colors[i],
             linewidth=2,
-            #linestyle="--",
             label=label
         )
     plt.scatter(
@@ -179,7 +195,7 @@ def plot_symb(
     plt.xlim(X_test.min() - epsilon, X_test.max() + epsilon)
     plt.xlabel("x")
     plt.ylabel("f(x)")
-    leg = plt.legend()
+    leg = plt.legend(framealpha=0.)
     leg.get_frame().set_linewidth(0.0)
     plt.tight_layout()
     if plot_dir:
@@ -190,12 +206,80 @@ def plot_symb(
     return fig
 
 
-def write_dict_to_cfg_file(dictionary: dict, target_file_path: str):
-    parser = cfgparse.ConfigParser()
-    section = 'symbolic_regression'
-    parser.add_section(section)
+def plot_symb2d(
+    X_train_smac,
+    X_train_rand,
+    X_test,
+    y_test,
+    symbolic_models,
+    function,
+    plot_dir=None,
+):
+    """
+    In the 2D setting, create a plot showing the training points from SMAC and random sampling, as well as the true
+    function and the functions fitted by symbolic models evaluated on a 2D grid.
+    """
 
-    for key in dictionary.keys():
-        parser.set(section, key, str(dictionary[key]))
-    with open(target_file_path, 'w') as f:
-        parser.write(f)
+    LABEL_SIZE = 8
+    TITLE_SIZE = 9
+
+    fig, axes = plt.subplots(ncols=len(symbolic_models) + 1, nrows=1)
+
+    ax = plt.subplot(len(symbolic_models) + 1, 1, 1)
+    plt.title(f"True: {function.expression}", fontsize=TITLE_SIZE)
+    plt.pcolormesh(X_test[0], X_test[1], y_test, cmap='Greens', shading='auto')
+    plt.xlabel("X0", fontsize=LABEL_SIZE)
+    plt.ylabel("X1", fontsize=LABEL_SIZE)
+    plt.tick_params(axis='both', which='major', labelsize=LABEL_SIZE)
+    cbar = plt.colorbar()
+    cbar.ax.tick_params(labelsize=LABEL_SIZE)
+    plt.grid(alpha=0)
+
+    for i, model_name in enumerate(symbolic_models):
+        symbolic_model = symbolic_models[model_name]
+
+        conv = convert_symb(symbolic_model, n_decimals=3)
+
+        if len(str(conv)) < 70:
+            label = f"{model_name}: {conv}"
+        else:
+            label = f"{model_name}:"
+        ax = plt.subplot(len(symbolic_models) + 1, 1, i + 2)
+        plt.title(f"{label}", fontsize=TITLE_SIZE)
+        plt.pcolormesh(X_test[0], X_test[1], symbolic_model.predict(X_test.T.reshape(100, 2)).reshape(10,10).T, 
+                       cmap='Greens', shading='auto')
+        plt.xlabel("X0", fontsize=LABEL_SIZE)
+        plt.ylabel("X1", fontsize=LABEL_SIZE)
+        plt.tick_params(axis='both', which='major', labelsize=LABEL_SIZE)
+        cbar = plt.colorbar()
+        cbar.ax.tick_params(labelsize=LABEL_SIZE)
+        plt.grid(alpha=0)
+
+        X_train = None
+        if "smac" in model_name:
+            X_train = X_train_smac
+        elif "rand" in model_name:
+            X_train = X_train_rand
+        if X_train is not None:
+            plt.scatter(
+                X_train[0],
+                X_train[1],
+                color="blue",
+                zorder=2,
+                marker=".",
+                s=5,
+                label="Train points",
+            )
+
+    handles, labels = ax.get_legend_handles_labels()
+    leg = fig.legend(handles, labels, loc='lower right', fontsize=LABEL_SIZE, framealpha=0.)
+    leg.get_frame().set_linewidth(0.0)
+
+    plt.tight_layout()
+    if plot_dir:
+        plt.savefig(f"{plot_dir}/{function.name.lower().replace(' ', '_')}", dpi=800)
+    else:
+        plt.show()
+    plt.close()
+
+    return fig
