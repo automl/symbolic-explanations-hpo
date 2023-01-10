@@ -53,7 +53,7 @@ class SymbolicMetaModelWrapper:
 
     def expression(self):
         exact_expression, approx_expression = self.metamodel.symbolic_expression()
-        return approx_expression
+        return exact_expression
 
 
 class SymbolicMetaExpressionWrapper:
