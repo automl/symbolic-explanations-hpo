@@ -13,16 +13,13 @@ from functions import get_functions1d, get_functions2d
 
 
 if __name__ == "__main__":
-    x_min = 0.01
-    x_max = 1.00
-    n_smac_samples = 10
+    n_smac_samples = 20
     n_test_samples = 100
     n_dim = 2
     symb_reg = True
     symb_meta = False
 
     assert n_dim in (1, 2), f"Currently, n_dim can only be in (1,2), got: {n_dim}."
-    assert not (symb_meta and n_dim == 2), f"Currently, Symbolic Metamodels can only be used with n_dim=1."
 
     functions = get_functions2d() if n_dim == 2 else get_functions1d()
 
@@ -37,9 +34,8 @@ if __name__ == "__main__":
 
     for function in functions:
         # get train samples for SR from SMAC sampling
-        hp_space = {f"x{i}": (x_min, x_max) for i in range(n_dim)} if n_dim > 1 else {"x": (x_min, x_max)}
         samples_smac, _ = run_smac_optimization(
-            hp_space=hp_space,
+            configspace=function.cs,
             function=function,
             n_eval=n_smac_samples,
             run_dir=run_dir,
@@ -53,16 +49,25 @@ if __name__ == "__main__":
         y_train_smac = function.apply(X_train_smac)
 
         # get train samples for SR from random sampling
-        X_train_rand = np.random.uniform(x_min, x_max, size=(n_dim, n_smac_samples))
-        y_train_rand = function.apply(X_train_rand)#.reshape(-1)
+        X_train_rand = function.cs.sample_configuration(size=n_smac_samples)
+        X_train_rand = np.array([list(i.get_dictionary().values()) for i in X_train_rand]).T
+        y_train_rand = function.apply(X_train_rand)
 
         # get test samples for SR
+        parameters = function.cs.get_hyperparameters()
         if n_dim == 2:
-            X_test = np.array(np.meshgrid(np.linspace(x_min, x_max, int(np.sqrt(n_test_samples))),
-                                          np.linspace(x_min, x_max, int(np.sqrt(n_test_samples)))))
+            test_lower, test_upper = [], []
+            for i in range(2):
+                lower = parameters[i].lower
+                upper = parameters[i].upper
+                test_lower.append(lower + 0.5 * (upper - lower) / int(np.sqrt(n_test_samples)))
+                test_upper.append(upper - (0.5 * (upper - lower) / int(np.sqrt(n_test_samples))))
+            X_test = np.array(np.meshgrid(
+                np.linspace(test_lower[0], test_upper[0], int(np.sqrt(n_test_samples))),
+                np.linspace(test_lower[1], test_upper[1], int(np.sqrt(n_test_samples)))))
         else:
-            X_test = np.linspace(x_min, x_max, n_test_samples)
-        y_test = function.apply(X_test)#.reshape(-1)
+            X_test = np.linspace(parameters[0].lower, parameters[0].upper, n_test_samples)
+        y_test = function.apply(X_test)
 
         if n_dim == 1:
             y_train_smac, y_train_rand, y_test = y_train_smac.reshape(-1), y_train_rand.reshape(-1), y_test.reshape(-1)
@@ -176,7 +181,7 @@ if __name__ == "__main__":
                 plot_dir=plot_dir,
             )
         else:
-            plot_symb2d(
+            plot = plot_symb2d(
                 X_train_smac,
                 X_train_rand,
                 X_test,

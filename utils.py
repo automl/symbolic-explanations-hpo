@@ -230,6 +230,13 @@ def plot_symb2d(
     plt.pcolormesh(X_test[0], X_test[1], y_test, cmap='Greens', shading='auto')
     plt.xlabel("X0", fontsize=LABEL_SIZE)
     plt.ylabel("X1", fontsize=LABEL_SIZE)
+    parameters = function.cs.get_hyperparameters()
+    step_x = 1 / 2 * (parameters[0].upper - parameters[0].lower) * (1 - 1 / X_test.shape[2])
+    dim_x = np.arange(np.min(X_test[0]), np.max(X_test[0]) + step_x, step_x)
+    plt.xticks(dim_x)
+    step_y = 1 / 2 * (parameters[1].upper - parameters[1].lower) * (1 - 1 / X_test.shape[1])
+    dim_y = np.arange(np.min(X_test[1]), np.max(X_test[1]) + step_y, step_y)
+    plt.yticks(dim_y)
     plt.tick_params(axis='both', which='major', labelsize=LABEL_SIZE)
     cbar = plt.colorbar()
     cbar.ax.tick_params(labelsize=LABEL_SIZE)
@@ -246,10 +253,20 @@ def plot_symb2d(
             label = f"{model_name}:"
         ax = plt.subplot(len(symbolic_models) + 1, 1, i + 2)
         plt.title(f"{label}", fontsize=TITLE_SIZE)
-        plt.pcolormesh(X_test[0], X_test[1], symbolic_model.predict(X_test.T.reshape(100, 2)).reshape(10,10).T, 
+        plt.pcolormesh(X_test[0], X_test[1],
+                       symbolic_model.predict(
+                           X_test.T.reshape(X_test.shape[1] * X_test.shape[2], X_test.shape[0])).reshape(
+                           X_test.shape[1], X_test.shape[2]).T,
                        cmap='Greens', shading='auto')
         plt.xlabel("X0", fontsize=LABEL_SIZE)
         plt.ylabel("X1", fontsize=LABEL_SIZE)
+        parameters = function.cs.get_hyperparameters()
+        step_x = 1/2 * (parameters[0].upper - parameters[0].lower) * (1 - 1 / X_test.shape[2])
+        dim_x = np.arange(np.min(X_test[0]), np.max(X_test[0]) + step_x, step_x)
+        plt.xticks(dim_x)
+        step_y = 1/2 * (parameters[1].upper - parameters[1].lower) * (1 - 1/X_test.shape[1])
+        dim_y = np.arange(np.min(X_test[1]), np.max(X_test[1]) + step_y, step_y)
+        plt.yticks(dim_y)
         plt.tick_params(axis='both', which='major', labelsize=LABEL_SIZE)
         cbar = plt.colorbar()
         cbar.ax.tick_params(labelsize=LABEL_SIZE)
