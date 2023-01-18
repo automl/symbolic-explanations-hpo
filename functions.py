@@ -4,8 +4,13 @@ from ConfigSpace import ConfigurationSpace, UniformFloatHyperparameter
 
 
 class NamedFunction:
-    def __init__(self, name: str, expression: str, function: Callable,
-                 params: dict[str, tuple[float, float]]):
+    def __init__(
+        self,
+        name: str,
+        expression: str,
+        function: Callable,
+        params: dict[str, tuple[float, float]],
+    ):
         """
         This class serves as a base class for functions. Each callable function is associated with a name
         and a (string) function expression.
@@ -54,19 +59,77 @@ def get_functions1d() -> list[NamedFunction]:
     """
     params = {"x": (0.0, 1.0)}
     functions = [
-        NamedFunction("Quadratic function A", "x**2", lambda x: x ** 2, params),
-        NamedFunction("Quadratic function B", "(x-1/2)**2", lambda x: (x - 0.5) ** 2, params),
-        NamedFunction("Polynom function A", "x**3", lambda x: x ** 3, params),
-        NamedFunction("Polynom function B", "x**4", lambda x: x ** 4, params),
-        NamedFunction("Square root function", "x**(1/2)", lambda x: x ** (1 / 2), params),
-        NamedFunction("Inv square root function", "x**(-1/2)", lambda x: x ** (-1 / 2), params),
-        NamedFunction("Sinosoidal function A", "sin(x)", lambda x: np.sin(x), params),
-        NamedFunction("Sinosoidal function B", "sin(2*x)", lambda x: np.sin(2 * x), params),
-        NamedFunction("Exponential function A", "exp(x)", lambda x: np.exp(x), params),
-        NamedFunction("Exponential function B", "3*exp(x)", lambda x: 3 * np.exp(x), params),
-        NamedFunction("Exponential function C", "exp(-3*x)", lambda x: np.exp(-3 * x), params),
         NamedFunction(
-            "Rational function", "x/(x + 1)**2", lambda x: x / ((x + 1) ** 2), params
+            name="Quadratic function A",
+            expression="x**2",
+            function=lambda x: x**2,
+            params=params,
+        ),
+        NamedFunction(
+            name="Quadratic function B",
+            expression="(x-1/2)**2",
+            function=lambda x: (x - 0.5) ** 2,
+            params=params,
+        ),
+        NamedFunction(
+            name="Polynom function A",
+            expression="x**3",
+            function=lambda x: x**3,
+            params=params,
+        ),
+        NamedFunction(
+            name="Polynom function B",
+            expression="x**4",
+            function=lambda x: x**4,
+            params=params,
+        ),
+        NamedFunction(
+            name="Square root function",
+            expression="x**(1/2)",
+            function=lambda x: x ** (1 / 2),
+            params=params,
+        ),
+        NamedFunction(
+            name="Inv square root function",
+            expression="x**(-1/2)",
+            function=lambda x: x ** (-1 / 2),
+            params=params,
+        ),
+        NamedFunction(
+            "Sinosoidal function A",
+            expression="sin(x)",
+            function=lambda x: np.sin(x),
+            params=params,
+        ),
+        NamedFunction(
+            name="Sinosoidal function B",
+            expression="sin(2*x)",
+            function=lambda x: np.sin(2 * x),
+            params=params,
+        ),
+        NamedFunction(
+            "Exponential function A",
+            expression="exp(x)",
+            function=lambda x: np.exp(x),
+            params=params,
+        ),
+        NamedFunction(
+            name="Exponential function B",
+            expression="3*exp(x)",
+            function=lambda x: 3 * np.exp(x),
+            params=params,
+        ),
+        NamedFunction(
+            name="Exponential function C",
+            expression="exp(-3*x)",
+            function=lambda x: np.exp(-3 * x),
+            params=params,
+        ),
+        NamedFunction(
+            name="Rational function",
+            expression="x/(x + 1)**2",
+            function=lambda x: x / ((x + 1) ** 2),
+            params=params,
         ),
     ]
     return functions
@@ -79,38 +142,48 @@ def get_functions2d() -> list[NamedFunction]:
     Warning: Use unique names to avoid overriding.
     """
     functions = [
-        NamedFunction("Linear 2D", "X0 + 2*X1", lambda x: x[0] + 2 * x[1],
-                      params=({"x0": (-10, 10), "x1": (-5, 5)})
-                      ),
         NamedFunction(
-            "Polynom function 2D", "2*X0 + X1**2", lambda x: 2 * x[0] + x[1]**2,
-            params=({"X0": (-10, 10), "X1": (-5, 5)})
+            name="Linear 2D",
+            expression="X0 + 2*X1",
+            function=lambda x: x[0] + 2 * x[1],
+            params=({"x0": (-10, 10), "x1": (-5, 5)}),
         ),
         NamedFunction(
-            "Exponential function 2D",
-            "2*exp(X0) + exp(3*X1)",
-            lambda x: 2 * np.exp(x[0]) + np.exp(3 * x[1]),
-            params=({"X0": (-10, 10), "X1": (-5, 5)})
+            name="Polynom function 2D",
+            expression="2*X0 + X1**2",
+            function=lambda x: 2 * x[0] + x[1] ** 2,
+            params=({"X0": (-10, 10), "X1": (-5, 5)}),
         ),
         NamedFunction(
-            "Rosenbrock 2D",
-            "100 * (X1 - X0**2)**2.0 + (1 - X0)**2",
-            lambda x: 100.0 * (x[1] - x[0]**2.0)**2.0 + (1 - x[0])**2.0,
-            params=({"X0": (-10, 10), "X1": (-5, 5)})
+            name="Exponential function 2D",
+            expression="2*exp(X0) + exp(3*X1)",
+            function=lambda x: 2 * np.exp(x[0]) + np.exp(3 * x[1]),
+            params=({"X0": (-10, 10), "X1": (-5, 5)}),
         ),
         NamedFunction(
-            "Branin 2D",
-            "X1 - 5.1 / (4 * PI**2) * X0**2 + 5 / PI * X0 - 6)**2 + 10 * (1 - 1 / (8 * PI)) * cos(X0) + 10",
-            lambda x: (x[1] - 5.1 / (4 * np.pi ** 2) * x[0] ** 2 + 5 / np.pi * x[0] - 6) ** 2 + 10 * (
-                        1 - 1 / (8 * np.pi)) * np.cos(x[0]) + 10,
-            params=({"X0": (-5, 10), "X1": (0, 15)})
+            name="Rosenbrock 2D",
+            expression="100 * (X1 - X0**2)**2.0 + (1 - X0)**2",
+            function=lambda x: 100.0 * (x[1] - x[0] ** 2.0) ** 2.0 + (1 - x[0]) ** 2.0,
+            params=({"X0": (-10, 10), "X1": (-5, 5)}),
         ),
         NamedFunction(
-            "Camelback 2D",
-            "(4 - 2.1 * X0**2 + X0**4 / 3) * X0**2 + X0 * X1 + (-4 + 4 * X1**2) * X1**2",
-            lambda x: (4 - 2.1 * x[0]**2 + x[0]**4 / 3) * x[0]**2 + x[0] * x[1] + (-4 + 4 * x[1]**2) * x[1]**2,
-            params=({"X0": (-3, 3), "X1": (-2, 2)})
+            name="Branin 2D",
+            expression="X1 - 5.1 / (4 * PI**2) * X0**2 + 5 / PI * X0 - 6)**2 + 10 * (1 - 1 / (8 * PI)) * cos(X0) + 10",
+            function=lambda x: (
+                x[1] - 5.1 / (4 * np.pi**2) * x[0] ** 2 + 5 / np.pi * x[0] - 6
+            )
+            ** 2
+            + 10 * (1 - 1 / (8 * np.pi)) * np.cos(x[0])
+            + 10,
+            params=({"X0": (-5, 10), "X1": (0, 15)}),
         ),
-
+        NamedFunction(
+            name="Camelback 2D",
+            expression="(4 - 2.1 * X0**2 + X0**4 / 3) * X0**2 + X0 * X1 + (-4 + 4 * X1**2) * X1**2",
+            function=lambda x: (4 - 2.1 * x[0] ** 2 + x[0] ** 4 / 3) * x[0] ** 2
+            + x[0] * x[1]
+            + (-4 + 4 * x[1] ** 2) * x[1] ** 2,
+            params=({"X0": (-3, 3), "X1": (-2, 2)}),
+        ),
     ]
     return functions

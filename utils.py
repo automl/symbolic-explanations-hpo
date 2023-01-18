@@ -4,7 +4,10 @@ import sympy
 import numpy as np
 import matplotlib.pyplot as plt
 from gplearn.genetic import SymbolicRegressor
-from symbolic_metamodeling.symbolic_meta_model_wrapper import SymbolicMetaModelWrapper, SymbolicMetaExpressionWrapper
+from symbolic_metamodeling.symbolic_meta_model_wrapper import (
+    SymbolicMetaModelWrapper,
+    SymbolicMetaExpressionWrapper,
+)
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 import configparser as cfgparse
 
@@ -97,12 +100,20 @@ def append_scores(
     Append scores to Scores Dataframe.
     """
     df_scores[function.expression] = {
-        "mae_train_smac": mean_absolute_error(y_train_smac, symb_smac.predict(X_train_smac)),
-        "mae_train_rand": mean_absolute_error(y_train_rand, symb_rand.predict(X_train_rand)),
+        "mae_train_smac": mean_absolute_error(
+            y_train_smac, symb_smac.predict(X_train_smac)
+        ),
+        "mae_train_rand": mean_absolute_error(
+            y_train_rand, symb_rand.predict(X_train_rand)
+        ),
         "mae_test_smac": mean_absolute_error(y_test, symb_smac.predict(X_test)),
         "mae_test_rand": mean_absolute_error(y_test, symb_rand.predict(X_test)),
-        "mse_train_smac": mean_squared_error(y_train_smac, symb_smac.predict(X_train_smac)),
-        "mse_train_rand": mean_squared_error(y_train_rand, symb_rand.predict(X_train_rand)),
+        "mse_train_smac": mean_squared_error(
+            y_train_smac, symb_smac.predict(X_train_smac)
+        ),
+        "mse_train_rand": mean_squared_error(
+            y_train_rand, symb_rand.predict(X_train_rand)
+        ),
         "mse_test_smac": mean_squared_error(y_test, symb_smac.predict(X_test)),
         "mse_test_rand": mean_squared_error(y_test, symb_rand.predict(X_test)),
         "r2_train_smac": r2_score(y_train_smac, symb_smac.predict(X_train_smac)),
@@ -115,12 +126,12 @@ def append_scores(
 
 def write_dict_to_cfg_file(dictionary: dict, target_file_path: str):
     parser = cfgparse.ConfigParser()
-    section = 'symbolic_regression'
+    section = "symbolic_regression"
     parser.add_section(section)
 
     for key in dictionary.keys():
         parser.set(section, key, str(dictionary[key]))
-    with open(target_file_path, 'w') as f:
+    with open(target_file_path, "w") as f:
         parser.write(f)
 
 
@@ -136,7 +147,7 @@ def plot_symb1d(
     plot_dir=None,
 ):
     """
-    In the 1D setting, create a plot showing the training points from SMAC and random sampling, as well as the true 
+    In the 1D setting, create a plot showing the training points from SMAC and random sampling, as well as the true
     function and the functions fitted by symbolic models.
     """
     X_train_smac, y_train_smac = sort(X_train_smac, y_train_smac)
@@ -171,7 +182,7 @@ def plot_symb1d(
             symbolic_model.predict(X_test),
             color=colors[i],
             linewidth=2,
-            label=label
+            label=label,
         )
     plt.scatter(
         X_train_smac,
@@ -195,7 +206,7 @@ def plot_symb1d(
     plt.xlim(X_test.min() - epsilon, X_test.max() + epsilon)
     plt.xlabel("x")
     plt.ylabel("f(x)")
-    leg = plt.legend(framealpha=0.)
+    leg = plt.legend(framealpha=0.0)
     leg.get_frame().set_linewidth(0.0)
     plt.tight_layout()
     if plot_dir:
@@ -227,17 +238,21 @@ def plot_symb2d(
 
     ax = plt.subplot(len(symbolic_models) + 1, 1, 1)
     plt.title(f"True: {function.expression}", fontsize=TITLE_SIZE)
-    plt.pcolormesh(X_test[0], X_test[1], y_test, cmap='Greens', shading='auto')
+    plt.pcolormesh(X_test[0], X_test[1], y_test, cmap="Greens", shading="auto")
     plt.xlabel("X0", fontsize=LABEL_SIZE)
     plt.ylabel("X1", fontsize=LABEL_SIZE)
     parameters = function.cs.get_hyperparameters()
-    step_x = 1 / 2 * (parameters[0].upper - parameters[0].lower) * (1 - 1 / X_test.shape[2])
+    step_x = (
+        (parameters[0].upper - parameters[0].lower) / X_test.shape[2]
+    )
     dim_x = np.arange(np.min(X_test[0]), np.max(X_test[0]) + step_x, step_x)
     plt.xticks(dim_x)
-    step_y = 1 / 2 * (parameters[1].upper - parameters[1].lower) * (1 - 1 / X_test.shape[1])
+    step_y = (
+        1 / 2 * (parameters[1].upper - parameters[1].lower) * (1 - 1 / X_test.shape[1])
+    )
     dim_y = np.arange(np.min(X_test[1]), np.max(X_test[1]) + step_y, step_y)
     plt.yticks(dim_y)
-    plt.tick_params(axis='both', which='major', labelsize=LABEL_SIZE)
+    plt.tick_params(axis="both", which="major", labelsize=LABEL_SIZE)
     cbar = plt.colorbar()
     cbar.ax.tick_params(labelsize=LABEL_SIZE)
     plt.grid(alpha=0)
@@ -253,21 +268,22 @@ def plot_symb2d(
             label = f"{model_name}:"
         ax = plt.subplot(len(symbolic_models) + 1, 1, i + 2)
         plt.title(f"{label}", fontsize=TITLE_SIZE)
-        plt.pcolormesh(X_test[0], X_test[1],
-                       symbolic_model.predict(
-                           X_test.T.reshape(X_test.shape[1] * X_test.shape[2], X_test.shape[0])).reshape(
-                           X_test.shape[1], X_test.shape[2]).T,
-                       cmap='Greens', shading='auto')
+        plt.pcolormesh(
+            X_test[0],
+            X_test[1],
+            symbolic_model.predict(
+                X_test.T.reshape(X_test.shape[1] * X_test.shape[2], X_test.shape[0])
+            )
+            .reshape(X_test.shape[1], X_test.shape[2])
+            .T,
+            cmap="Greens",
+            shading="auto",
+        )
         plt.xlabel("X0", fontsize=LABEL_SIZE)
         plt.ylabel("X1", fontsize=LABEL_SIZE)
-        parameters = function.cs.get_hyperparameters()
-        step_x = 1/2 * (parameters[0].upper - parameters[0].lower) * (1 - 1 / X_test.shape[2])
-        dim_x = np.arange(np.min(X_test[0]), np.max(X_test[0]) + step_x, step_x)
         plt.xticks(dim_x)
-        step_y = 1/2 * (parameters[1].upper - parameters[1].lower) * (1 - 1/X_test.shape[1])
-        dim_y = np.arange(np.min(X_test[1]), np.max(X_test[1]) + step_y, step_y)
         plt.yticks(dim_y)
-        plt.tick_params(axis='both', which='major', labelsize=LABEL_SIZE)
+        plt.tick_params(axis="both", which="major", labelsize=LABEL_SIZE)
         cbar = plt.colorbar()
         cbar.ax.tick_params(labelsize=LABEL_SIZE)
         plt.grid(alpha=0)
@@ -289,7 +305,9 @@ def plot_symb2d(
             )
 
     handles, labels = ax.get_legend_handles_labels()
-    leg = fig.legend(handles, labels, loc='lower right', fontsize=LABEL_SIZE, framealpha=0.)
+    leg = fig.legend(
+        handles, labels, loc="lower right", fontsize=LABEL_SIZE, framealpha=0.0
+    )
     leg.get_frame().set_linewidth(0.0)
 
     plt.tight_layout()

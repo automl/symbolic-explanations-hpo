@@ -3,11 +3,23 @@ from os import path
 import numpy as np
 import pandas as pd
 from gplearn.genetic import SymbolicRegressor
-from symbolic_metamodeling.symbolic_meta_model_wrapper import SymbolicMetaModelWrapper, SymbolicMetaExpressionWrapper
-from symbolic_metamodeling.pysymbolic.algorithms.symbolic_expressions import get_symbolic_model
+from symbolic_metamodeling.symbolic_meta_model_wrapper import (
+    SymbolicMetaModelWrapper,
+    SymbolicMetaExpressionWrapper,
+)
+from symbolic_metamodeling.pysymbolic.algorithms.symbolic_expressions import (
+    get_symbolic_model,
+)
 from gplearn.functions import make_function
 
-from utils import get_output_dirs, convert_symb, append_scores, plot_symb1d, plot_symb2d, write_dict_to_cfg_file
+from utils import (
+    get_output_dirs,
+    convert_symb,
+    append_scores,
+    plot_symb1d,
+    plot_symb2d,
+    write_dict_to_cfg_file,
+)
 from smac_utils import run_smac_optimization
 from functions import get_functions1d, get_functions2d
 
@@ -50,7 +62,9 @@ if __name__ == "__main__":
 
         # get train samples for SR from random sampling
         X_train_rand = function.cs.sample_configuration(size=n_smac_samples)
-        X_train_rand = np.array([list(i.get_dictionary().values()) for i in X_train_rand]).T
+        X_train_rand = np.array(
+            [list(i.get_dictionary().values()) for i in X_train_rand]
+        ).T
         y_train_rand = function.apply(X_train_rand)
 
         # get test samples for SR
@@ -60,21 +74,38 @@ if __name__ == "__main__":
             for i in range(2):
                 lower = parameters[i].lower
                 upper = parameters[i].upper
-                test_lower.append(lower + 0.5 * (upper - lower) / int(np.sqrt(n_test_samples)))
-                test_upper.append(upper - (0.5 * (upper - lower) / int(np.sqrt(n_test_samples))))
-            X_test = np.array(np.meshgrid(
-                np.linspace(test_lower[0], test_upper[0], int(np.sqrt(n_test_samples))),
-                np.linspace(test_lower[1], test_upper[1], int(np.sqrt(n_test_samples)))))
+                test_lower.append(
+                    lower + 0.5 * (upper - lower) / int(np.sqrt(n_test_samples))
+                )
+                test_upper.append(
+                    upper - (0.5 * (upper - lower) / int(np.sqrt(n_test_samples)))
+                )
+            X_test = np.array(
+                np.meshgrid(
+                    np.linspace(
+                        test_lower[0], test_upper[0], int(np.sqrt(n_test_samples))
+                    ),
+                    np.linspace(
+                        test_lower[1], test_upper[1], int(np.sqrt(n_test_samples))
+                    ),
+                )
+            )
         else:
-            X_test = np.linspace(parameters[0].lower, parameters[0].upper, n_test_samples)
+            X_test = np.linspace(
+                parameters[0].lower, parameters[0].upper, n_test_samples
+            )
         y_test = function.apply(X_test)
 
         if n_dim == 1:
-            y_train_smac, y_train_rand, y_test = y_train_smac.reshape(-1), y_train_rand.reshape(-1), y_test.reshape(-1)
+            y_train_smac, y_train_rand, y_test = (
+                y_train_smac.reshape(-1),
+                y_train_rand.reshape(-1),
+                y_test.reshape(-1),
+            )
 
         # Create a safe exp function which does not cause problems
         def exp(x):
-            with np.errstate(all='ignore'):
+            with np.errstate(all="ignore"):
                 # TODO: We maybe want to set a larger upper limit
                 max_value = np.full(shape=x.shape, fill_value=100000)
                 return np.minimum(np.exp(x), max_value)
@@ -84,7 +115,17 @@ if __name__ == "__main__":
         if symb_reg:
             # SR settings
             exp_func = make_function(function=exp, arity=1, name="exp")
-            function_set = ["add", "sub", "mul", "div", "sqrt", "log", "sin", "cos", exp_func]
+            function_set = [
+                "add",
+                "sub",
+                "mul",
+                "div",
+                "sqrt",
+                "log",
+                "sin",
+                "cos",
+                exp_func,
+            ]
             # TODO: log symb regression logs?
             symb_params = dict(
                 population_size=1000,
@@ -99,10 +140,13 @@ if __name__ == "__main__":
                 function_set=function_set,
                 metric="mean absolute error",
                 random_state=0,
-                verbose=0
+                verbose=0,
             )
 
-            write_dict_to_cfg_file(dictionary=symb_params, target_file_path=path.join(run_dir, 'symbolic_regression_params.cfg'))
+            write_dict_to_cfg_file(
+                dictionary=symb_params,
+                target_file_path=path.join(run_dir, "symbolic_regression_params.cfg"),
+            )
 
             # run SR on SMAC samples
             symb_smac = SymbolicRegressor(**symb_params)
@@ -135,15 +179,15 @@ if __name__ == "__main__":
             symb_meta_smac = SymbolicMetaModelWrapper()
             symb_meta_smac.fit(X_train_smac.T, y_train_smac)
             # or run symbolic metaexpressions on SMAC samples
-            #symb_meta_smac, _ = get_symbolic_model(function.apply, X_train_smac)
-            #symb_meta_smac = SymbolicMetaExpressionWrapper(symb_meta_smac)
+            # symb_meta_smac, _ = get_symbolic_model(function.apply, X_train_smac)
+            # symb_meta_smac = SymbolicMetaExpressionWrapper(symb_meta_smac)
 
             # run symbolic metamodels on random samples
             symb_meta_rand = SymbolicMetaModelWrapper()
             symb_meta_rand.fit(X_train_rand.T, y_train_rand)
             # or run symbolic metaexpressions on SMAC samples
-            #symb_meta_rand, _ = get_symbolic_model(function.apply, X_train_rand)
-            #symb_meta_rand = SymbolicMetaExpressionWrapper(symb_meta_rand)
+            # symb_meta_rand, _ = get_symbolic_model(function.apply, X_train_rand)
+            # symb_meta_rand = SymbolicMetaExpressionWrapper(symb_meta_rand)
 
             symbolic_models["Meta-smac"] = symb_meta_smac
             symbolic_models["Meta-rand"] = symb_meta_rand
@@ -163,8 +207,10 @@ if __name__ == "__main__":
             )
             df_scores_symb_meta.to_csv(f"{res_dir}/scores_symb_meta.csv")
 
-        df_expr[function.expression] = {k: convert_symb(v, n_dim=n_dim, n_decimals=3) for k, v in
-                                        symbolic_models.items()}
+        df_expr[function.expression] = {
+            k: convert_symb(v, n_dim=n_dim, n_decimals=3)
+            for k, v in symbolic_models.items()
+        }
         df_expr.to_csv(f"{res_dir}/functions.csv")
 
         # plot results
