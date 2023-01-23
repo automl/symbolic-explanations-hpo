@@ -4,9 +4,9 @@ import sympy
 import numpy as np
 import matplotlib.pyplot as plt
 from gplearn.genetic import SymbolicRegressor
-from symbolic_metamodeling.symbolic_meta_model_wrapper import (
+from symbolic_meta_model_wrapper import (
     SymbolicMetaModelWrapper,
-    SymbolicMetaExpressionWrapper,
+    SymbolicPursuitModelWrapper,
 )
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 import configparser as cfgparse
@@ -57,7 +57,7 @@ def convert_symb(symb, n_dim: int = None, n_decimals: int = None) -> sympy.core.
     """
     if isinstance(symb, SymbolicRegressor):
         symb_str = str(symb._program)
-    elif isinstance(symb, SymbolicMetaModelWrapper):
+    elif isinstance(symb, SymbolicMetaModelWrapper) or isinstance(symb, SymbolicPursuitModelWrapper):
         symb_str = str(symb.expression())
     else:
         raise Exception("Unknown symbolic model")
@@ -71,10 +71,16 @@ def convert_symb(symb, n_dim: int = None, n_decimals: int = None) -> sympy.core.
         "pow": lambda x, y: x**y,
     }
 
-    symb_conv = sympy.simplify(sympy.sympify(symb_str, locals=converter))
+    symb_conv = sympy.simplify(sympy.sympify(symb_str.replace("[", "").replace("]", ""), locals=converter))
     if n_dim == 1:
         x, X0 = sympy.symbols("x X0")
         symb_conv = symb_conv.subs(X0, x)
+    if isinstance(symb, SymbolicPursuitModelWrapper):
+        proj = symb.metamodel.get_projections()
+        for i, p in enumerate(proj):
+            for a in sympy.preorder_traversal(symb_conv):
+                if isinstance(a, sympy.core.Symbol) and str(a) == f"P{i+1}":
+                    symb_conv = symb_conv.subs(a, p)
     if n_decimals:
         # Make sure also floats deeper in the expression tree are rounded
         for a in sympy.preorder_traversal(symb_conv):

@@ -3,8 +3,13 @@ import numpy as np
 from scipy.optimize import minimize
 from sympy import Symbol, sympify
 
-import symbolic_pursuit.logger as log
+# Adapted logger
+#import symbolic_pursuit.logger as log
+import logging
+
 from symbolic_pursuit.pysymbolic.models.special_functions import MeijerG
+
+log = logging.getLogger(__name__)
 
 # Hyperparameters related functions:
 
@@ -127,10 +132,18 @@ class SymbolicRegressor:
             index_list.pop(exclusion_id)
         for k in index_list:
             meijer_g, v, w = self.terms_list[k]
-            result = result + w * meijer_g.evaluate(
-                self._get_nonlin()(np.matmul(X, v))
-                / (np.sqrt(self.dim_x) * np.linalg.norm(v))
-            )
+            if self.dim_x > 1:
+                result = result + w * meijer_g.evaluate(
+                    self._get_nonlin()(np.matmul(X, v))
+                    / (np.sqrt(self.dim_x) * np.linalg.norm(v))
+                )
+            else:
+                # Allow for problems with one dimension only
+                result = result + w * meijer_g.evaluate(
+                    self._get_nonlin()(X * v)
+                    / (np.sqrt(self.dim_x) * np.linalg.norm(v))
+                ).reshape(X.shape[0], )
+
         return result
 
     def get_expression(self):
@@ -149,8 +162,12 @@ class SymbolicRegressor:
         for k in range(len(self.terms_list)):
             _, vk, _ = self.terms_list[k]
             symbol_k = 0
-            for j in range(self.dim_x):
-                symbol_k += vk[j] * Symbol("X" + str(j + 1))
+            if self.dim_x > 1:
+                for j in range(self.dim_x):
+                    symbol_k += vk[j] * Symbol("X" + str(j))
+            else:
+                # For problems with one dimension only
+                symbol_k += vk * Symbol("X")
             proj_list.append(symbol_k)
         return proj_list
 
@@ -231,8 +248,29 @@ class SymbolicRegressor:
                     np.matmul(X, v_) / (np.sqrt(self.dim_x) * np.linalg.norm(v_))
                 )
             )
-
-            loss_ = np.mean((Y - residual_list) ** 2)
+            use_lasso = False
+            if use_lasso:
+                labmda = 100.
+                m, n, p, q = g_order
+                min_terms_p = min(p, q - m)
+                min_terms_q = min(q, p - n)
+                a_p_ = theta_g[0: g_order[2]]
+                b_q_ = theta_g[g_order[2]:][: g_order[3]]
+                sum_p, sum_q = 0, 0
+                alpha = a_p_[0: n]
+                delta = a_p_[n:]
+                beta = b_q_[0: m]
+                gamma = b_q_[m:]
+                for i in range(min_terms_p):
+                    sum_p += np.abs(alpha[i] - delta[i])
+                for i in range(min_terms_q):
+                    sum_q += np.abs(beta[i] - gamma[i])
+                lasso_term_p = labmda / min_terms_p * sum_p if min_terms_p != 0 else 0
+                lasso_term_q = labmda / min_terms_q * sum_q if min_terms_p != 0 else 0
+                lasso_term = lasso_term_p + lasso_term_q
+                loss_ = np.mean((Y - residual_list) ** 2) + lasso_term
+            else:
+                loss_ = np.mean((Y - residual_list) ** 2)
             return loss_
 
         new_theta, new_loss = self.optimize_CG(loss, theta_0)
@@ -278,12 +316,13 @@ class SymbolicRegressor:
                 )
                 new_loss_list.append(new_loss)
                 new_terms_list.append([new_meijer_g, new_v, new_w])
-                if new_loss < loss_tol:
-                    log.info(100 * "=")
-                    log.info(
-                        "The algorithm stopped because the desired precision was achieved."
-                    )
-                    break
+                #if new_loss < loss_tol:
+                #    log.info(100 * "=")
+                #    log.info(
+                #        "The algorithm stopped because the desired precision was achieved."
+                #    )
+                #    break
+                print(f"Current expression: {new_meijer_g.expression()}")
             best_index = np.argmin(np.array(new_loss_list))
             best_term = new_terms_list[int(best_index)]
             best_loss = new_loss_list[int(best_index)]
@@ -332,7 +371,11 @@ class SymbolicRegressor:
             )
             meijer_g0, v0, w0 = self.terms_list[k]
             theta_meijer0 = meijer_g0.theta[:-1]
-            theta0 = np.concatenate((theta_meijer0, v0, [w0]))
+            # Allow for problems with one dimension only
+            if v0.shape == ():
+                theta0 = np.concatenate((theta_meijer0, v0.reshape(1, ), [w0])) 
+            else:
+                theta0 = np.concatenate((theta_meijer0, v0, [w0]))
             g_order = meijer_g0.order
             new_meijerg, new_v, new_w, new_loss = self.tune_new_term(X, g_order, theta0)
             if new_loss < self.loss_list[-1]:

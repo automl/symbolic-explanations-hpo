@@ -3,12 +3,8 @@ from os import path
 import numpy as np
 import pandas as pd
 from gplearn.genetic import SymbolicRegressor
-from symbolic_metamodeling.symbolic_meta_model_wrapper import (
-    SymbolicMetaModelWrapper,
-    SymbolicMetaExpressionWrapper,
-)
-from symbolic_metamodeling.pysymbolic.algorithms.symbolic_expressions import (
-    get_symbolic_model,
+from symbolic_meta_model_wrapper import (
+    SymbolicMetaModelWrapper, SymbolicPursuitModelWrapper
 )
 from gplearn.functions import make_function
 
@@ -25,13 +21,17 @@ from functions import get_functions1d, get_functions2d
 
 
 if __name__ == "__main__":
+    seed = 42
     n_smac_samples = 20
     n_test_samples = 100
-    n_dim = 2
+    n_dim = 1
     symb_reg = True
     symb_meta = False
+    symb_purs = True
 
     assert n_dim in (1, 2), f"Currently, n_dim can only be in (1,2), got: {n_dim}."
+
+    np.random.seed(seed)
 
     functions = get_functions2d() if n_dim == 2 else get_functions1d()
 
@@ -42,6 +42,7 @@ if __name__ == "__main__":
 
     df_scores_symb_reg = pd.DataFrame() if symb_reg else None
     df_scores_symb_meta = pd.DataFrame() if symb_meta else None
+    df_scores_symb_purs = pd.DataFrame() if symb_purs else None
     df_expr = pd.DataFrame()
 
     for function in functions:
@@ -51,6 +52,7 @@ if __name__ == "__main__":
             function=function,
             n_eval=n_smac_samples,
             run_dir=run_dir,
+            seed=seed
         )
 
         logger.info(
@@ -206,6 +208,33 @@ if __name__ == "__main__":
                 y_test.reshape(n_test_samples),
             )
             df_scores_symb_meta.to_csv(f"{res_dir}/scores_symb_meta.csv")
+
+        if symb_purs:
+            # run symbolic pursuit models on SMAC samples
+            symb_purs_smac = SymbolicPursuitModelWrapper()
+            symb_purs_smac.fit(X_train_smac.T, y_train_smac)
+
+            # run symbolic pursuit models on random samples
+            symb_purs_rand = SymbolicPursuitModelWrapper()
+            symb_purs_rand.fit(X_train_rand.T, y_train_rand)
+
+            symbolic_models["Pursuit-smac"] = symb_purs_smac
+            symbolic_models["Pursuit-rand"] = symb_purs_rand
+
+            # write results to csv files
+            df_scores_symb_purs = append_scores(
+                df_scores_symb_purs,
+                function,
+                symb_purs_smac,
+                symb_purs_rand,
+                X_train_smac.T,
+                y_train_smac,
+                X_train_rand.T,
+                y_train_rand,
+                X_test.reshape(n_dim, n_test_samples).T,
+                y_test.reshape(n_test_samples),
+            )
+            df_scores_symb_purs.to_csv(f"{res_dir}/scores_symb_purs.csv")
 
         df_expr[function.expression] = {
             k: convert_symb(v, n_dim=n_dim, n_decimals=3)
