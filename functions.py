@@ -57,7 +57,7 @@ def get_functions1d() -> list[NamedFunction]:
     To evaluate on more 1D functions, add additional functions here.
     Warning: Use unique names to avoid overriding.
     """
-    params = {"x": (0.0, 1.0)}
+    params = {"x": (0.01, 1.0)}
     functions = [
         NamedFunction(
             name="Quadratic function A",
@@ -158,7 +158,7 @@ def get_functions2d() -> list[NamedFunction]:
             name="Exponential function 2D",
             expression="2*exp(X0) + exp(3*X1)",
             function=lambda x: 2 * np.exp(x[0]) + np.exp(3 * x[1]),
-            params=({"X0": (-10, 10), "X1": (-5, 5)}),
+            params=({"X0": (-2, 2), "X1": (-2, 2)}),
         ),
         NamedFunction(
             name="Rosenbrock 2D",

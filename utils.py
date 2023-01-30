@@ -92,7 +92,7 @@ def convert_symb(symb, n_dim: int = None, n_decimals: int = None) -> sympy.core.
 
 def append_scores(
     df_scores,
-    function,
+    col_name,
     symb_smac,
     symb_rand,
     X_train_smac,
@@ -105,7 +105,7 @@ def append_scores(
     """
     Append scores to Scores Dataframe.
     """
-    df_scores[function.expression] = {
+    df_scores[col_name] = {
         "mae_train_smac": mean_absolute_error(
             y_train_smac, symb_smac.predict(X_train_smac)
         ),
@@ -148,8 +148,13 @@ def plot_symb1d(
     y_train_rand,
     X_test,
     y_test,
+    xlabel,
+    ylabel,
     symbolic_models,
-    function,
+    function_name,
+    xmin=None,
+    xmax=None,
+    function_expression=None,
     plot_dir=None,
 ):
     """
@@ -160,20 +165,33 @@ def plot_symb1d(
     X_train_rand, y_train_rand = sort(X_train_rand, y_train_rand)
     X_test, y_test = sort(X_test, y_test)
     fig = plt.figure(figsize=(8, 5))
-    plt.title(f"{function.expression}")
-    plt.plot(
-        X_test,
-        y_test,
-        color="C0",
-        linewidth=3,
-        label=f"True: {function.expression}",
-    )
-
+    if function_expression:
+        plt.title(f"{function_expression}")
+    else:
+        plt.title(f"{function_name}")
+    if function_expression:
+        plt.plot(
+            X_test,
+            y_test,
+            color="C0",
+            linewidth=3,
+            label=f"True: {function_expression}",
+        )
+    else:
+        plt.scatter(
+            X_test,
+            y_test,
+            color="C0",
+            zorder=3,
+            marker="+",
+            s=20,
+            label=f"Test",
+        )
     colors = ["C1", "C8", "C6", "C9"]
     for i, model_name in enumerate(symbolic_models):
         symbolic_model = symbolic_models[model_name]
 
-        conv = convert_symb(symbolic_model, n_dim=1, n_decimals=1)
+        conv = convert_symb(symbolic_model, n_dim=1, n_decimals=3)
 
         if len(str(conv)) < 70:
             label = f"{model_name}: {conv}"
@@ -208,15 +226,17 @@ def plot_symb1d(
         s=40,
         label="Train points (random)",
     )
-    epsilon = (X_test.max() - X_test.min()) / 100
-    plt.xlim(X_test.min() - epsilon, X_test.max() + epsilon)
-    plt.xlabel("x")
-    plt.ylabel("f(x)")
+    xmax = xmax if xmax else X_test.max()
+    xmin = xmin if xmin else X_test.min()
+    epsilon = (xmax - xmin) / 100
+    plt.xlim(xmin - epsilon, xmax + epsilon)
+    plt.xlabel(xlabel)
+    plt.ylabel(ylabel)
     leg = plt.legend(framealpha=0.0)
     leg.get_frame().set_linewidth(0.0)
     plt.tight_layout()
     if plot_dir:
-        plt.savefig(f"{plot_dir}/{function.name.lower().replace(' ', '_')}", dpi=800)
+        plt.savefig(f"{plot_dir}/{function_name}", dpi=800)
     else:
         plt.show()
     plt.close()
@@ -229,7 +249,9 @@ def plot_symb2d(
     X_test,
     y_test,
     symbolic_models,
-    function,
+    parameters,
+    function_name,
+    function_expression=None,
     plot_dir=None,
 ):
     """
@@ -243,20 +265,33 @@ def plot_symb2d(
     fig, axes = plt.subplots(ncols=len(symbolic_models) + 1, nrows=1)
 
     ax = plt.subplot(len(symbolic_models) + 1, 1, 1)
-    plt.title(f"True: {function.expression}", fontsize=TITLE_SIZE)
-    plt.pcolormesh(X_test[0], X_test[1], y_test, cmap="Greens", shading="auto")
-    plt.xlabel("X0", fontsize=LABEL_SIZE)
-    plt.ylabel("X1", fontsize=LABEL_SIZE)
-    parameters = function.cs.get_hyperparameters()
-    step_x = (
-        (parameters[0].upper - parameters[0].lower) / X_test.shape[2]
-    )
+    if function_expression:
+        plt.title(f"{function_expression}", fontsize=TITLE_SIZE)
+    else:
+        plt.title(f"{function_name}", fontsize=TITLE_SIZE)
+    plt.pcolormesh(X_test[0], X_test[1], y_test, cmap="Spectral", shading="auto")
+    if parameters:
+        X0_name = f"X0: log({parameters[0].name})" if parameters[0].log else f"X0: {parameters[0].name}"
+        X1_name = f"X1: log({parameters[1].name})" if parameters[1].log else f"X0: {parameters[1].name}"
+    else:
+        X0_name = "X0"
+        X1_name = "X1"
+    plt.xlabel(X0_name, fontsize=LABEL_SIZE)
+    plt.ylabel(X1_name, fontsize=LABEL_SIZE)
+    if parameters and parameters[0].log:
+        step_x = (
+                (np.log(parameters[0].upper) - np.log(parameters[0].lower)) / X_test.shape[2]
+        )
+    else:
+        step_x = (
+            (parameters[0].upper - parameters[0].lower) / X_test.shape[2]
+        )
     dim_x = np.arange(np.min(X_test[0]), np.max(X_test[0]) + step_x, step_x)
     plt.xticks(dim_x)
     step_y = (
-        1 / 2 * (parameters[1].upper - parameters[1].lower) * (1 - 1 / X_test.shape[1])
+        1 / 2 * (np.max(X_test[1]) - np.min(X_test[1]))
     )
-    dim_y = np.arange(np.min(X_test[1]), np.max(X_test[1]) + step_y, step_y)
+    dim_y = np.arange(np.min(X_test[1]), np.max(X_test[1]) + step_y/2, step_y)
     plt.yticks(dim_y)
     plt.tick_params(axis="both", which="major", labelsize=LABEL_SIZE)
     cbar = plt.colorbar()
@@ -282,11 +317,11 @@ def plot_symb2d(
             )
             .reshape(X_test.shape[1], X_test.shape[2])
             .T,
-            cmap="Greens",
+            cmap="Spectral",
             shading="auto",
         )
-        plt.xlabel("X0", fontsize=LABEL_SIZE)
-        plt.ylabel("X1", fontsize=LABEL_SIZE)
+        plt.xlabel(X0_name, fontsize=LABEL_SIZE)
+        plt.ylabel(X1_name, fontsize=LABEL_SIZE)
         plt.xticks(dim_x)
         plt.yticks(dim_y)
         plt.tick_params(axis="both", which="major", labelsize=LABEL_SIZE)
@@ -303,10 +338,10 @@ def plot_symb2d(
             plt.scatter(
                 X_train[0],
                 X_train[1],
-                color="blue",
+                color="midnightblue",
                 zorder=2,
                 marker=".",
-                s=5,
+                s=8,
                 label="Train points",
             )
 
@@ -318,7 +353,7 @@ def plot_symb2d(
 
     plt.tight_layout()
     if plot_dir:
-        plt.savefig(f"{plot_dir}/{function.name.lower().replace(' ', '_')}", dpi=800)
+        plt.savefig(f"{plot_dir}/{function_name}", dpi=800)
     else:
         plt.show()
     plt.close()

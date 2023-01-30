@@ -6,7 +6,6 @@ from gplearn.genetic import SymbolicRegressor
 from symbolic_meta_model_wrapper import (
     SymbolicMetaModelWrapper, SymbolicPursuitModelWrapper
 )
-from gplearn.functions import make_function
 
 from utils import (
     get_output_dirs,
@@ -18,16 +17,17 @@ from utils import (
 )
 from smac_utils import run_smac_optimization
 from functions import get_functions1d, get_functions2d
+from symb_reg_utils import get_function_set
 
 
 if __name__ == "__main__":
     seed = 42
     n_smac_samples = 20
     n_test_samples = 100
-    n_dim = 1
+    n_dim = 2
     symb_reg = True
     symb_meta = False
-    symb_purs = True
+    symb_purs = False
 
     assert n_dim in (1, 2), f"Currently, n_dim can only be in (1,2), got: {n_dim}."
 
@@ -46,17 +46,16 @@ if __name__ == "__main__":
     df_expr = pd.DataFrame()
 
     for function in functions:
+        logger.info(f"Run SMAC for: {function.name}: {function.expression}")
+
         # get train samples for SR from SMAC sampling
         samples_smac, _ = run_smac_optimization(
             configspace=function.cs,
-            function=function,
+            target_function=function.smac_apply,
+            function_name=function.name.lower().replace(' ', '_'),
             n_eval=n_smac_samples,
             run_dir=run_dir,
             seed=seed
-        )
-
-        logger.info(
-            f"Fit Symbolic Regression for: {function.name}: {function.expression}"
         )
 
         X_train_smac = samples_smac
@@ -105,6 +104,10 @@ if __name__ == "__main__":
                 y_test.reshape(-1),
             )
 
+        logger.info(
+            f"Fit Symbolic Models for: {function.name}: {function.expression}"
+        )
+
         # Create a safe exp function which does not cause problems
         def exp(x):
             with np.errstate(all="ignore"):
@@ -115,23 +118,10 @@ if __name__ == "__main__":
         symbolic_models = {}
 
         if symb_reg:
-            # SR settings
-            exp_func = make_function(function=exp, arity=1, name="exp")
-            function_set = [
-                "add",
-                "sub",
-                "mul",
-                "div",
-                "sqrt",
-                "log",
-                "sin",
-                "cos",
-                exp_func,
-            ]
             # TODO: log symb regression logs?
             symb_params = dict(
-                population_size=1000,
-                generations=50,
+                population_size=5000,
+                generations=100,
                 stopping_criteria=0.001,
                 p_crossover=0.7,
                 p_subtree_mutation=0.1,
@@ -139,7 +129,7 @@ if __name__ == "__main__":
                 p_point_mutation=0.1,
                 max_samples=0.9,
                 parsimony_coefficient=0.01,
-                function_set=function_set,
+                function_set=get_function_set(),
                 metric="mean absolute error",
                 random_state=0,
                 verbose=0,
@@ -164,7 +154,7 @@ if __name__ == "__main__":
             # write results to csv files
             df_scores_symb_reg = append_scores(
                 df_scores_symb_reg,
-                function,
+                function.expression,
                 symb_smac,
                 symb_rand,
                 X_train_smac.T,
@@ -197,7 +187,7 @@ if __name__ == "__main__":
             # write results to csv files
             df_scores_symb_meta = append_scores(
                 df_scores_symb_meta,
-                function,
+                function.expression,
                 symb_meta_smac,
                 symb_meta_rand,
                 X_train_smac.T,
@@ -210,12 +200,27 @@ if __name__ == "__main__":
             df_scores_symb_meta.to_csv(f"{res_dir}/scores_symb_meta.csv")
 
         if symb_purs:
+            purs_params = dict(
+                loss_tol=1.0e-3,
+                ratio_tol=0.9,
+                patience=10,
+                maxiter=20,
+                eps=1.0e-5,
+                random_seed=42,
+                task_type="regression",
+            )
+
+            write_dict_to_cfg_file(
+                dictionary=purs_params,
+                target_file_path=path.join(run_dir, "symbolic_pursuit_params.cfg"),
+            )
+
             # run symbolic pursuit models on SMAC samples
-            symb_purs_smac = SymbolicPursuitModelWrapper()
+            symb_purs_smac = SymbolicPursuitModelWrapper(**purs_params)
             symb_purs_smac.fit(X_train_smac.T, y_train_smac)
 
             # run symbolic pursuit models on random samples
-            symb_purs_rand = SymbolicPursuitModelWrapper()
+            symb_purs_rand = SymbolicPursuitModelWrapper(**purs_params)
             symb_purs_rand.fit(X_train_rand.T, y_train_rand)
 
             symbolic_models["Pursuit-smac"] = symb_purs_smac
@@ -224,7 +229,7 @@ if __name__ == "__main__":
             # write results to csv files
             df_scores_symb_purs = append_scores(
                 df_scores_symb_purs,
-                function,
+                function.expression,
                 symb_purs_smac,
                 symb_purs_rand,
                 X_train_smac.T,
@@ -245,23 +250,28 @@ if __name__ == "__main__":
         # plot results
         if n_dim == 1:
             plot = plot_symb1d(
-                X_train_smac.T,
-                y_train_smac,
-                X_train_rand.T,
-                y_train_rand,
-                X_test,
-                y_test,
-                symbolic_models,
-                function,
+                X_train_smac=X_train_smac.T,
+                y_train_smac=y_train_smac,
+                X_train_rand=X_train_rand.T,
+                y_train_rand=y_train_rand,
+                X_test=X_test,
+                y_test=y_test,
+                xlabel="x",
+                ylabel="f(x)",
+                symbolic_models=symbolic_models,
+                function_name=function.name.lower().replace(' ', '_'),
+                function_expression=function.expression,
                 plot_dir=plot_dir,
             )
         else:
             plot = plot_symb2d(
-                X_train_smac,
-                X_train_rand,
-                X_test,
-                y_test,
-                symbolic_models,
-                function,
+                X_train_smac=X_train_smac,
+                X_train_rand=X_train_rand,
+                X_test=X_test,
+                y_test=y_test,
+                symbolic_models=symbolic_models,
+                parameters=function.cs.get_hyperparameters(),
+                function_name=function.name.lower().replace(' ', '_'),
+                function_expression=function.expression,
                 plot_dir=plot_dir,
             )

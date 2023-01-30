@@ -54,12 +54,12 @@ class SymbolicRegressor:
         self,
         loss_tol=1.0e-3,
         ratio_tol=0.9,
-        maxiter=100,
+        patience: int = 10,
+        maxiter=20,
         eps=1.0e-5,
         random_seed=42,
-        baselines=list(load_h().keys()),
         task_type="regression",
-        patience: int = 10,
+        baselines=list(load_h().keys()),
     ):
         self.terms_list = []  # List of all the terms in the model
         self.loss_list = []  # List of residual losses associated to each term
