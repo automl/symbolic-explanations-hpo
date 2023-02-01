@@ -2,11 +2,14 @@ import logging
 import numpy as np
 from pathlib import Path
 from ConfigSpace import ConfigurationSpace
-from smac import BlackBoxFacade, Scenario
+from typing import Type
+from smac import Scenario
+from smac.facade import AbstractFacade
 
 
 def run_smac_optimization(
     configspace: ConfigurationSpace,
+    facade: Type[AbstractFacade],
     target_function,
     function_name: str,
     n_eval: int,
@@ -18,7 +21,9 @@ def run_smac_optimization(
     Parameters
     ----------
     configspace : Hyperparameter configuration space.
-    function : Function to be minimized.
+    facade: SMAC facade to be used.
+    target_function : Function to be minimized.
+    function_name: Name of the function to be minimized.
     n_eval : Desired number of function evaluations.
     run_dir : Run directory to save SMAC output to.
     seed : Seed to be used in SMAC scenario.
@@ -28,7 +33,7 @@ def run_smac_optimization(
     conf_hp: Evaluated hyperparameter settings.
     conf_res: According true function value for each evaluated hyperparameter setting.
     """
-    
+
     scenario = Scenario(
         configspace=configspace,
         deterministic=True,
@@ -37,9 +42,9 @@ def run_smac_optimization(
         seed=seed
     )
 
-    config_selector = BlackBoxFacade.get_config_selector(scenario, retrain_after=1)
+    config_selector = facade.get_config_selector(scenario, retrain_after=1)
 
-    smac = BlackBoxFacade(
+    smac = facade(
         scenario=scenario,
         target_function=target_function,
         logging_level=Path("logging_smac.yml"),

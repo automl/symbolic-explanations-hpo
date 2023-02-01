@@ -4,13 +4,13 @@ import numpy as np
 import pandas as pd
 from functools import partial
 from gplearn.genetic import SymbolicRegressor
+from smac import HyperparameterOptimizationFacade
+from ConfigSpace import Configuration, UniformIntegerHyperparameter
+
 from symbolic_meta_model_wrapper import (
     SymbolicMetaModelWrapper, SymbolicPursuitModelWrapper
 )
 from symb_reg_utils import get_function_set
-
-from ConfigSpace import Configuration, UniformIntegerHyperparameter
-
 from utils import (
     get_output_dirs,
     convert_symb,
@@ -20,7 +20,6 @@ from utils import (
     write_dict_to_cfg_file,
 )
 from smac_utils import run_smac_optimization
-
 from model_wrapper import SVM, MLP
 
 
@@ -28,11 +27,10 @@ if __name__ == "__main__":
     seed = 42
     n_smac_samples = 20
     n_test_samples = 100
+    model = "MLP"
     symb_reg = True
     symb_meta = False
     symb_purs = False
-    model = "MLP"
-    classifier = None
 
     np.random.seed(seed)
 
@@ -42,11 +40,17 @@ if __name__ == "__main__":
     logger = logging.getLogger(__name__)
 
     if model == "MLP":
-        classifier = MLP(optimize_n_neurons=True, optimize_batch_size=True, seed=seed)
+        classifier = MLP(
+            optimize_n_neurons=True,
+            optimize_batch_size=True,
+            optimize_learning_rate_init=False,
+            seed=seed
+        )
     elif model == "SVM":
         classifier = SVM()
     else:
         print(f"Unknown model: {model}")
+        classifier = None
 
     optimized_parameters = classifier.configspace.get_hyperparameters()
 
@@ -59,14 +63,15 @@ if __name__ == "__main__":
 
     X_train_smac, y_train_smac = run_smac_optimization(
         configspace=classifier.configspace,
+        facade=HyperparameterOptimizationFacade,
         target_function=classifier.train,
         function_name=model,
         n_eval=n_smac_samples,
         run_dir=run_dir,
         seed=seed
     )
+    X_train_smac = X_train_smac.astype(float)
 
-   # initial_design = HyperparameterOptimizationFacade.get_initial_design(scenario, n_configs=5)
 
     logger.info(
         f"Sample random configs and train {model}."
@@ -77,79 +82,63 @@ if __name__ == "__main__":
     y_train_rand = np.array([classifier.train(config=x, seed=seed) for x in X_train_rand])
     X_train_rand = np.array(
         [list(i.get_dictionary().values()) for i in X_train_rand]
-    ).T
+    ).T.astype(float)
 
     logger.info(
-        f"Sample configs for testing and train {model}."
+        f"Create grid configs for testing and train {model}."
     )
 
     # get test samples for SR
-    if len(optimized_parameters) == 2:
-        X_test_dimensions = []
-        for i in range(len(optimized_parameters)):
-            space = partial(np.logspace, base=np.e) if optimized_parameters[i].log else np.linspace
-            if optimized_parameters[i].log:
-                lower = np.log(optimized_parameters[i].lower)
-                upper = np.log(optimized_parameters[i].upper)
-            else:
-                lower = optimized_parameters[i].lower
-                upper = optimized_parameters[i].upper
-            param_space = space(lower + 0.5 * (upper - lower) / int(np.sqrt(n_test_samples)),
-                                upper - (0.5 * (upper - lower) / int(np.sqrt(n_test_samples))),
-                                int(np.sqrt(n_test_samples))
-                                )
-            if isinstance(optimized_parameters[i], UniformIntegerHyperparameter):
-                X_test_dimensions.append(np.unique(([int(i) for i in param_space])))
-            else:
-                X_test_dimensions.append(param_space)
+    X_test_dimensions = []
+    n_test_steps = int(np.sqrt(n_test_samples)) if len(optimized_parameters) == 2 else n_test_samples if len(
+        optimized_parameters) == 1 else None
+    for i in range(len(optimized_parameters)):
+        space = partial(np.logspace, base=np.e) if optimized_parameters[i].log else np.linspace
+        if optimized_parameters[i].log:
+            lower = np.log(optimized_parameters[i].lower)
+            upper = np.log(optimized_parameters[i].upper)
+        else:
+            lower = optimized_parameters[i].lower
+            upper = optimized_parameters[i].upper
+        param_space = space(lower + 0.5 * (upper - lower) / n_test_steps,
+                            upper - (0.5 * (upper - lower) / n_test_steps),
+                            n_test_steps
+                            )
+        if isinstance(optimized_parameters[i], UniformIntegerHyperparameter):
+            X_test_dimensions.append(np.unique(([int(i) for i in param_space])))
+        else:
+            X_test_dimensions.append(param_space)
 
+    param_dict = {}
+    if len(optimized_parameters) == 1:
+        X_test = X_test_dimensions[0]
+        y_test = np.zeros(len(X_test_dimensions[0]))
+        for n in range(len(X_test_dimensions[0])):
+            param_dict[optimized_parameters[0].name] = X_test[n]
+            conf = Configuration(configuration_space=classifier.configspace, values=param_dict)
+            y_test[n] = classifier.train(config=conf, seed=seed)
+        X_test, y_test = X_test.astype(float).reshape(1, X_test.shape[0]), y_test.reshape(-1)
+    elif len(optimized_parameters) == 2:
         X_test = np.array(
             np.meshgrid(
                 X_test_dimensions[0],
                 X_test_dimensions[1],
             )
         ).astype(float)
-    elif len(optimized_parameters) == 1:
-        if isinstance(optimized_parameters[0], UniformIntegerHyperparameter):
-            step = int((optimized_parameters[0].upper - optimized_parameters[0].lower) / n_test_samples)
-            X_test = np.arange(optimized_parameters[0].lower, optimized_parameters[0].upper, step)
-            if optimized_parameters[0].upper not in X_test:
-                X_test = np.append(X_test, [optimized_parameters[0].upper])
-            X_test = X_test.reshape(-1, 1)
-        else:
-            if optimized_parameters[0].log:
-                X_test = np.logspace(
-                    np.log(optimized_parameters[0].lower), np.log(optimized_parameters[0].upper), n_test_samples, base=np.e
-                ).reshape(n_test_samples, 1)
-            else:
-                X_test = np.linspace(
-                    optimized_parameters[0].lower, optimized_parameters[0].upper, n_test_samples
-                ).reshape(n_test_samples, 1)
+        y_test = np.zeros((X_test.shape[1], X_test.shape[2]))
+        for n in range(X_test.shape[1]):
+            for m in range(X_test.shape[2]):
+                for i, param in enumerate(optimized_parameters):
+                    if isinstance(optimized_parameters[i], UniformIntegerHyperparameter):
+                        param_dict[optimized_parameters[i].name] = int(X_test[i, n, m])
+                    else:
+                        param_dict[optimized_parameters[i].name] = X_test[i, n, m]
+                conf = Configuration(configuration_space=classifier.configspace, values=param_dict)
+                y_test[n, m] = classifier.train(config=conf, seed=seed)
     else:
         X_test = None
+        y_test = None
         print("Not yet supported.")
-
-    y_test = np.zeros((X_test.shape[1], X_test.shape[2]))
-    param_dict = {}
-
-    for n in range(X_test.shape[1]):
-        for m in range(X_test.shape[2]):
-            for i, param in enumerate(optimized_parameters):
-                if isinstance(optimized_parameters[i], UniformIntegerHyperparameter):
-                    param_dict[optimized_parameters[i].name] = int(X_test[i, n, m])
-                else:
-                    param_dict[optimized_parameters[i].name] = X_test[i, n, m]
-            conf = Configuration(configuration_space=classifier.configspace, values=param_dict)
-            y_test[n, m] = classifier.train(config=conf, seed=seed)
-    # for conf in X_test_array.reshape(2, X_test_array.shape[1]*X_test_array.shape[2]).T:
-    #     for i, param in enumerate(optimized_parameters):
-    #         if isinstance(param, UniformIntegerHyperparameter):
-    #             param_dict[param.name] = int(conf[i])
-    #         else:
-    # #             param_dict[param.name] = conf[i]
-    #     X_test.append(Configuration(configuration_space=classifier.configspace, values=param_dict))
-    # y_test = np.array([classifier.train(config=x, seed=seed) for x in X_test])
-    # y_test = y_test.reshape(X_test_array.shape[1], X_test_array.shape[2])
 
     # log transform values of parameters that were log-sampled before training the symbolic models
     for i in range(len(optimized_parameters)):
@@ -168,7 +157,7 @@ if __name__ == "__main__":
         # TODO: log symb regression logs?
         symb_params = dict(
             population_size=5000,
-            generations=20,
+            generations=50,
             stopping_criteria=0.001,
             p_crossover=0.7,
             p_subtree_mutation=0.1,
@@ -208,10 +197,85 @@ if __name__ == "__main__":
             y_train_smac,
             X_train_rand.T,
             y_train_rand,
-            X_test.reshape(2, X_test.shape[1]*X_test.shape[2]).T,
+            X_test.reshape(len(optimized_parameters), -1).T,
             y_test.reshape(-1),
         )
         df_scores_symb_reg.to_csv(f"{res_dir}/scores_symb_reg.csv")
+
+    if symb_meta:
+        # run symbolic metamodels on SMAC samples
+        symb_meta_smac = SymbolicMetaModelWrapper()
+        symb_meta_smac.fit(X_train_smac.T, y_train_smac)
+        # or run symbolic metaexpressions on SMAC samples
+        # symb_meta_smac, _ = get_symbolic_model(function.apply, X_train_smac)
+        # symb_meta_smac = SymbolicMetaExpressionWrapper(symb_meta_smac)
+
+        # run symbolic metamodels on random samples
+        symb_meta_rand = SymbolicMetaModelWrapper()
+        symb_meta_rand.fit(X_train_rand.T, y_train_rand)
+        # or run symbolic metaexpressions on SMAC samples
+        # symb_meta_rand, _ = get_symbolic_model(function.apply, X_train_rand)
+        # symb_meta_rand = SymbolicMetaExpressionWrapper(symb_meta_rand)
+
+        symbolic_models["Meta-smac"] = symb_meta_smac
+        symbolic_models["Meta-rand"] = symb_meta_rand
+
+        # write results to csv files
+        df_scores_symb_meta = append_scores(
+            df_scores_symb_meta,
+            model,
+            symb_meta_smac,
+            symb_meta_rand,
+            X_train_smac.T,
+            y_train_smac,
+            X_train_rand.T,
+            y_train_rand,
+            X_test.reshape(len(optimized_parameters), -1).T,
+            y_test.reshape(-1),
+        )
+        df_scores_symb_meta.to_csv(f"{res_dir}/scores_symb_meta.csv")
+
+    if symb_purs:
+        purs_params = dict(
+            loss_tol=1.0e-3,
+            ratio_tol=0.9,
+            patience=10,
+            maxiter=20,
+            eps=1.0e-5,
+            random_seed=42,
+            task_type="regression",
+        )
+
+        write_dict_to_cfg_file(
+            dictionary=purs_params,
+            target_file_path=path.join(run_dir, "symbolic_pursuit_params.cfg"),
+        )
+
+        # run symbolic pursuit models on SMAC samples
+        symb_purs_smac = SymbolicPursuitModelWrapper(**purs_params)
+        symb_purs_smac.fit(X_train_smac.T, y_train_smac)
+
+        # run symbolic pursuit models on random samples
+        symb_purs_rand = SymbolicPursuitModelWrapper(**purs_params)
+        symb_purs_rand.fit(X_train_rand.T, y_train_rand)
+
+        symbolic_models["Pursuit-smac"] = symb_purs_smac
+        symbolic_models["Pursuit-rand"] = symb_purs_rand
+
+        # write results to csv files
+        df_scores_symb_purs = append_scores(
+            df_scores_symb_purs,
+            model,
+            symb_purs_smac,
+            symb_purs_rand,
+            X_train_smac.T,
+            y_train_smac,
+            X_train_rand.T,
+            y_train_rand,
+            X_test.reshape(len(optimized_parameters), -1).T,
+            y_test.reshape(-1),
+        )
+        df_scores_symb_purs.to_csv(f"{res_dir}/scores_symb_purs.csv")
 
     df_expr[model] = {
         k: convert_symb(v, n_dim=len(optimized_parameters), n_decimals=3)
@@ -221,8 +285,7 @@ if __name__ == "__main__":
 
     # plot results
     if len(optimized_parameters) == 1:
-        param_name = optimized_parameters[0].name
-        param_log = optimized_parameters[0].log
+        param = optimized_parameters[0]
         plot = plot_symb1d(
             X_train_smac=X_train_smac.T,
             y_train_smac=y_train_smac,
@@ -230,23 +293,22 @@ if __name__ == "__main__":
             y_train_rand=y_train_rand,
             X_test=X_test.T,
             y_test=y_test,
-            xlabel=f"log({param_name})" if param_log else param_name,
+            xlabel=f"log({param.name})" if param.log else param.name,
             ylabel="Cost",
             symbolic_models=symbolic_models,
             function_name=model,
-            xmin=optimized_parameters[0].lower,
-            xmax=optimized_parameters[0].upper,
+            xmin=np.log(param.lower) if param.log else param.lower,
+            xmax=np.log(param.upper) if param.log else param.upper,
             plot_dir=plot_dir,
         )
     elif len(optimized_parameters) == 2:
-        param0_name = optimized_parameters[0].name
-        param0_log = optimized_parameters[0].log
         plot = plot_symb2d(
             X_train_smac=X_train_smac,
             X_train_rand=X_train_rand,
             X_test=X_test,
             y_test=y_test,
             function_name=model,
+            metric_name="Cost",
             symbolic_models=symbolic_models,
             parameters=optimized_parameters,
             plot_dir=plot_dir,

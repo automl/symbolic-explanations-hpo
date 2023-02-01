@@ -146,7 +146,7 @@ def get_functions2d() -> list[NamedFunction]:
             name="Linear 2D",
             expression="X0 + 2*X1",
             function=lambda x: x[0] + 2 * x[1],
-            params=({"x0": (-10, 10), "x1": (-5, 5)}),
+            params=({"X0": (-10, 10), "X1": (-5, 5)}),
         ),
         NamedFunction(
             name="Polynom function 2D",

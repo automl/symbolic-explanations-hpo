@@ -10,6 +10,7 @@ from symbolic_meta_model_wrapper import (
 )
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 import configparser as cfgparse
+from ConfigSpace import UniformIntegerHyperparameter
 
 plt.style.use("tableau-colorblind10")
 
@@ -251,6 +252,7 @@ def plot_symb2d(
     symbolic_models,
     parameters,
     function_name,
+    metric_name=None,
     function_expression=None,
     plot_dir=None,
 ):
@@ -261,55 +263,57 @@ def plot_symb2d(
 
     LABEL_SIZE = 8
     TITLE_SIZE = 9
-
-    fig, axes = plt.subplots(ncols=len(symbolic_models) + 1, nrows=1)
-
-    ax = plt.subplot(len(symbolic_models) + 1, 1, 1)
-    if function_expression:
-        plt.title(f"{function_expression}", fontsize=TITLE_SIZE)
+    X0_name = "X0" if parameters[0].name == "X0" else f"X0: log({parameters[0].name})" if parameters[
+        0].log else f"X0: {parameters[0].name}"
+    X1_name = "X1" if parameters[1].name == "X1" else f"X1: log({parameters[1].name})" if parameters[
+        1].log else f"X1: {parameters[1].name}"
+    if parameters[0].log:
+        X0_upper = np.log(parameters[0].upper)
+        X0_lower = np.log(parameters[0].lower)
     else:
-        plt.title(f"{function_name}", fontsize=TITLE_SIZE)
-    plt.pcolormesh(X_test[0], X_test[1], y_test, cmap="Spectral", shading="auto")
-    if parameters:
-        X0_name = f"X0: log({parameters[0].name})" if parameters[0].log else f"X0: {parameters[0].name}"
-        X1_name = f"X1: log({parameters[1].name})" if parameters[1].log else f"X0: {parameters[1].name}"
-    else:
-        X0_name = "X0"
-        X1_name = "X1"
-    plt.xlabel(X0_name, fontsize=LABEL_SIZE)
-    plt.ylabel(X1_name, fontsize=LABEL_SIZE)
-    if parameters and parameters[0].log:
-        step_x = (
-                (np.log(parameters[0].upper) - np.log(parameters[0].lower)) / X_test.shape[2]
-        )
+        X0_upper = parameters[0].upper
+        X0_lower = parameters[0].lower
+    if isinstance(parameters[0], UniformIntegerHyperparameter):
+        dim_x = X_test[0][0].astype(int)
     else:
         step_x = (
-            (parameters[0].upper - parameters[0].lower) / X_test.shape[2]
+                (X0_upper - X0_lower) / X_test.shape[2]
         )
-    dim_x = np.arange(np.min(X_test[0]), np.max(X_test[0]) + step_x, step_x)
-    plt.xticks(dim_x)
+        dim_x = np.arange(np.min(X_test[0]), np.max(X_test[0]) + step_x / 2, step_x)
+    if parameters[1].log:
+        X1_upper = np.log(parameters[1].upper)
+        X1_lower = np.log(parameters[1].lower)
+    else:
+        X1_upper = parameters[1].upper
+        X1_lower = parameters[1].lower
     step_y = (
-        1 / 2 * (np.max(X_test[1]) - np.min(X_test[1]))
+            1 / 2 * (np.max(X_test[1]) - np.min(X_test[1]))
     )
-    dim_y = np.arange(np.min(X_test[1]), np.max(X_test[1]) + step_y/2, step_y)
-    plt.yticks(dim_y)
-    plt.tick_params(axis="both", which="major", labelsize=LABEL_SIZE)
-    cbar = plt.colorbar()
-    cbar.ax.tick_params(labelsize=LABEL_SIZE)
-    plt.grid(alpha=0)
+    dim_y = np.arange(np.min(X_test[1]), np.max(X_test[1]) + step_y / 2, step_y)
+
+    fig, axes = plt.subplots(ncols=1, nrows=len(symbolic_models) + 1, constrained_layout=True)
+    im = axes[0].pcolormesh(X_test[0], X_test[1], y_test, cmap="summer", shading="auto")
+    if function_expression:
+        axes[0].set_title(f"{function_expression}", fontsize=TITLE_SIZE)
+    else:
+        axes[0].set_title(f"{function_name}", fontsize=TITLE_SIZE)
+    axes[0].set_xlabel(X0_name, fontsize=LABEL_SIZE)
+    axes[0].set_ylabel(X1_name, fontsize=LABEL_SIZE)
+    axes[0].set_xticks(dim_x)
+    axes[0].set_yticks(dim_y)
+    axes[0].set_xlim(X0_lower, X0_upper)
+    axes[0].set_ylim(X1_lower, X1_upper)
+    axes[0].tick_params(axis="both", which="major", labelsize=LABEL_SIZE)
+    axes[0].grid(alpha=0)
 
     for i, model_name in enumerate(symbolic_models):
         symbolic_model = symbolic_models[model_name]
-
         conv = convert_symb(symbolic_model, n_decimals=3)
-
         if len(str(conv)) < 70:
             label = f"{model_name}: {conv}"
         else:
             label = f"{model_name}:"
-        ax = plt.subplot(len(symbolic_models) + 1, 1, i + 2)
-        plt.title(f"{label}", fontsize=TITLE_SIZE)
-        plt.pcolormesh(
+        im = axes[i + 1].pcolormesh(
             X_test[0],
             X_test[1],
             symbolic_model.predict(
@@ -317,41 +321,45 @@ def plot_symb2d(
             )
             .reshape(X_test.shape[1], X_test.shape[2])
             .T,
-            cmap="Spectral",
+            cmap="summer",
             shading="auto",
         )
-        plt.xlabel(X0_name, fontsize=LABEL_SIZE)
-        plt.ylabel(X1_name, fontsize=LABEL_SIZE)
-        plt.xticks(dim_x)
-        plt.yticks(dim_y)
-        plt.tick_params(axis="both", which="major", labelsize=LABEL_SIZE)
-        cbar = plt.colorbar()
-        cbar.ax.tick_params(labelsize=LABEL_SIZE)
-        plt.grid(alpha=0)
-
+        axes[i + 1].set_title(f"{label}", fontsize=TITLE_SIZE)
+        axes[i + 1].set_xlabel(X0_name, fontsize=LABEL_SIZE)
+        axes[i + 1].set_ylabel(X1_name, fontsize=LABEL_SIZE)
+        axes[i + 1].set_xticks(dim_x)
+        axes[i + 1].set_yticks(dim_y)
+        axes[i + 1].set_xlim(X0_lower, X0_upper)
+        axes[i + 1].set_ylim(X1_lower, X1_upper)
+        axes[i + 1].tick_params(axis="both", which="major", labelsize=LABEL_SIZE)
+        axes[i + 1].grid(alpha=0)
         X_train = None
         if "smac" in model_name:
             X_train = X_train_smac
         elif "rand" in model_name:
             X_train = X_train_rand
         if X_train is not None:
-            plt.scatter(
+            axes[i + 1].scatter(
                 X_train[0],
                 X_train[1],
                 color="midnightblue",
                 zorder=2,
                 marker=".",
-                s=8,
+                s=40,
                 label="Train points",
             )
 
-    handles, labels = ax.get_legend_handles_labels()
+    handles, labels = axes[-1].get_legend_handles_labels()
     leg = fig.legend(
         handles, labels, loc="lower right", fontsize=LABEL_SIZE, framealpha=0.0
     )
     leg.get_frame().set_linewidth(0.0)
-
-    plt.tight_layout()
+    cbar = fig.colorbar(im, ax=axes, shrink=0.4)
+    if metric_name:
+        cbar.set_label(metric_name, fontsize=LABEL_SIZE, rotation=270, labelpad=10)
+    else:
+        cbar.set_label("f(X0, X1)", fontsize=LABEL_SIZE, rotation=270, labelpad=10)
+    cbar.ax.tick_params(labelsize=LABEL_SIZE)
     if plot_dir:
         plt.savefig(f"{plot_dir}/{function_name}", dpi=800)
     else:

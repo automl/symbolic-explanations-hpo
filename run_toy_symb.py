@@ -2,11 +2,13 @@ import logging
 from os import path
 import numpy as np
 import pandas as pd
+from smac import BlackBoxFacade
 from gplearn.genetic import SymbolicRegressor
+
 from symbolic_meta_model_wrapper import (
     SymbolicMetaModelWrapper, SymbolicPursuitModelWrapper
 )
-
+from symb_reg_utils import get_function_set
 from utils import (
     get_output_dirs,
     convert_symb,
@@ -17,7 +19,6 @@ from utils import (
 )
 from smac_utils import run_smac_optimization
 from functions import get_functions1d, get_functions2d
-from symb_reg_utils import get_function_set
 
 
 if __name__ == "__main__":
@@ -25,6 +26,7 @@ if __name__ == "__main__":
     n_smac_samples = 20
     n_test_samples = 100
     n_dim = 2
+    metric = "mean absolute error"
     symb_reg = True
     symb_meta = False
     symb_purs = False
@@ -51,6 +53,7 @@ if __name__ == "__main__":
         # get train samples for SR from SMAC sampling
         samples_smac, _ = run_smac_optimization(
             configspace=function.cs,
+            facade=BlackBoxFacade,
             target_function=function.smac_apply,
             function_name=function.name.lower().replace(' ', '_'),
             n_eval=n_smac_samples,
@@ -121,7 +124,7 @@ if __name__ == "__main__":
             # TODO: log symb regression logs?
             symb_params = dict(
                 population_size=5000,
-                generations=100,
+                generations=50,
                 stopping_criteria=0.001,
                 p_crossover=0.7,
                 p_subtree_mutation=0.1,
@@ -130,7 +133,7 @@ if __name__ == "__main__":
                 max_samples=0.9,
                 parsimony_coefficient=0.01,
                 function_set=get_function_set(),
-                metric="mean absolute error",
+                metric=metric,
                 random_state=0,
                 verbose=0,
             )
@@ -161,8 +164,8 @@ if __name__ == "__main__":
                 y_train_smac,
                 X_train_rand.T,
                 y_train_rand,
-                X_test.reshape(n_dim, n_test_samples).T,
-                y_test.reshape(n_test_samples),
+                X_test.reshape(n_dim, -1).T,
+                y_test.reshape(-1),
             )
             df_scores_symb_reg.to_csv(f"{res_dir}/scores_symb_reg.csv")
 
