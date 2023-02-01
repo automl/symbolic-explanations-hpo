@@ -27,7 +27,6 @@ if __name__ == "__main__":
     n_smac_samples = 20
     n_test_samples = 100
     n_dim = 2
-    metric = "mean absolute error"
     symb_reg = True
     symb_meta = False
     symb_purs = False
@@ -132,7 +131,7 @@ if __name__ == "__main__":
                 max_samples=0.9,
                 parsimony_coefficient=0.01,
                 function_set=get_function_set(),
-                metric=metric,
+                metric="mean absolute error",
                 random_state=0,
                 verbose=0,
             )

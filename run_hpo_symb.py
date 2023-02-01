@@ -5,7 +5,7 @@ import pandas as pd
 from functools import partial
 from gplearn.genetic import SymbolicRegressor
 from smac import HyperparameterOptimizationFacade
-from ConfigSpace import Configuration, UniformIntegerHyperparameter
+from ConfigSpace import Configuration, UniformIntegerHyperparameter, UniformFloatHyperparameter
 
 from symbolic_meta_model_wrapper import (
     SymbolicMetaModelWrapper,
@@ -28,7 +28,7 @@ if __name__ == "__main__":
     seed = 42
     n_smac_samples = 20
     n_test_samples = 100
-    model = "MLP"
+    model = "SVM"
     symb_reg = True
     symb_meta = False
     symb_purs = False
@@ -48,7 +48,12 @@ if __name__ == "__main__":
             seed=seed,
         )
     elif model == "SVM":
-        classifier = SVM()
+        classifier = SVM(
+            optimize_C=True,
+            optimize_degree=True,
+            optimize_coef=False,
+            optimize_gamma=False,
+        )
     else:
         print(f"Unknown model: {model}")
         classifier = None
@@ -113,7 +118,8 @@ if __name__ == "__main__":
             n_test_steps,
         )
         if isinstance(optimized_parameters[i], UniformIntegerHyperparameter):
-            X_test_dimensions.append(np.unique(([int(i) for i in param_space])))
+            int_spacing = np.unique(([int(i) for i in param_space] + [optimized_parameters[i].upper]))
+            X_test_dimensions.append(int_spacing)
         else:
             X_test_dimensions.append(param_space)
 

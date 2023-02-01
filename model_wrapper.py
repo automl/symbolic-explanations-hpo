@@ -22,12 +22,30 @@ dataset = load_digits()
 
 
 class SVM:
+    def __init__(
+        self,
+        optimize_kernel=False,
+        optimize_C=False,
+        optimize_shrinking=False,
+        optimize_degree=False,
+        optimize_coef=False,
+        optimize_gamma=False,
+        optimize_gamma_value=False,
+        seed=0,
+    ):
+        self.optimize_kernel = optimize_kernel
+        self.optimize_C = optimize_C
+        self.optimize_shrinking = optimize_shrinking
+        self.optimize_degree = optimize_degree
+        self.optimize_coef = optimize_coef
+        self.optimize_gamma = optimize_gamma
+        self.optimize_gamma_value = optimize_gamma_value
+        self.seed = seed
+
     @property
     def configspace(self) -> ConfigurationSpace:
-        # Build Configuration Space which defines all parameters and their ranges
         cs = ConfigurationSpace(seed=0)
 
-        # First we create our hyperparameters
         kernel = Categorical(
             "kernel", ["linear", "poly", "rbf", "sigmoid"], default="poly"
         )
@@ -35,37 +53,55 @@ class SVM:
         shrinking = Categorical("shrinking", [True, False], default=True)
         degree = Integer("degree", (1, 5), default=3)
         coef = Float("coef0", (0.0, 10.0), default=0.0)
-        gamma = Categorical("gamma", ["auto", "value"], default="value")
-        gamma_value = Float("gamma_value", (0.0001, 8.0), default=1.0, log=True)
+        gamma = Float("gamma", (0.0001, 8.0), default=1.0, log=True)
 
-        # Then we create dependencies
-        use_degree = InCondition(child=degree, parent=kernel, values=["poly"])
-        use_coef = InCondition(child=coef, parent=kernel, values=["poly", "sigmoid"])
-        use_gamma = InCondition(
-            child=gamma, parent=kernel, values=["rbf", "poly", "sigmoid"]
-        )
-        use_gamma_value = InCondition(child=gamma_value, parent=gamma, values=["value"])
+        if self.optimize_kernel:
+            cs.add_hyperparameter(kernel)
+        if self.optimize_C:
+            cs.add_hyperparameter(C)
+        if self.optimize_shrinking:
+            cs.add_hyperparameter(shrinking)
+        if self.optimize_degree:
+            cs.add_hyperparameter(degree)
+        if self.optimize_coef:
+            cs.add_hyperparameter(coef)
+        if self.optimize_gamma_value:
+            cs.add_hyperparameter(gamma)
 
-        # Add hyperparameters and conditions to our configspace
-        cs.add_hyperparameters([C])
-        # cs.add_hyperparameters([kernel, C, shrinking, degree, coef, gamma, gamma_value])
-        # cs.add_conditions([use_degree, use_coef, use_gamma, use_gamma_value])
-
+        if self.optimize_kernel and self.optimize_degree:
+            use_degree = InCondition(
+                cs=cs, child=degree, parent=kernel, values=["poly"]
+            )
+            cs.add_condition(use_degree)
+        if self.optimize_kernel and self.optimize_coef:
+            use_coef = InCondition(
+                cs=cs, child=coef, parent=kernel, values=["poly", "sigmoid"]
+            )
+            cs.add_condition(use_coef)
+        if self.optimize_kernel and self.optimize_gamma:
+            use_gamma = InCondition(
+                cs=cs, child=gamma, parent=kernel, values=["rbf", "poly", "sigmoid"]
+            )
+            cs.add_condition(use_gamma)
         return cs
 
     def train(self, config: Configuration, seed: int = 0) -> float:
-        """Creates an SVM based on a configuration and evaluates it on the
+        """Train an SVM based on a configuration and evaluate it on the
         iris-dataset using cross-validation."""
-        config_dict = config.get_dictionary()
-        if "gamma" in config:
-            config_dict["gamma"] = (
-                config_dict["gamma_value"]
-                if config_dict["gamma"] == "value"
-                else "auto"
-            )
-            config_dict.pop("gamma_value", None)
+        C = config["C"] if "C" in config else 1.0
+        shrinking = config["shrinking"] if "shrinking" in config else True
+        degree = config["degree"] if "degree" in config else 3
+        coef = config["coef"] if "coef" in config else 0.0
+        gamma = config["gamma"] if config["gamma"] else 1.0
 
-        classifier = svm.SVC(**config_dict, random_state=seed)
+        classifier = svm.SVC(
+            C=C,
+            shrinking=shrinking,
+            degree=degree,
+            coef0=coef,
+            gamma=gamma,
+            random_state=self.seed,
+        )
         scores = cross_val_score(classifier, iris.data, iris.target, cv=5)
         cost = 1 - np.mean(scores)
 
@@ -97,10 +133,7 @@ class MLP:
 
     @property
     def configspace(self) -> ConfigurationSpace:
-        # Build Configuration Space which defines all parameters and their ranges.
-        # To illustrate different parameter types, we use continuous, integer and categorical parameters.
-        cs = ConfigurationSpace()
-        cs.seed(self.seed)
+        cs = ConfigurationSpace(seed=self.seed)
 
         n_layer = Integer("n_layer", (1, 5), default=1)
         n_neurons = Integer("n_neurons", (8, 256), log=True, default=10)
@@ -131,20 +164,16 @@ class MLP:
         if self.optimize_learning_rate_init:
             cs.add_hyperparameter(learning_rate_init)
 
-        # Adding conditions to restrict the hyperparameter space...
-        # ... since learning rate is only used when solver is 'sgd'.
         if self.optimize_solver and self.optimize_learning_rate:
             use_lr = EqualsCondition(
                 cs=cs, child=learning_rate, parent=solver, value="sgd"
             )
             cs.add_condition(use_lr)
-        # ... since learning rate initialization will only be accounted for when using 'sgd' or 'adam'.
         if self.optimize_solver and self.optimize_learning_rate_init:
             use_lr_init = InCondition(
                 cs=cs, child=learning_rate_init, parent=solver, values=["sgd", "adam"]
             )
             cs.add_condition(use_lr_init)
-        # ... since batch size will not be considered when optimizer is 'lbfgs'.
         if self.optimize_solver and self.optimize_batch_size:
             use_batch_size = InCondition(
                 cs=cs, child=batch_size, parent=solver, values=["sgd", "adam"]
@@ -153,9 +182,9 @@ class MLP:
         return cs
 
     def train(self, config: Configuration, seed: int) -> float:
-        # For deactivated parameters (by virtue of the conditions),
-        # the configuration stores None-values.
-        # This is not accepted by the MLP, so we replace them with placeholder values.
+        """Train an MLP based on a configuration and evaluate it on the
+        digit-dataset using cross-validation."""
+        config_dict = config.get_dictionary()
         n_layer = config["n_layer"] if "n_layer" in config else 1
         n_neurons = config["n_neurons"] if "n_neurons" in config else 10
         activation = config["activation"] if "activation" in config else "tanh"
@@ -180,10 +209,7 @@ class MLP:
                 random_state=self.seed,
             )
 
-            # Returns the 5-fold cross validation accuracy
-            cv = StratifiedKFold(
-                n_splits=5, random_state=seed, shuffle=True
-            )  # to make CV splits consistent
+            cv = StratifiedKFold(n_splits=5, random_state=self.seed, shuffle=True)
             score = cross_val_score(
                 classifier, dataset.data, dataset.target, cv=cv, error_score="raise"
             )

@@ -74,6 +74,10 @@ def convert_symb(symb, n_dim: int = None, n_decimals: int = None) -> sympy.core.
         "pow": lambda x, y: x**y,
     }
 
+    if len(symb_str) > 500:
+        print(f"Expression of length {len(symb_str)} too long to convert, return raw string.")
+        return symb_str
+
     symb_conv = sympy.simplify(
         sympy.sympify(symb_str.replace("[", "").replace("]", ""), locals=converter)
     )
@@ -331,7 +335,7 @@ def plot_symb2d(
             symbolic_model.predict(
                 X_test.T.reshape(X_test.shape[1] * X_test.shape[2], X_test.shape[0])
             )
-            .reshape(X_test.shape[1], X_test.shape[2])
+            .reshape(X_test.shape[2], X_test.shape[1])
             .T,
             cmap="summer",
             shading="auto",
