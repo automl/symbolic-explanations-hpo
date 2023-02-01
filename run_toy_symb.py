@@ -6,7 +6,8 @@ from smac import BlackBoxFacade
 from gplearn.genetic import SymbolicRegressor
 
 from symbolic_meta_model_wrapper import (
-    SymbolicMetaModelWrapper, SymbolicPursuitModelWrapper
+    SymbolicMetaModelWrapper,
+    SymbolicPursuitModelWrapper,
 )
 from symb_reg_utils import get_function_set
 from utils import (
@@ -55,10 +56,10 @@ if __name__ == "__main__":
             configspace=function.cs,
             facade=BlackBoxFacade,
             target_function=function.smac_apply,
-            function_name=function.name.lower().replace(' ', '_'),
+            function_name=function.name.lower().replace(" ", "_"),
             n_eval=n_smac_samples,
             run_dir=run_dir,
-            seed=seed
+            seed=seed,
         )
 
         X_train_smac = samples_smac
@@ -107,9 +108,7 @@ if __name__ == "__main__":
                 y_test.reshape(-1),
             )
 
-        logger.info(
-            f"Fit Symbolic Models for: {function.name}: {function.expression}"
-        )
+        logger.info(f"Fit Symbolic Models for: {function.name}: {function.expression}")
 
         # Create a safe exp function which does not cause problems
         def exp(x):
@@ -262,7 +261,7 @@ if __name__ == "__main__":
                 xlabel="x",
                 ylabel="f(x)",
                 symbolic_models=symbolic_models,
-                function_name=function.name.lower().replace(' ', '_'),
+                function_name=function.name.lower().replace(" ", "_"),
                 function_expression=function.expression,
                 plot_dir=plot_dir,
             )
@@ -274,7 +273,7 @@ if __name__ == "__main__":
                 y_test=y_test,
                 symbolic_models=symbolic_models,
                 parameters=function.cs.get_hyperparameters(),
-                function_name=function.name.lower().replace(' ', '_'),
+                function_name=function.name.lower().replace(" ", "_"),
                 function_expression=function.expression,
                 plot_dir=plot_dir,
             )

@@ -24,5 +24,5 @@ def get_function_set():
         "cos",
         exp_func,
     ]
-    
+
     return function_set

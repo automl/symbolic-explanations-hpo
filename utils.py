@@ -58,7 +58,9 @@ def convert_symb(symb, n_dim: int = None, n_decimals: int = None) -> sympy.core.
     """
     if isinstance(symb, SymbolicRegressor):
         symb_str = str(symb._program)
-    elif isinstance(symb, SymbolicMetaModelWrapper) or isinstance(symb, SymbolicPursuitModelWrapper):
+    elif isinstance(symb, SymbolicMetaModelWrapper) or isinstance(
+        symb, SymbolicPursuitModelWrapper
+    ):
         symb_str = str(symb.expression())
     else:
         raise Exception("Unknown symbolic model")
@@ -72,7 +74,9 @@ def convert_symb(symb, n_dim: int = None, n_decimals: int = None) -> sympy.core.
         "pow": lambda x, y: x**y,
     }
 
-    symb_conv = sympy.simplify(sympy.sympify(symb_str.replace("[", "").replace("]", ""), locals=converter))
+    symb_conv = sympy.simplify(
+        sympy.sympify(symb_str.replace("[", "").replace("]", ""), locals=converter)
+    )
     if n_dim == 1:
         x, X0 = sympy.symbols("x X0")
         symb_conv = symb_conv.subs(X0, x)
@@ -263,10 +267,20 @@ def plot_symb2d(
 
     LABEL_SIZE = 8
     TITLE_SIZE = 9
-    X0_name = "X0" if parameters[0].name == "X0" else f"X0: log({parameters[0].name})" if parameters[
-        0].log else f"X0: {parameters[0].name}"
-    X1_name = "X1" if parameters[1].name == "X1" else f"X1: log({parameters[1].name})" if parameters[
-        1].log else f"X1: {parameters[1].name}"
+    X0_name = (
+        "X0"
+        if parameters[0].name == "X0"
+        else f"X0: log({parameters[0].name})"
+        if parameters[0].log
+        else f"X0: {parameters[0].name}"
+    )
+    X1_name = (
+        "X1"
+        if parameters[1].name == "X1"
+        else f"X1: log({parameters[1].name})"
+        if parameters[1].log
+        else f"X1: {parameters[1].name}"
+    )
     if parameters[0].log:
         X0_upper = np.log(parameters[0].upper)
         X0_lower = np.log(parameters[0].lower)
@@ -276,9 +290,7 @@ def plot_symb2d(
     if isinstance(parameters[0], UniformIntegerHyperparameter):
         dim_x = X_test[0][0].astype(int)
     else:
-        step_x = (
-                (X0_upper - X0_lower) / X_test.shape[2]
-        )
+        step_x = (X0_upper - X0_lower) / X_test.shape[2]
         dim_x = np.arange(np.min(X_test[0]), np.max(X_test[0]) + step_x / 2, step_x)
     if parameters[1].log:
         X1_upper = np.log(parameters[1].upper)
@@ -286,12 +298,12 @@ def plot_symb2d(
     else:
         X1_upper = parameters[1].upper
         X1_lower = parameters[1].lower
-    step_y = (
-            1 / 2 * (np.max(X_test[1]) - np.min(X_test[1]))
-    )
+    step_y = 1 / 2 * (np.max(X_test[1]) - np.min(X_test[1]))
     dim_y = np.arange(np.min(X_test[1]), np.max(X_test[1]) + step_y / 2, step_y)
 
-    fig, axes = plt.subplots(ncols=1, nrows=len(symbolic_models) + 1, constrained_layout=True)
+    fig, axes = plt.subplots(
+        ncols=1, nrows=len(symbolic_models) + 1, constrained_layout=True
+    )
     im = axes[0].pcolormesh(X_test[0], X_test[1], y_test, cmap="summer", shading="auto")
     if function_expression:
         axes[0].set_title(f"{function_expression}", fontsize=TITLE_SIZE)

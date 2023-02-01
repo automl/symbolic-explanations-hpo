@@ -14,7 +14,7 @@ def run_smac_optimization(
     function_name: str,
     n_eval: int,
     run_dir: str,
-    seed: int
+    seed: int,
 ) -> [np.ndarray, np.ndarray]:
     """Runs SMAC Hyperparameter Optimization on the given function within the hyperparameter space.
 
@@ -39,7 +39,7 @@ def run_smac_optimization(
         deterministic=True,
         n_trials=n_eval,
         output_directory=Path(f"{run_dir}/smac/{function_name}"),
-        seed=seed
+        seed=seed,
     )
 
     config_selector = facade.get_config_selector(scenario, retrain_after=1)
@@ -69,15 +69,13 @@ def run_smac_optimization(
         conf_hp.append(
             [
                 config.get_dictionary()[hp_name]
-                if hp_name in config.get_dictionary() else None
+                if hp_name in config.get_dictionary()
+                else None
                 for config in smac.runhistory.get_configs()
             ]
         )
     conf_res.append(
-        [
-            smac.runhistory.get_cost(config)
-            for config in smac.runhistory.get_configs()
-        ]
+        [smac.runhistory.get_cost(config) for config in smac.runhistory.get_configs()]
     )
 
     conf_hp, conf_res = np.array(conf_hp), np.array(conf_res)

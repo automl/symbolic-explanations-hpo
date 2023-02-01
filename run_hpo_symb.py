@@ -8,7 +8,8 @@ from smac import HyperparameterOptimizationFacade
 from ConfigSpace import Configuration, UniformIntegerHyperparameter
 
 from symbolic_meta_model_wrapper import (
-    SymbolicMetaModelWrapper, SymbolicPursuitModelWrapper
+    SymbolicMetaModelWrapper,
+    SymbolicPursuitModelWrapper,
 )
 from symb_reg_utils import get_function_set
 from utils import (
@@ -44,7 +45,7 @@ if __name__ == "__main__":
             optimize_n_neurons=True,
             optimize_batch_size=True,
             optimize_learning_rate_init=False,
-            seed=seed
+            seed=seed,
         )
     elif model == "SVM":
         classifier = SVM()
@@ -68,42 +69,49 @@ if __name__ == "__main__":
         function_name=model,
         n_eval=n_smac_samples,
         run_dir=run_dir,
-        seed=seed
+        seed=seed,
     )
     X_train_smac = X_train_smac.astype(float)
 
-
-    logger.info(
-        f"Sample random configs and train {model}."
-    )
+    logger.info(f"Sample random configs and train {model}.")
 
     # get train samples for SR from random sampling
     X_train_rand = classifier.configspace.sample_configuration(size=n_smac_samples)
-    y_train_rand = np.array([classifier.train(config=x, seed=seed) for x in X_train_rand])
+    y_train_rand = np.array(
+        [classifier.train(config=x, seed=seed) for x in X_train_rand]
+    )
     X_train_rand = np.array(
         [list(i.get_dictionary().values()) for i in X_train_rand]
     ).T.astype(float)
 
-    logger.info(
-        f"Create grid configs for testing and train {model}."
-    )
+    logger.info(f"Create grid configs for testing and train {model}.")
 
     # get test samples for SR
     X_test_dimensions = []
-    n_test_steps = int(np.sqrt(n_test_samples)) if len(optimized_parameters) == 2 else n_test_samples if len(
-        optimized_parameters) == 1 else None
+    n_test_steps = (
+        int(np.sqrt(n_test_samples))
+        if len(optimized_parameters) == 2
+        else n_test_samples
+        if len(optimized_parameters) == 1
+        else None
+    )
     for i in range(len(optimized_parameters)):
-        space = partial(np.logspace, base=np.e) if optimized_parameters[i].log else np.linspace
+        space = (
+            partial(np.logspace, base=np.e)
+            if optimized_parameters[i].log
+            else np.linspace
+        )
         if optimized_parameters[i].log:
             lower = np.log(optimized_parameters[i].lower)
             upper = np.log(optimized_parameters[i].upper)
         else:
             lower = optimized_parameters[i].lower
             upper = optimized_parameters[i].upper
-        param_space = space(lower + 0.5 * (upper - lower) / n_test_steps,
-                            upper - (0.5 * (upper - lower) / n_test_steps),
-                            n_test_steps
-                            )
+        param_space = space(
+            lower + 0.5 * (upper - lower) / n_test_steps,
+            upper - (0.5 * (upper - lower) / n_test_steps),
+            n_test_steps,
+        )
         if isinstance(optimized_parameters[i], UniformIntegerHyperparameter):
             X_test_dimensions.append(np.unique(([int(i) for i in param_space])))
         else:
@@ -115,9 +123,13 @@ if __name__ == "__main__":
         y_test = np.zeros(len(X_test_dimensions[0]))
         for n in range(len(X_test_dimensions[0])):
             param_dict[optimized_parameters[0].name] = X_test[n]
-            conf = Configuration(configuration_space=classifier.configspace, values=param_dict)
+            conf = Configuration(
+                configuration_space=classifier.configspace, values=param_dict
+            )
             y_test[n] = classifier.train(config=conf, seed=seed)
-        X_test, y_test = X_test.astype(float).reshape(1, X_test.shape[0]), y_test.reshape(-1)
+        X_test, y_test = X_test.astype(float).reshape(
+            1, X_test.shape[0]
+        ), y_test.reshape(-1)
     elif len(optimized_parameters) == 2:
         X_test = np.array(
             np.meshgrid(
@@ -129,11 +141,15 @@ if __name__ == "__main__":
         for n in range(X_test.shape[1]):
             for m in range(X_test.shape[2]):
                 for i, param in enumerate(optimized_parameters):
-                    if isinstance(optimized_parameters[i], UniformIntegerHyperparameter):
+                    if isinstance(
+                        optimized_parameters[i], UniformIntegerHyperparameter
+                    ):
                         param_dict[optimized_parameters[i].name] = int(X_test[i, n, m])
                     else:
                         param_dict[optimized_parameters[i].name] = X_test[i, n, m]
-                conf = Configuration(configuration_space=classifier.configspace, values=param_dict)
+                conf = Configuration(
+                    configuration_space=classifier.configspace, values=param_dict
+                )
                 y_test[n, m] = classifier.train(config=conf, seed=seed)
     else:
         X_test = None
@@ -147,9 +163,7 @@ if __name__ == "__main__":
             X_train_rand[i, :] = np.log(X_train_rand[i, :])
             X_test[i, :] = np.log(X_test[i, :])
 
-    logger.info(
-        f"Fit Symbolic Models for {model}."
-    )
+    logger.info(f"Fit Symbolic Models for {model}.")
 
     symbolic_models = {}
 
