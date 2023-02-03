@@ -103,11 +103,12 @@ def append_scores(
     df_scores,
     col_name,
     symb_smac,
-    symb_rand,
+    symb_comp,
     X_train_smac,
     y_train_smac,
-    X_train_rand,
-    y_train_rand,
+    X_train_comp,
+    y_train_comp,
+    comp_postfix,
     X_test,
     y_test,
 ):
@@ -118,23 +119,23 @@ def append_scores(
         "mae_train_smac": mean_absolute_error(
             y_train_smac, symb_smac.predict(X_train_smac)
         ),
-        "mae_train_rand": mean_absolute_error(
-            y_train_rand, symb_rand.predict(X_train_rand)
+        f"mae_train_{comp_postfix}": mean_absolute_error(
+            y_train_comp, symb_comp.predict(X_train_comp)
         ),
         "mae_test_smac": mean_absolute_error(y_test, symb_smac.predict(X_test)),
-        "mae_test_rand": mean_absolute_error(y_test, symb_rand.predict(X_test)),
+        f"mae_test_{comp_postfix}": mean_absolute_error(y_test, symb_comp.predict(X_test)),
         "mse_train_smac": mean_squared_error(
             y_train_smac, symb_smac.predict(X_train_smac)
         ),
-        "mse_train_rand": mean_squared_error(
-            y_train_rand, symb_rand.predict(X_train_rand)
+        f"mse_train_{comp_postfix}": mean_squared_error(
+            y_train_comp, symb_comp.predict(X_train_comp)
         ),
         "mse_test_smac": mean_squared_error(y_test, symb_smac.predict(X_test)),
-        "mse_test_rand": mean_squared_error(y_test, symb_rand.predict(X_test)),
+        f"mse_test_{comp_postfix}": mean_squared_error(y_test, symb_comp.predict(X_test)),
         "r2_train_smac": r2_score(y_train_smac, symb_smac.predict(X_train_smac)),
-        "r2_train_rand": r2_score(y_train_rand, symb_rand.predict(X_train_rand)),
+        f"r2_train_{comp_postfix}": r2_score(y_train_comp, symb_comp.predict(X_train_comp)),
         "r2_test_smac": r2_score(y_test, symb_smac.predict(X_test)),
-        "r2_test_rand": r2_score(y_test, symb_rand.predict(X_test)),
+        f"r2_test_{comp_postfix}": r2_score(y_test, symb_comp.predict(X_test)),
     }
     return df_scores
 
@@ -254,7 +255,7 @@ def plot_symb1d(
 
 def plot_symb2d(
     X_train_smac,
-    X_train_rand,
+    X_train_compare,
     X_test,
     y_test,
     symbolic_models,
@@ -265,12 +266,11 @@ def plot_symb2d(
     plot_dir=None,
 ):
     """
-    In the 2D setting, create a plot showing the training points from SMAC and random sampling, as well as the true
+    In the 2D setting, create a plot showing the training points from SMAC and another sampling, as well as the true
     function and the functions fitted by symbolic models evaluated on a 2D grid.
     """
 
-    LABEL_SIZE = 8
-    TITLE_SIZE = 9
+    LABEL_SIZE = 9
     X0_name = (
         "X0"
         if parameters[0].name == "X0"
@@ -306,13 +306,13 @@ def plot_symb2d(
     dim_y = np.arange(np.min(X_test[1]), np.max(X_test[1]) + step_y / 2, step_y)
 
     fig, axes = plt.subplots(
-        ncols=1, nrows=len(symbolic_models) + 1, constrained_layout=True
+        ncols=1, nrows=len(symbolic_models) + 1, constrained_layout=True, figsize=(8, 5)
     )
     im = axes[0].pcolormesh(X_test[0], X_test[1], y_test, cmap="summer", shading="auto")
     if function_expression:
-        axes[0].set_title(f"{function_expression}", fontsize=TITLE_SIZE)
+        axes[0].set_title(f"True: {function_expression}", fontsize=LABEL_SIZE)
     else:
-        axes[0].set_title(f"{function_name}", fontsize=TITLE_SIZE)
+        axes[0].set_title(f"{function_name}", fontsize=LABEL_SIZE)
     axes[0].set_xlabel(X0_name, fontsize=LABEL_SIZE)
     axes[0].set_ylabel(X1_name, fontsize=LABEL_SIZE)
     axes[0].set_xticks(dim_x)
@@ -325,7 +325,7 @@ def plot_symb2d(
     for i, model_name in enumerate(symbolic_models):
         symbolic_model = symbolic_models[model_name]
         conv = convert_symb(symbolic_model, n_decimals=3)
-        if len(str(conv)) < 70:
+        if len(str(conv)) < 80:
             label = f"{model_name}: {conv}"
         else:
             label = f"{model_name}:"
@@ -340,7 +340,7 @@ def plot_symb2d(
             cmap="summer",
             shading="auto",
         )
-        axes[i + 1].set_title(f"{label}", fontsize=TITLE_SIZE)
+        axes[i + 1].set_title(f"{label}", fontsize=LABEL_SIZE)
         axes[i + 1].set_xlabel(X0_name, fontsize=LABEL_SIZE)
         axes[i + 1].set_ylabel(X1_name, fontsize=LABEL_SIZE)
         axes[i + 1].set_xticks(dim_x)
@@ -349,11 +349,15 @@ def plot_symb2d(
         axes[i + 1].set_ylim(X1_lower, X1_upper)
         axes[i + 1].tick_params(axis="both", which="major", labelsize=LABEL_SIZE)
         axes[i + 1].grid(alpha=0)
-        X_train = None
         if "smac" in model_name:
             X_train = X_train_smac
         elif "rand" in model_name:
-            X_train = X_train_rand
+            X_train = X_train_compare
+        elif "test" in model_name:
+            X_train = X_train_compare
+        else:
+            X_train = None
+            print("No training data for model name. Model name should contain 'smac' or 'rand'.")
         if X_train is not None:
             axes[i + 1].scatter(
                 X_train[0],

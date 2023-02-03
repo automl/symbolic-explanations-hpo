@@ -168,7 +168,7 @@ def get_functions2d() -> list[NamedFunction]:
         ),
         NamedFunction(
             name="Branin 2D",
-            expression="X1 - 5.1 / (4 * PI**2) * X0**2 + 5 / PI * X0 - 6)**2 + 10 * (1 - 1 / (8 * PI)) * cos(X0) + 10",
+            expression="(X1 - 5.1 / (4 * PI**2) * X0**2 + 5 / PI * X0 - 6)**2 + 10 * (1 - 1 / (8 * PI)) * cos(X0) + 10",
             function=lambda x: (
                 x[1] - 5.1 / (4 * np.pi**2) * x[0] ** 2 + 5 / np.pi * x[0] - 6
             )

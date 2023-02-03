@@ -33,12 +33,7 @@ if __name__ == "__main__":
     symb_meta = False
     symb_purs = False
 
-    np.random.seed(seed)
-
-    run_dir, res_dir, plot_dir = get_output_dirs()
-
-    # setup logging
-    logger = logging.getLogger(__name__)
+    compare_on_test = True
 
     if model == "MLP":
         classifier = MLP(
@@ -58,16 +53,23 @@ if __name__ == "__main__":
         print(f"Unknown model: {model}")
         classifier = None
 
-    optimized_parameters = classifier.configspace.get_hyperparameters()
+    np.random.seed(seed)
 
-    logger.info(f"Run SMAC to sample configs and train {model}.")
+    run_dir, res_dir, plot_dir = get_output_dirs()
+
+    # setup logging
+    logger = logging.getLogger(__name__)
+
+    optimized_parameters = classifier.configspace.get_hyperparameters()
 
     df_scores_symb_reg = pd.DataFrame() if symb_reg else None
     df_scores_symb_meta = pd.DataFrame() if symb_meta else None
     df_scores_symb_purs = pd.DataFrame() if symb_purs else None
     df_expr = pd.DataFrame()
 
-    X_train_smac, y_train_smac = run_smac_optimization(
+    logger.info(f"Run SMAC to sample configs and train {model}.")
+
+    X_train_smac, y_train_smac, smac_facade = run_smac_optimization(
         configspace=classifier.configspace,
         facade=HyperparameterOptimizationFacade,
         target_function=classifier.train,
@@ -77,17 +79,6 @@ if __name__ == "__main__":
         seed=seed,
     )
     X_train_smac = X_train_smac.astype(float)
-
-    logger.info(f"Sample random configs and train {model}.")
-
-    # get train samples for SR from random sampling
-    X_train_rand = classifier.configspace.sample_configuration(size=n_smac_samples)
-    y_train_rand = np.array(
-        [classifier.train(config=x, seed=seed) for x in X_train_rand]
-    )
-    X_train_rand = np.array(
-        [list(i.get_dictionary().values()) for i in X_train_rand]
-    ).T.astype(float)
 
     logger.info(f"Create grid configs for testing and train {model}.")
 
@@ -162,11 +153,28 @@ if __name__ == "__main__":
         y_test = None
         print("Not yet supported.")
 
+    if compare_on_test:
+        X_train_compare = X_test.copy().reshape(len(optimized_parameters), -1)
+        y_train_compare = y_test.copy().reshape(-1)
+    else:
+        logger.info(f"Sample random configs and train {model}.")
+
+        # get train samples for SR from random sampling
+        X_train_rand = classifier.configspace.sample_configuration(size=n_smac_samples)
+        y_train_rand = np.array(
+            [classifier.train(config=x, seed=seed) for x in X_train_rand]
+        )
+        X_train_rand = np.array(
+            [list(i.get_dictionary().values()) for i in X_train_rand]
+        ).T.astype(float)
+        X_train_compare = X_train_rand.copy()
+        y_train_compare = y_train_rand.copy()
+
     # log transform values of parameters that were log-sampled before training the symbolic models
     for i in range(len(optimized_parameters)):
         if optimized_parameters[i].log:
             X_train_smac[i, :] = np.log(X_train_smac[i, :])
-            X_train_rand[i, :] = np.log(X_train_rand[i, :])
+            X_train_compare[i, :] = np.log(X_train_compare[i, :])
             X_test[i, :] = np.log(X_test[i, :])
 
     logger.info(f"Fit Symbolic Models for {model}.")
@@ -186,7 +194,7 @@ if __name__ == "__main__":
             max_samples=0.9,
             parsimony_coefficient=0.01,
             function_set=get_function_set(),
-            metric="mean absolute error",
+            metric="mse", #"mean absolute error",
             random_state=0,
             verbose=1,
         )
@@ -199,24 +207,29 @@ if __name__ == "__main__":
         # run SR on SMAC samples
         symb_smac = SymbolicRegressor(**symb_params)
         symb_smac.fit(X_train_smac.T, y_train_smac)
-
-        # run SR on random samples
-        symb_rand = SymbolicRegressor(**symb_params)
-        symb_rand.fit(X_train_rand.T, y_train_rand)
-
         symbolic_models["Symb-smac"] = symb_smac
-        symbolic_models["Symb-rand"] = symb_rand
+
+        # run SR on compare samples (either random samples or test grid samples)
+        symb_compare = SymbolicRegressor(**symb_params)
+        symb_compare.fit(X_train_compare.T, y_train_compare)
+        if compare_on_test:
+            symbolic_models["Symb-test"] = symb_compare
+            comp_postfix = "test"
+        else:
+            symbolic_models["Symb-rand"] = symb_compare
+            comp_postfix = "rand"
 
         # write results to csv files
         df_scores_symb_reg = append_scores(
             df_scores_symb_reg,
             model,
             symb_smac,
-            symb_rand,
+            symb_compare,
             X_train_smac.T,
             y_train_smac,
-            X_train_rand.T,
-            y_train_rand,
+            X_train_compare.T,
+            y_train_compare,
+            comp_postfix,
             X_test.reshape(len(optimized_parameters), -1).T,
             y_test.reshape(-1),
         )
@@ -232,9 +245,9 @@ if __name__ == "__main__":
 
         # run symbolic metamodels on random samples
         symb_meta_rand = SymbolicMetaModelWrapper()
-        symb_meta_rand.fit(X_train_rand.T, y_train_rand)
+        symb_meta_rand.fit(X_train_compare.T, y_train_compare)
         # or run symbolic metaexpressions on SMAC samples
-        # symb_meta_rand, _ = get_symbolic_model(function.apply, X_train_rand)
+        # symb_meta_rand, _ = get_symbolic_model(function.apply, X_train_compare)
         # symb_meta_rand = SymbolicMetaExpressionWrapper(symb_meta_rand)
 
         symbolic_models["Meta-smac"] = symb_meta_smac
@@ -248,8 +261,9 @@ if __name__ == "__main__":
             symb_meta_rand,
             X_train_smac.T,
             y_train_smac,
-            X_train_rand.T,
-            y_train_rand,
+            X_train_compare.T,
+            y_train_compare,
+            comp_postfix,
             X_test.reshape(len(optimized_parameters), -1).T,
             y_test.reshape(-1),
         )
@@ -277,7 +291,7 @@ if __name__ == "__main__":
 
         # run symbolic pursuit models on random samples
         symb_purs_rand = SymbolicPursuitModelWrapper(**purs_params)
-        symb_purs_rand.fit(X_train_rand.T, y_train_rand)
+        symb_purs_rand.fit(X_train_compare.T, y_train_compare)
 
         symbolic_models["Pursuit-smac"] = symb_purs_smac
         symbolic_models["Pursuit-rand"] = symb_purs_rand
@@ -290,8 +304,9 @@ if __name__ == "__main__":
             symb_purs_rand,
             X_train_smac.T,
             y_train_smac,
-            X_train_rand.T,
-            y_train_rand,
+            X_train_compare.T,
+            y_train_compare,
+            comp_postfix,
             X_test.reshape(len(optimized_parameters), -1).T,
             y_test.reshape(-1),
         )
@@ -309,8 +324,8 @@ if __name__ == "__main__":
         plot = plot_symb1d(
             X_train_smac=X_train_smac.T,
             y_train_smac=y_train_smac,
-            X_train_rand=X_train_rand.T,
-            y_train_rand=y_train_rand,
+            X_train_rand=X_train_compare.T,
+            y_train_rand=y_train_compare,
             X_test=X_test.T,
             y_test=y_test,
             xlabel=f"log({param.name})" if param.log else param.name,
@@ -324,7 +339,7 @@ if __name__ == "__main__":
     elif len(optimized_parameters) == 2:
         plot = plot_symb2d(
             X_train_smac=X_train_smac,
-            X_train_rand=X_train_rand,
+            X_train_compare=X_train_compare,
             X_test=X_test,
             y_test=y_test,
             function_name=model,

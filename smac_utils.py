@@ -80,4 +80,4 @@ def run_smac_optimization(
 
     conf_hp, conf_res = np.array(conf_hp), np.array(conf_res)
 
-    return conf_hp, conf_res.reshape(-1)
+    return conf_hp, conf_res.reshape(-1), smac
