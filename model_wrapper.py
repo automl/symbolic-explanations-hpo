@@ -15,10 +15,164 @@ from ConfigSpace import (
 from sklearn.datasets import load_digits
 from sklearn.model_selection import StratifiedKFold, cross_val_score
 from sklearn.neural_network import MLPClassifier
-
+from sklearn.ensemble import AdaBoostClassifier
 
 iris = datasets.load_iris()
-dataset = load_digits()
+digits = load_digits()
+
+
+class MLP:
+    def __init__(
+        self,
+        optimize_n_neurons=False,
+        optimize_n_layer=False,
+        optimize_activation=False,
+        optimize_solver=False,
+        optimize_batch_size=False,
+        optimize_learning_rate_init=False,
+        optimize_max_iter=False,
+        seed=0,
+    ):
+        self.optimize_n_neurons = optimize_n_neurons
+        self.optimize_n_layer = optimize_n_layer
+        self.optimize_activation = optimize_activation
+        self.optimize_solver = optimize_solver
+        self.optimize_batch_size = optimize_batch_size
+        self.optimize_learning_rate_init = optimize_learning_rate_init
+        self.optimize_max_iter = optimize_max_iter
+        self.seed = seed
+
+    @property
+    def configspace(self) -> ConfigurationSpace:
+        cs = ConfigurationSpace(seed=self.seed)
+
+        n_layer = Integer("n_layer", (1, 5), default=1)
+        n_neurons = Integer("n_neurons", (8, 256), log=True, default=10)
+        activation = Categorical(
+            "activation", ["logistic", "tanh", "relu"], default="tanh"
+        )
+        solver = Categorical("solver", ["lbfgs", "sgd", "adam"], default="adam")
+        batch_size = Integer("batch_size", (30, 300), default=200)
+        learning_rate_init = Float(
+            "learning_rate_init", (0.0001, 1.0), default=0.001, log=True
+        )
+        max_iter = Integer("max_iter", (10, 500), default=200)
+
+        if self.optimize_n_layer:
+            cs.add_hyperparameter(n_layer)
+        if self.optimize_n_neurons:
+            cs.add_hyperparameter(n_neurons)
+        if self.optimize_activation:
+            cs.add_hyperparameter(activation)
+        if self.optimize_solver:
+            cs.add_hyperparameter(solver)
+        if self.optimize_batch_size:
+            cs.add_hyperparameter(batch_size)
+        if self.optimize_learning_rate_init:
+            cs.add_hyperparameter(learning_rate_init)
+        if self.optimize_max_iter:
+            cs.add_hyperparameter(max_iter)
+
+        if self.optimize_solver and self.optimize_learning_rate_init:
+            use_lr_init = InCondition(
+                cs=cs, child=learning_rate_init, parent=solver, values=["sgd", "adam"]
+            )
+            cs.add_condition(use_lr_init)
+        if self.optimize_solver and self.optimize_batch_size:
+            use_batch_size = InCondition(
+                cs=cs, child=batch_size, parent=solver, values=["sgd", "adam"]
+            )
+            cs.add_condition(use_batch_size)
+        return cs
+
+    def train(self, config: Configuration, seed: int) -> float:
+        """Train an MLP based on a configuration and evaluate it on the
+        digit-dataset using cross-validation."""
+        n_layer = config["n_layer"] if "n_layer" in config else 1
+        n_neurons = config["n_neurons"] if "n_neurons" in config else 10
+        activation = config["activation"] if "activation" in config else "tanh"
+        solver = config["solver"] if "solver" in config else "adam"
+        batch_size = config["batch_size"] if "batch_size" in config else 200
+        lr_init = (
+            config["learning_rate_init"] if "learning_rate_init" in config else 0.001
+        )
+        max_iter = config["max_iter"] if "max_iter" in config else 200
+
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore")
+
+            classifier = MLPClassifier(
+                hidden_layer_sizes=n_neurons * n_layer,
+                solver=solver,
+                batch_size=batch_size,
+                activation=activation,
+                learning_rate="constant",
+                learning_rate_init=lr_init,
+                max_iter=max_iter,
+                random_state=self.seed,
+            )
+
+            cv = StratifiedKFold(n_splits=5, random_state=self.seed, shuffle=True)
+            score = cross_val_score(
+                classifier, digits.data, digits.target, cv=cv, error_score="raise"
+            )
+
+        return 1 - np.mean(score)
+
+
+class BDT:
+    def __init__(
+        self,
+        optimize_learning_rate=False,
+        optimize_n_estimators=False,
+        seed=0,
+    ):
+        self.optimize_learning_rate = optimize_learning_rate
+        self.optimize_n_estimators = optimize_n_estimators
+        self.seed = seed
+
+    @property
+    def configspace(self) -> ConfigurationSpace:
+        cs = ConfigurationSpace(seed=self.seed)
+
+        learning_rate = Float(
+            "learning_rate", (0.0001, 1.0), default=0.1, log=True
+        )
+        n_estimators = Integer("n_estimators", (1, 200), default=100)
+
+        if self.optimize_learning_rate:
+            cs.add_hyperparameter(learning_rate)
+        if self.optimize_n_estimators:
+            cs.add_hyperparameter(n_estimators)
+
+        return cs
+
+    def train(self, config: Configuration, seed: int) -> float:
+        """Train an Ada Boost Classifier based on a configuration and evaluate it on the
+        digit-dataset using cross-validation."""
+
+        learning_rate = (
+            config["learning_rate"] if "learning_rate" in config else 0.1
+        )
+        n_estimators = (
+            config["n_estimators"] if "n_estimators" in config else 100
+        )
+
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore")
+
+            classifier = AdaBoostClassifier(
+                learning_rate=learning_rate,
+                n_estimators=n_estimators,
+                random_state=self.seed,
+            )
+
+            cv = StratifiedKFold(n_splits=5, random_state=self.seed, shuffle=True)
+            score = cross_val_score(
+                classifier, digits.data, digits.target, cv=cv, error_score="raise"
+            )
+
+        return 1 - np.mean(score)
 
 
 class SVM:
@@ -30,7 +184,6 @@ class SVM:
         optimize_degree=False,
         optimize_coef=False,
         optimize_gamma=False,
-        optimize_gamma_value=False,
         seed=0,
     ):
         self.optimize_kernel = optimize_kernel
@@ -39,7 +192,6 @@ class SVM:
         self.optimize_degree = optimize_degree
         self.optimize_coef = optimize_coef
         self.optimize_gamma = optimize_gamma
-        self.optimize_gamma_value = optimize_gamma_value
         self.seed = seed
 
     @property
@@ -65,7 +217,7 @@ class SVM:
             cs.add_hyperparameter(degree)
         if self.optimize_coef:
             cs.add_hyperparameter(coef)
-        if self.optimize_gamma_value:
+        if self.optimize_gamma:
             cs.add_hyperparameter(gamma)
 
         if self.optimize_kernel and self.optimize_degree:
@@ -106,112 +258,3 @@ class SVM:
         cost = 1 - np.mean(scores)
 
         return cost
-
-
-class MLP:
-    def __init__(
-        self,
-        optimize_n_neurons=False,
-        optimize_n_layer=False,
-        optimize_activation=False,
-        optimize_solver=False,
-        optimize_batch_size=False,
-        optimize_learning_rate=False,
-        optimize_learning_rate_init=False,
-        max_iter=25,
-        seed=0,
-    ):
-        self.optimize_n_neurons = optimize_n_neurons
-        self.optimize_n_layer = optimize_n_layer
-        self.optimize_activation = optimize_activation
-        self.optimize_solver = optimize_solver
-        self.optimize_batch_size = optimize_batch_size
-        self.optimize_learning_rate = optimize_learning_rate
-        self.optimize_learning_rate_init = optimize_learning_rate_init
-        self.max_iter = max_iter
-        self.seed = seed
-
-    @property
-    def configspace(self) -> ConfigurationSpace:
-        cs = ConfigurationSpace(seed=self.seed)
-
-        n_layer = Integer("n_layer", (1, 5), default=1)
-        n_neurons = Integer("n_neurons", (8, 256), log=True, default=10)
-        activation = Categorical(
-            "activation", ["logistic", "tanh", "relu"], default="tanh"
-        )
-        solver = Categorical("solver", ["lbfgs", "sgd", "adam"], default="adam")
-        learning_rate = Categorical(
-            "learning_rate", ["constant", "invscaling", "adaptive"], default="constant"
-        )
-        batch_size = Integer("batch_size", (30, 300), default=200)
-        learning_rate_init = Float(
-            "learning_rate_init", (0.0001, 1.0), default=0.001, log=True
-        )
-
-        if self.optimize_n_layer:
-            cs.add_hyperparameter(n_layer)
-        if self.optimize_n_neurons:
-            cs.add_hyperparameter(n_neurons)
-        if self.optimize_activation:
-            cs.add_hyperparameter(activation)
-        if self.optimize_solver:
-            cs.add_hyperparameter(solver)
-        if self.optimize_learning_rate:
-            cs.add_hyperparameter(learning_rate)
-        if self.optimize_batch_size:
-            cs.add_hyperparameter(batch_size)
-        if self.optimize_learning_rate_init:
-            cs.add_hyperparameter(learning_rate_init)
-
-        if self.optimize_solver and self.optimize_learning_rate:
-            use_lr = EqualsCondition(
-                cs=cs, child=learning_rate, parent=solver, value="sgd"
-            )
-            cs.add_condition(use_lr)
-        if self.optimize_solver and self.optimize_learning_rate_init:
-            use_lr_init = InCondition(
-                cs=cs, child=learning_rate_init, parent=solver, values=["sgd", "adam"]
-            )
-            cs.add_condition(use_lr_init)
-        if self.optimize_solver and self.optimize_batch_size:
-            use_batch_size = InCondition(
-                cs=cs, child=batch_size, parent=solver, values=["sgd", "adam"]
-            )
-            cs.add_condition(use_batch_size)
-        return cs
-
-    def train(self, config: Configuration, seed: int) -> float:
-        """Train an MLP based on a configuration and evaluate it on the
-        digit-dataset using cross-validation."""
-        config_dict = config.get_dictionary()
-        n_layer = config["n_layer"] if "n_layer" in config else 1
-        n_neurons = config["n_neurons"] if "n_neurons" in config else 10
-        activation = config["activation"] if "activation" in config else "tanh"
-        solver = config["solver"] if "solver" in config else "adam"
-        batch_size = config["batch_size"] if "batch_size" in config else 200
-        lr = config["learning_rate"] if "learning_rate" in config else "constant"
-        lr_init = (
-            config["learning_rate_init"] if "learning_rate_init" in config else 0.001
-        )
-
-        with warnings.catch_warnings():
-            warnings.filterwarnings("ignore")
-
-            classifier = MLPClassifier(
-                hidden_layer_sizes=n_neurons * n_layer,
-                solver=solver,
-                batch_size=batch_size,
-                activation=activation,
-                learning_rate=lr,
-                learning_rate_init=lr_init,
-                max_iter=self.max_iter,
-                random_state=self.seed,
-            )
-
-            cv = StratifiedKFold(n_splits=5, random_state=self.seed, shuffle=True)
-            score = cross_val_score(
-                classifier, dataset.data, dataset.target, cv=cv, error_score="raise"
-            )
-
-        return 1 - np.mean(score)
