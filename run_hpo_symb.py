@@ -6,7 +6,11 @@ from functools import partial
 from gplearn.genetic import SymbolicRegressor
 from smac import BlackBoxFacade, HyperparameterOptimizationFacade
 from smac.runhistory.encoder.encoder import convert_configurations_to_array
-from ConfigSpace import Configuration, UniformIntegerHyperparameter, UniformFloatHyperparameter
+from ConfigSpace import (
+    Configuration,
+    UniformIntegerHyperparameter,
+    UniformFloatHyperparameter,
+)
 
 from symbolic_meta_model_wrapper import (
     SymbolicMetaModelWrapper,
@@ -47,7 +51,7 @@ if __name__ == "__main__":
             optimize_max_iter=False,
             seed=seed,
         )
-    elif model == "SVM": # set lower tolerance, iris (stopping_criteria=0.00001)
+    elif model == "SVM":  # set lower tolerance, iris (stopping_criteria=0.00001)
         classifier = SVM(
             optimize_C=False,
             optimize_degree=True,
@@ -55,15 +59,9 @@ if __name__ == "__main__":
             optimize_gamma=False,
         )
     elif model == "BDT":
-        classifier = BDT(
-            optimize_learning_rate=True,
-            optimize_n_estimators=True
-        )
+        classifier = BDT(optimize_learning_rate=True, optimize_n_estimators=True)
     elif model == "DT":
-        classifier = DT(
-            optimize_max_depth=True,
-            optimize_min_samples_leaf=True
-        )
+        classifier = DT(optimize_max_depth=True, optimize_min_samples_leaf=True)
     else:
         print(f"Unknown model: {model}")
         classifier = None
@@ -86,7 +84,7 @@ if __name__ == "__main__":
 
     X_train_smac, y_train_smac, smac_facade = run_smac_optimization(
         configspace=classifier.configspace,
-        facade=BlackBoxFacade, # HyperparameterOptimizationFacade,
+        facade=BlackBoxFacade,  # HyperparameterOptimizationFacade,
         target_function=classifier.train,
         function_name=model,
         n_eval=n_smac_samples,
@@ -124,7 +122,9 @@ if __name__ == "__main__":
             n_test_steps,
         )
         if isinstance(optimized_parameters[i], UniformIntegerHyperparameter):
-            int_spacing = np.unique(([int(i) for i in param_space]))# + [optimized_parameters[i].upper]))
+            int_spacing = np.unique(
+                ([int(i) for i in param_space])
+            )  # + [optimized_parameters[i].upper]))
             X_test_dimensions.append(int_spacing)
         else:
             X_test_dimensions.append(param_space)
@@ -190,12 +190,30 @@ if __name__ == "__main__":
             y_test_surrogate = np.zeros((X_test.shape[1], X_test.shape[2]))
             for i in range(X_test.shape[1]):
                 for j in range(X_test.shape[2]):
-                    x0 = int(X_test[0, i, j]) if isinstance(optimized_parameters[0], UniformIntegerHyperparameter) else X_test[0, i, j]
-                    x1 = int(X_test[1, i, j]) if isinstance(optimized_parameters[1], UniformIntegerHyperparameter) else X_test[1, i, j]
-                    conf = Configuration(
-                        configuration_space=classifier.configspace, values={optimized_parameters[0].name: x0, optimized_parameters[1].name: x1}
+                    x0 = (
+                        int(X_test[0, i, j])
+                        if isinstance(
+                            optimized_parameters[0], UniformIntegerHyperparameter
+                        )
+                        else X_test[0, i, j]
                     )
-                    y_test_surrogate[i, j] = smac_facade._model.predict(convert_configurations_to_array([conf]))[0][0][0]
+                    x1 = (
+                        int(X_test[1, i, j])
+                        if isinstance(
+                            optimized_parameters[1], UniformIntegerHyperparameter
+                        )
+                        else X_test[1, i, j]
+                    )
+                    conf = Configuration(
+                        configuration_space=classifier.configspace,
+                        values={
+                            optimized_parameters[0].name: x0,
+                            optimized_parameters[1].name: x1,
+                        },
+                    )
+                    y_test_surrogate[i, j] = smac_facade._model.predict(
+                        convert_configurations_to_array([conf])
+                    )[0][0][0]
             y_test_surrogate = y_test_surrogate.reshape(-1)
 
     # log transform values of parameters that were log-sampled before training the symbolic models
@@ -222,10 +240,13 @@ if __name__ == "__main__":
             max_samples=0.9,
             parsimony_coefficient=0.01,
             function_set=get_function_set(),
-            metric="mse", #"mean absolute error",
+            metric="mse",  # "mean absolute error",
             random_state=0,
             verbose=1,
-            const_range=(100, 100)  # Range for constants, rather arbitrary setting here?
+            const_range=(
+                100,
+                100,
+            ),  # Range for constants, rather arbitrary setting here?
         )
 
         write_dict_to_cfg_file(
@@ -236,7 +257,10 @@ if __name__ == "__main__":
         # run SR on SMAC samples
         symb_smac = SymbolicRegressor(**symb_params)
         if train_on_surrogate:
-            symb_smac.fit(X_test.T.reshape(X_test.shape[1] * X_test.shape[2], X_test.shape[0]), y_test_surrogate)
+            symb_smac.fit(
+                X_test.T.reshape(X_test.shape[1] * X_test.shape[2], X_test.shape[0]),
+                y_test_surrogate,
+            )
         else:
             symb_smac.fit(X_train_smac.T, y_train_smac)
         symbolic_models["Symb-smac"] = symb_smac

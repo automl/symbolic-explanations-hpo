@@ -136,9 +136,7 @@ class BDT:
     def configspace(self) -> ConfigurationSpace:
         cs = ConfigurationSpace(seed=self.seed)
 
-        learning_rate = Float(
-            "learning_rate", (0.0001, 1.0), default=0.1, log=True
-        )
+        learning_rate = Float("learning_rate", (0.0001, 1.0), default=0.1, log=True)
         n_estimators = Integer("n_estimators", (1, 200), default=100)
 
         if self.optimize_learning_rate:
@@ -152,12 +150,8 @@ class BDT:
         """Train an Ada Boost Classifier based on a configuration and evaluate it on the
         digit-dataset using cross-validation."""
 
-        learning_rate = (
-            config["learning_rate"] if "learning_rate" in config else 0.1
-        )
-        n_estimators = (
-            config["n_estimators"] if "n_estimators" in config else 100
-        )
+        learning_rate = config["learning_rate"] if "learning_rate" in config else 0.1
+        n_estimators = config["n_estimators"] if "n_estimators" in config else 100
 
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore")
@@ -192,7 +186,9 @@ class DT:
         cs = ConfigurationSpace(seed=self.seed)
 
         max_depth = Integer(
-            "max_depth", (1, 20), default=3, 
+            "max_depth",
+            (1, 20),
+            default=3,
         )
         min_samples_leaf = Integer("min_samples_leaf", (1, 100), default=1)
 
@@ -207,9 +203,7 @@ class DT:
         """Train a Decision Tree Classifier based on a configuration and evaluate it on the
         digit-dataset using cross-validation."""
 
-        max_depth = (
-            config["max_depth"] if "max_depth" in config else 3
-        )
+        max_depth = config["max_depth"] if "max_depth" in config else 3
         min_samples_leaf = (
             config["min_samples_leaf"] if "min_samples_leaf" in config else 1
         )
@@ -310,7 +304,9 @@ class SVM:
             gamma=gamma,
             random_state=self.seed,
         )
-        scores = cross_val_score(classifier, digits.data, digits.target, cv=5) # score: accuracy
+        scores = cross_val_score(
+            classifier, digits.data, digits.target, cv=5
+        )  # score: accuracy
         cost = 1 - np.mean(scores)
 
         return cost

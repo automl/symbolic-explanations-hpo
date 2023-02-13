@@ -59,7 +59,7 @@ if __name__ == "__main__":
         # get train samples for SR from SMAC sampling
         samples_smac, _, smac_facade = run_smac_optimization(
             configspace=function.cs,
-            facade=BlackBoxFacade, #HyperparameterOptimizationFacade,
+            facade=BlackBoxFacade,  # HyperparameterOptimizationFacade,
             target_function=function.smac_apply,
             function_name=function.name.lower().replace(" ", "_"),
             n_eval=n_smac_samples,
@@ -118,9 +118,12 @@ if __name__ == "__main__":
             for i in range(X_test.shape[1]):
                 for j in range(X_test.shape[2]):
                     conf = Configuration(
-                        configuration_space=function.cs, values={"X0": X_test[0, i, j], "X1": X_test[1, i, j]}
+                        configuration_space=function.cs,
+                        values={"X0": X_test[0, i, j], "X1": X_test[1, i, j]},
                     )
-                    y_test_surrogate[i, j] = smac_facade._model.predict(convert_configurations_to_array([conf]))[0][0][0]
+                    y_test_surrogate[i, j] = smac_facade._model.predict(
+                        convert_configurations_to_array([conf])
+                    )[0][0][0]
             y_test_surrogate = y_test_surrogate.reshape(-1)
 
         if n_dim == 1:
@@ -157,7 +160,10 @@ if __name__ == "__main__":
                 metric="mse",
                 random_state=0,
                 verbose=1,
-                const_range=(100, 100) # Range for constants, rather arbitrary setting here?
+                const_range=(
+                    100,
+                    100,
+                ),  # Range for constants, rather arbitrary setting here?
             )
 
             write_dict_to_cfg_file(
@@ -168,7 +174,12 @@ if __name__ == "__main__":
             # run SR on SMAC samples
             symb_smac = SymbolicRegressor(**symb_params)
             if train_on_surrogate:
-                symb_smac.fit(X_test.T.reshape(X_test.shape[1] * X_test.shape[2], X_test.shape[0]), y_test_surrogate)
+                symb_smac.fit(
+                    X_test.T.reshape(
+                        X_test.shape[1] * X_test.shape[2], X_test.shape[0]
+                    ),
+                    y_test_surrogate,
+                )
             else:
                 symb_smac.fit(X_train_smac.T, y_train_smac)
             symbolic_models["Symb-smac"] = symb_smac

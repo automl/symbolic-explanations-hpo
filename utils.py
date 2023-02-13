@@ -75,7 +75,9 @@ def convert_symb(symb, n_dim: int = None, n_decimals: int = None) -> sympy.core.
     }
 
     if len(symb_str) > 500:
-        print(f"Expression of length {len(symb_str)} too long to convert, return raw string.")
+        print(
+            f"Expression of length {len(symb_str)} too long to convert, return raw string."
+        )
         return symb_str
 
     symb_conv = sympy.simplify(
@@ -123,7 +125,9 @@ def append_scores(
             y_train_comp, symb_comp.predict(X_train_comp)
         ),
         "mae_test_smac": mean_absolute_error(y_test, symb_smac.predict(X_test)),
-        f"mae_test_{comp_postfix}": mean_absolute_error(y_test, symb_comp.predict(X_test)),
+        f"mae_test_{comp_postfix}": mean_absolute_error(
+            y_test, symb_comp.predict(X_test)
+        ),
         "mse_train_smac": mean_squared_error(
             y_train_smac, symb_smac.predict(X_train_smac)
         ),
@@ -131,9 +135,13 @@ def append_scores(
             y_train_comp, symb_comp.predict(X_train_comp)
         ),
         "mse_test_smac": mean_squared_error(y_test, symb_smac.predict(X_test)),
-        f"mse_test_{comp_postfix}": mean_squared_error(y_test, symb_comp.predict(X_test)),
+        f"mse_test_{comp_postfix}": mean_squared_error(
+            y_test, symb_comp.predict(X_test)
+        ),
         "r2_train_smac": r2_score(y_train_smac, symb_smac.predict(X_train_smac)),
-        f"r2_train_{comp_postfix}": r2_score(y_train_comp, symb_comp.predict(X_train_comp)),
+        f"r2_train_{comp_postfix}": r2_score(
+            y_train_comp, symb_comp.predict(X_train_comp)
+        ),
         "r2_test_smac": r2_score(y_test, symb_smac.predict(X_test)),
         f"r2_test_{comp_postfix}": r2_score(y_test, symb_comp.predict(X_test)),
     }
@@ -312,13 +320,31 @@ def plot_symb2d(
     pred_test = []
     for i, model_name in enumerate(symbolic_models):
         symbolic_model = symbolic_models[model_name]
-        pred_test.append(symbolic_model.predict(
-            X_test.T.reshape(X_test.shape[1] * X_test.shape[2], X_test.shape[0])
-        ).reshape(X_test.shape[2], X_test.shape[1]).T)
-    y_values = np.concatenate((y_test.reshape(-1, 1), pred_test[0].reshape(-1, 1), pred_test[1].reshape(-1, 1)))
+        pred_test.append(
+            symbolic_model.predict(
+                X_test.T.reshape(X_test.shape[1] * X_test.shape[2], X_test.shape[0])
+            )
+            .reshape(X_test.shape[2], X_test.shape[1])
+            .T
+        )
+    y_values = np.concatenate(
+        (
+            y_test.reshape(-1, 1),
+            pred_test[0].reshape(-1, 1),
+            pred_test[1].reshape(-1, 1),
+        )
+    )
     vmin, vmax = min(y_values), max(y_values)
 
-    im = axes[0].pcolormesh(X_test[0], X_test[1], y_test, cmap="summer", shading="auto", vmin=vmin, vmax=vmax)
+    im = axes[0].pcolormesh(
+        X_test[0],
+        X_test[1],
+        y_test,
+        cmap="summer",
+        shading="auto",
+        vmin=vmin,
+        vmax=vmax,
+    )
     if function_expression:
         axes[0].set_title(f"True: {function_expression}", fontsize=LABEL_SIZE)
     else:
@@ -346,7 +372,7 @@ def plot_symb2d(
             cmap="summer",
             shading="auto",
             vmin=vmin,
-            vmax=vmax
+            vmax=vmax,
         )
         axes[i + 1].set_title(f"{label}", fontsize=LABEL_SIZE)
         axes[i + 1].set_xlabel(X0_name, fontsize=LABEL_SIZE)
@@ -365,7 +391,9 @@ def plot_symb2d(
             X_train = X_train_compare
         else:
             X_train = None
-            print("No training data for model name. Model name should contain 'smac' or 'rand'.")
+            print(
+                "No training data for model name. Model name should contain 'smac' or 'rand'."
+            )
         if X_train is not None:
             axes[i + 1].scatter(
                 X_train[0],
@@ -412,7 +440,7 @@ def plot_symb2d_surrogate(
     """
     In the 2D setting, create a plot showing the training points from SMAC as well as the
     true function and the functions fitted by the surrogate model evaluated on a 2D grid.
-    Furthermore, the function fitted by a symbolic model on the surrogate values of each 
+    Furthermore, the function fitted by a symbolic model on the surrogate values of each
     grid point evaluated on the grid is shown.
     """
 
@@ -453,8 +481,16 @@ def plot_symb2d_surrogate(
 
     model_name = "Symb-smac"
     symbolic_model = symbolic_models[model_name]
-    pred_test = symbolic_model.predict(X_test.T.reshape(X_test.shape[1] * X_test.shape[2], X_test.shape[0]))
-    y_values = np.concatenate((y_test.reshape(-1, 1), y_test_surrogate.reshape(-1, 1), pred_test.reshape(-1, 1)))
+    pred_test = symbolic_model.predict(
+        X_test.T.reshape(X_test.shape[1] * X_test.shape[2], X_test.shape[0])
+    )
+    y_values = np.concatenate(
+        (
+            y_test.reshape(-1, 1),
+            y_test_surrogate.reshape(-1, 1),
+            pred_test.reshape(-1, 1),
+        )
+    )
     vmin, vmax = min(y_values), max(y_values)
 
     fig, axes = plt.subplots(
@@ -481,7 +517,7 @@ def plot_symb2d_surrogate(
         cmap="summer",
         shading="auto",
         vmin=vmin,
-        vmax=vmax
+        vmax=vmax,
     )
     axes[1].scatter(
         X_train_smac[0],
@@ -514,7 +550,7 @@ def plot_symb2d_surrogate(
         cmap="summer",
         shading="auto",
         vmin=vmin,
-        vmax=vmax
+        vmax=vmax,
     )
     axes[2].scatter(
         X_test[0],
