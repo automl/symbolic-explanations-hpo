@@ -4,7 +4,8 @@ import numpy as np
 import pandas as pd
 from functools import partial
 from gplearn.genetic import SymbolicRegressor
-from smac import HyperparameterOptimizationFacade
+from smac import BlackBoxFacade, HyperparameterOptimizationFacade
+from smac.runhistory.encoder.encoder import convert_configurations_to_array
 from ConfigSpace import Configuration, UniformIntegerHyperparameter, UniformFloatHyperparameter
 
 from symbolic_meta_model_wrapper import (
@@ -18,36 +19,50 @@ from utils import (
     append_scores,
     plot_symb1d,
     plot_symb2d,
+    plot_symb2d_surrogate,
     write_dict_to_cfg_file,
 )
 from smac_utils import run_smac_optimization
-from model_wrapper import SVM, MLP
+from model_wrapper import SVM, MLP, BDT, DT
 
 
 if __name__ == "__main__":
     seed = 42
     n_smac_samples = 20
     n_test_samples = 100
-    model = "SVM"
+    model = "MLP"
     symb_reg = True
     symb_meta = False
     symb_purs = False
 
-    compare_on_test = True
+    train_on_surrogate = False
+    compare_on_test = False
 
     if model == "MLP":
         classifier = MLP(
-            optimize_n_neurons=True,
-            optimize_batch_size=True,
-            optimize_learning_rate_init=False,
+            optimize_n_neurons=False,
+            optimize_n_layer=False,
+            optimize_batch_size=False,
+            optimize_learning_rate_init=True,
+            optimize_max_iter=False,
             seed=seed,
         )
-    elif model == "SVM":
+    elif model == "SVM": # set lower tolerance, iris (stopping_criteria=0.00001)
         classifier = SVM(
-            optimize_C=True,
+            optimize_C=False,
             optimize_degree=True,
-            optimize_coef=False,
+            optimize_coef=True,
             optimize_gamma=False,
+        )
+    elif model == "BDT":
+        classifier = BDT(
+            optimize_learning_rate=True,
+            optimize_n_estimators=True
+        )
+    elif model == "DT":
+        classifier = DT(
+            optimize_max_depth=True,
+            optimize_min_samples_leaf=True
         )
     else:
         print(f"Unknown model: {model}")
@@ -71,7 +86,7 @@ if __name__ == "__main__":
 
     X_train_smac, y_train_smac, smac_facade = run_smac_optimization(
         configspace=classifier.configspace,
-        facade=HyperparameterOptimizationFacade,
+        facade=BlackBoxFacade, # HyperparameterOptimizationFacade,
         target_function=classifier.train,
         function_name=model,
         n_eval=n_smac_samples,
@@ -109,7 +124,7 @@ if __name__ == "__main__":
             n_test_steps,
         )
         if isinstance(optimized_parameters[i], UniformIntegerHyperparameter):
-            int_spacing = np.unique(([int(i) for i in param_space] + [optimized_parameters[i].upper]))
+            int_spacing = np.unique(([int(i) for i in param_space]))# + [optimized_parameters[i].upper]))
             X_test_dimensions.append(int_spacing)
         else:
             X_test_dimensions.append(param_space)
@@ -170,6 +185,19 @@ if __name__ == "__main__":
         X_train_compare = X_train_rand.copy()
         y_train_compare = y_train_rand.copy()
 
+        if train_on_surrogate:
+            # Accessing internal SMAC methods for this, is there a better way here?
+            y_test_surrogate = np.zeros((X_test.shape[1], X_test.shape[2]))
+            for i in range(X_test.shape[1]):
+                for j in range(X_test.shape[2]):
+                    x0 = int(X_test[0, i, j]) if isinstance(optimized_parameters[0], UniformIntegerHyperparameter) else X_test[0, i, j]
+                    x1 = int(X_test[1, i, j]) if isinstance(optimized_parameters[1], UniformIntegerHyperparameter) else X_test[1, i, j]
+                    conf = Configuration(
+                        configuration_space=classifier.configspace, values={optimized_parameters[0].name: x0, optimized_parameters[1].name: x1}
+                    )
+                    y_test_surrogate[i, j] = smac_facade._model.predict(convert_configurations_to_array([conf]))[0][0][0]
+            y_test_surrogate = y_test_surrogate.reshape(-1)
+
     # log transform values of parameters that were log-sampled before training the symbolic models
     for i in range(len(optimized_parameters)):
         if optimized_parameters[i].log:
@@ -197,6 +225,7 @@ if __name__ == "__main__":
             metric="mse", #"mean absolute error",
             random_state=0,
             verbose=1,
+            const_range=(100, 100)  # Range for constants, rather arbitrary setting here?
         )
 
         write_dict_to_cfg_file(
@@ -206,7 +235,10 @@ if __name__ == "__main__":
 
         # run SR on SMAC samples
         symb_smac = SymbolicRegressor(**symb_params)
-        symb_smac.fit(X_train_smac.T, y_train_smac)
+        if train_on_surrogate:
+            symb_smac.fit(X_test.T.reshape(X_test.shape[1] * X_test.shape[2], X_test.shape[0]), y_test_surrogate)
+        else:
+            symb_smac.fit(X_train_smac.T, y_train_smac)
         symbolic_models["Symb-smac"] = symb_smac
 
         # run SR on compare samples (either random samples or test grid samples)
@@ -337,14 +369,26 @@ if __name__ == "__main__":
             plot_dir=plot_dir,
         )
     elif len(optimized_parameters) == 2:
-        plot = plot_symb2d(
-            X_train_smac=X_train_smac,
-            X_train_compare=X_train_compare,
-            X_test=X_test,
-            y_test=y_test,
-            function_name=model,
-            metric_name="Cost",
-            symbolic_models=symbolic_models,
-            parameters=optimized_parameters,
-            plot_dir=plot_dir,
-        )
+        if train_on_surrogate:
+            plot = plot_symb2d_surrogate(
+                X_train_smac=X_train_smac,
+                y_test_surrogate=y_test_surrogate,
+                X_test=X_test,
+                y_test=y_test,
+                symbolic_models=symbolic_models,
+                parameters=optimized_parameters,
+                function_name=model,
+                plot_dir=plot_dir,
+            )
+        else:
+            plot = plot_symb2d(
+                X_train_smac=X_train_smac,
+                X_train_compare=X_train_compare,
+                X_test=X_test,
+                y_test=y_test,
+                function_name=model,
+                metric_name="Cost",
+                symbolic_models=symbolic_models,
+                parameters=optimized_parameters,
+                plot_dir=plot_dir,
+            )

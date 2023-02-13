@@ -2,8 +2,10 @@ import logging
 from os import path
 import numpy as np
 import pandas as pd
-from smac import BlackBoxFacade
 from gplearn.genetic import SymbolicRegressor
+from smac import BlackBoxFacade, HyperparameterOptimizationFacade
+from smac.runhistory.encoder.encoder import convert_configurations_to_array
+from ConfigSpace import Configuration
 
 from symbolic_meta_model_wrapper import (
     SymbolicMetaModelWrapper,
@@ -16,6 +18,7 @@ from utils import (
     append_scores,
     plot_symb1d,
     plot_symb2d,
+    plot_symb2d_surrogate,
     write_dict_to_cfg_file,
 )
 from smac_utils import run_smac_optimization
@@ -27,10 +30,11 @@ if __name__ == "__main__":
     n_smac_samples = 20
     n_test_samples = 100
     n_dim = 2
-    symb_reg = True
+    symb_reg = False
     symb_meta = False
-    symb_purs = False
+    symb_purs = True
 
+    train_on_surrogate = False
     compare_on_test = False
 
     assert n_dim in (1, 2), f"Currently, n_dim can only be in (1,2), got: {n_dim}."
@@ -55,7 +59,7 @@ if __name__ == "__main__":
         # get train samples for SR from SMAC sampling
         samples_smac, _, smac_facade = run_smac_optimization(
             configspace=function.cs,
-            facade=BlackBoxFacade,
+            facade=BlackBoxFacade, #HyperparameterOptimizationFacade,
             target_function=function.smac_apply,
             function_name=function.name.lower().replace(" ", "_"),
             n_eval=n_smac_samples,
@@ -108,6 +112,17 @@ if __name__ == "__main__":
             X_train_compare = X_train_rand.copy()
             y_train_compare = y_train_rand.copy()
 
+        if train_on_surrogate:
+            # Accessing internal SMAC methods for this, is there a better way here?
+            y_test_surrogate = np.zeros((10, 10))
+            for i in range(X_test.shape[1]):
+                for j in range(X_test.shape[2]):
+                    conf = Configuration(
+                        configuration_space=function.cs, values={"X0": X_test[0, i, j], "X1": X_test[1, i, j]}
+                    )
+                    y_test_surrogate[i, j] = smac_facade._model.predict(convert_configurations_to_array([conf]))[0][0][0]
+            y_test_surrogate = y_test_surrogate.reshape(-1)
+
         if n_dim == 1:
             y_train_smac, y_train_rand, y_test = (
                 y_train_smac.reshape(-1),
@@ -130,7 +145,7 @@ if __name__ == "__main__":
             # TODO: log symb regression logs?
             symb_params = dict(
                 population_size=5000,
-                generations=10,
+                generations=50,
                 stopping_criteria=0.001,
                 p_crossover=0.7,
                 p_subtree_mutation=0.1,
@@ -139,10 +154,10 @@ if __name__ == "__main__":
                 max_samples=0.9,
                 parsimony_coefficient=0.01,
                 function_set=get_function_set(),
-                const_range=(-100, 100),
                 metric="mse",
                 random_state=0,
                 verbose=1,
+                const_range=(100, 100) # Range for constants, rather arbitrary setting here?
             )
 
             write_dict_to_cfg_file(
@@ -152,7 +167,10 @@ if __name__ == "__main__":
 
             # run SR on SMAC samples
             symb_smac = SymbolicRegressor(**symb_params)
-            symb_smac.fit(X_train_smac.T, y_train_smac)
+            if train_on_surrogate:
+                symb_smac.fit(X_test.T.reshape(X_test.shape[1] * X_test.shape[2], X_test.shape[0]), y_test_surrogate)
+            else:
+                symb_smac.fit(X_train_smac.T, y_train_smac)
             symbolic_models["Symb-smac"] = symb_smac
 
             # run SR on compare samples (either random samples or test grid samples)
@@ -289,14 +307,27 @@ if __name__ == "__main__":
                 plot_dir=plot_dir,
             )
         else:
-            plot = plot_symb2d(
-                X_train_smac=X_train_smac,
-                X_train_compare=X_train_compare,
-                X_test=X_test,
-                y_test=y_test,
-                symbolic_models=symbolic_models,
-                parameters=function.cs.get_hyperparameters(),
-                function_name=function.name.lower().replace(" ", "_"),
-                function_expression=function.expression,
-                plot_dir=plot_dir,
-            )
+            if train_on_surrogate:
+                plot = plot_symb2d_surrogate(
+                    X_train_smac=X_train_smac,
+                    y_test_surrogate=y_test_surrogate,
+                    X_test=X_test,
+                    y_test=y_test,
+                    symbolic_models=symbolic_models,
+                    parameters=function.cs.get_hyperparameters(),
+                    function_name=function.name.lower().replace(" ", "_"),
+                    function_expression=function.expression,
+                    plot_dir=plot_dir,
+                )
+            else:
+                plot = plot_symb2d(
+                    X_train_smac=X_train_smac,
+                    X_train_compare=X_train_compare,
+                    X_test=X_test,
+                    y_test=y_test,
+                    symbolic_models=symbolic_models,
+                    parameters=function.cs.get_hyperparameters(),
+                    function_name=function.name.lower().replace(" ", "_"),
+                    function_expression=function.expression,
+                    plot_dir=plot_dir,
+                )

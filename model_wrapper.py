@@ -16,6 +16,7 @@ from sklearn.datasets import load_digits
 from sklearn.model_selection import StratifiedKFold, cross_val_score
 from sklearn.neural_network import MLPClassifier
 from sklearn.ensemble import AdaBoostClassifier
+from sklearn.tree import DecisionTreeClassifier
 
 iris = datasets.load_iris()
 digits = load_digits()
@@ -56,7 +57,7 @@ class MLP:
         learning_rate_init = Float(
             "learning_rate_init", (0.0001, 1.0), default=0.001, log=True
         )
-        max_iter = Integer("max_iter", (10, 500), default=200)
+        max_iter = Integer("max_iter", (10, 100), default=25)
 
         if self.optimize_n_layer:
             cs.add_hyperparameter(n_layer)
@@ -96,7 +97,7 @@ class MLP:
         lr_init = (
             config["learning_rate_init"] if "learning_rate_init" in config else 0.001
         )
-        max_iter = config["max_iter"] if "max_iter" in config else 200
+        max_iter = config["max_iter"] if "max_iter" in config else 25
 
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore")
@@ -175,6 +176,61 @@ class BDT:
         return 1 - np.mean(score)
 
 
+class DT:
+    def __init__(
+        self,
+        optimize_max_depth=False,
+        optimize_min_samples_leaf=False,
+        seed=0,
+    ):
+        self.optimize_max_depth = optimize_max_depth
+        self.optimize_min_samples_leaf = optimize_min_samples_leaf
+        self.seed = seed
+
+    @property
+    def configspace(self) -> ConfigurationSpace:
+        cs = ConfigurationSpace(seed=self.seed)
+
+        max_depth = Integer(
+            "max_depth", (1, 20), default=3, 
+        )
+        min_samples_leaf = Integer("min_samples_leaf", (1, 100), default=1)
+
+        if self.optimize_max_depth:
+            cs.add_hyperparameter(max_depth)
+        if self.optimize_min_samples_leaf:
+            cs.add_hyperparameter(min_samples_leaf)
+
+        return cs
+
+    def train(self, config: Configuration, seed: int) -> float:
+        """Train a Decision Tree Classifier based on a configuration and evaluate it on the
+        digit-dataset using cross-validation."""
+
+        max_depth = (
+            config["max_depth"] if "max_depth" in config else 3
+        )
+        min_samples_leaf = (
+            config["min_samples_leaf"] if "min_samples_leaf" in config else 1
+        )
+
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore")
+
+            classifier = DecisionTreeClassifier(
+                max_depth=max_depth,
+                min_samples_leaf=min_samples_leaf,
+                random_state=self.seed,
+            )
+
+            cv = StratifiedKFold(n_splits=5, random_state=self.seed, shuffle=True)
+            score = cross_val_score(
+                classifier, digits.data, digits.target, cv=cv, error_score="raise"
+            )
+
+        return 1 - np.mean(score)
+
+
 class SVM:
     def __init__(
         self,
@@ -239,7 +295,7 @@ class SVM:
 
     def train(self, config: Configuration, seed: int = 0) -> float:
         """Train an SVM based on a configuration and evaluate it on the
-        iris-dataset using cross-validation."""
+        digits-dataset using cross-validation."""
         C = config["C"] if "C" in config else 1.0
         shrinking = config["shrinking"] if "shrinking" in config else True
         degree = config["degree"] if "degree" in config else 3
@@ -254,7 +310,7 @@ class SVM:
             gamma=gamma,
             random_state=self.seed,
         )
-        scores = cross_val_score(classifier, iris.data, iris.target, cv=5)
+        scores = cross_val_score(classifier, digits.data, digits.target, cv=5) # score: accuracy
         cost = 1 - np.mean(scores)
 
         return cost
