@@ -1,9 +1,10 @@
 import numpy as np
 
 from symbolic_metamodeling.pysymbolic.algorithms.symbolic_metamodeling import *
+from symbolic_pursuit.models import SymbolicRegressor
+
 
 class MemorizingModel:
-
     def __init__(self):
         self.X = None
         self.y = None
@@ -65,3 +66,21 @@ class SymbolicMetaExpressionWrapper:
 
     def expression(self):
         return self.metaexpression.expression()
+
+
+class SymbolicPursuitModelWrapper:
+    def __init__(self):
+        self.metamodel = None
+
+    def fit(self, X, y):
+        memorizing_model = MemorizingModel()
+        memorizing_model.fit(X=X, y=y)
+        self.metamodel = SymbolicRegressor()
+        self.metamodel.fit(memorizing_model.predict, X)
+        return self
+
+    def predict(self, X):
+        return self.metamodel.predict(X)
+
+    def expression(self):
+        return self.metamodel.get_expression()

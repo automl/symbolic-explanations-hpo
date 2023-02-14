@@ -17,4 +17,4 @@ dependencies:
   - xgboost
   - black
   - pip:
-    - smac==v2.0.0a2
+    - smac==v2.0.0b1
