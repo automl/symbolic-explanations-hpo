@@ -25,12 +25,12 @@ class NamedFunction:
         self.name = name
         self.expression = expression
         self.function = function
-        cs = ConfigurationSpace(seed=0)
+        configspace = ConfigurationSpace(seed=0)
         configs = []
         for name, (x_min, x_max) in params.items():
             configs.append(UniformFloatHyperparameter(name, lower=x_min, upper=x_max))
-        cs.add_hyperparameters(configs)
-        self.cs = cs
+        configspace.add_hyperparameters(configs)
+        self.configspace = configspace
 
     def apply(self, x: float | np.ndarray) -> float | np.ndarray:
         """
@@ -38,7 +38,7 @@ class NamedFunction:
         """
         return self.function(x)
 
-    def smac_apply(self, config: ConfigurationSpace, seed: int) -> float:
+    def train(self, config: ConfigurationSpace, seed: int) -> float:
         """
         Function to be passed as target function for SMAC (requires config and seed).
         """

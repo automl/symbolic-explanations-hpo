@@ -16,5 +16,6 @@ dependencies:
   - sympy
   - xgboost
   - black
+  - dill
   - pip:
     - smac==v2.0.0b1

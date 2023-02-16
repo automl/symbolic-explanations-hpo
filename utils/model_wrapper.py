@@ -43,6 +43,9 @@ class MLP:
         self.optimize_max_iter = optimize_max_iter
         self.seed = seed
 
+    def set_seed(self, seed):
+        self.seed = seed
+
     @property
     def configspace(self) -> ConfigurationSpace:
         cs = ConfigurationSpace(seed=self.seed)
@@ -132,6 +135,9 @@ class BDT:
         self.optimize_n_estimators = optimize_n_estimators
         self.seed = seed
 
+    def set_seed(self, seed):
+        self.seed = seed
+
     @property
     def configspace(self) -> ConfigurationSpace:
         cs = ConfigurationSpace(seed=self.seed)
@@ -179,6 +185,9 @@ class DT:
     ):
         self.optimize_max_depth = optimize_max_depth
         self.optimize_min_samples_leaf = optimize_min_samples_leaf
+        self.seed = seed
+
+    def set_seed(self, seed):
         self.seed = seed
 
     @property
@@ -244,9 +253,12 @@ class SVM:
         self.optimize_gamma = optimize_gamma
         self.seed = seed
 
+    def set_seed(self, seed):
+        self.seed = seed
+
     @property
     def configspace(self) -> ConfigurationSpace:
-        cs = ConfigurationSpace(seed=0)
+        cs = ConfigurationSpace(seed=self.seed)
 
         kernel = Categorical(
             "kernel", ["linear", "poly", "rbf", "sigmoid"], default="poly"

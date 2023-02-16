@@ -3,7 +3,7 @@ from os import path
 import numpy as np
 import pandas as pd
 from gplearn.genetic import SymbolicRegressor
-from smac import BlackBoxFacade, HyperparameterOptimizationFacade
+from smac import BlackBoxFacade
 from smac.runhistory.encoder.encoder import convert_configurations_to_array
 from ConfigSpace import Configuration
 
@@ -11,8 +11,8 @@ from symbolic_meta_model_wrapper import (
     SymbolicMetaModelWrapper,
     SymbolicPursuitModelWrapper,
 )
-from symb_reg_utils import get_function_set
-from utils import (
+from utils.symb_reg_utils import get_function_set
+from utils.utils import (
     get_output_dirs,
     convert_symb,
     append_scores,
@@ -21,8 +21,8 @@ from utils import (
     plot_symb2d_surrogate,
     write_dict_to_cfg_file,
 )
-from smac_utils import run_smac_optimization
-from functions import get_functions1d, get_functions2d
+from utils.smac_utils import run_smac_optimization
+from utils.functions import get_functions1d, get_functions2d
 
 
 if __name__ == "__main__":
@@ -58,9 +58,9 @@ if __name__ == "__main__":
 
         # get train samples for SR from SMAC sampling
         samples_smac, _, smac_facade = run_smac_optimization(
-            configspace=function.cs,
+            configspace=function.configspace,
             facade=BlackBoxFacade,  # HyperparameterOptimizationFacade,
-            target_function=function.smac_apply,
+            target_function=function.train,
             function_name=function.name.lower().replace(" ", "_"),
             n_eval=n_smac_samples,
             run_dir=run_dir,
@@ -71,7 +71,7 @@ if __name__ == "__main__":
         y_train_smac = function.apply(X_train_smac)
 
         # get test samples for SR
-        parameters = function.cs.get_hyperparameters()
+        parameters = function.configspace.get_hyperparameters()
         if n_dim == 2:
             test_lower, test_upper = [], []
             for i in range(2):
@@ -104,7 +104,7 @@ if __name__ == "__main__":
             y_train_compare = y_test.copy().reshape(-1)
         else:
             # get train samples for SR from random sampling
-            X_train_rand = function.cs.sample_configuration(size=n_smac_samples)
+            X_train_rand = function.configspace.sample_configuration(size=n_smac_samples)
             X_train_rand = np.array(
                 [list(i.get_dictionary().values()) for i in X_train_rand]
             ).T
@@ -118,7 +118,7 @@ if __name__ == "__main__":
             for i in range(X_test.shape[1]):
                 for j in range(X_test.shape[2]):
                     conf = Configuration(
-                        configuration_space=function.cs,
+                        configuration_space=function.configspace,
                         values={"X0": X_test[0, i, j], "X1": X_test[1, i, j]},
                     )
                     y_test_surrogate[i, j] = smac_facade._model.predict(
@@ -325,7 +325,7 @@ if __name__ == "__main__":
                     X_test=X_test,
                     y_test=y_test,
                     symbolic_models=symbolic_models,
-                    parameters=function.cs.get_hyperparameters(),
+                    parameters=function.configspace.get_hyperparameters(),
                     function_name=function.name.lower().replace(" ", "_"),
                     function_expression=function.expression,
                     plot_dir=plot_dir,
@@ -337,7 +337,7 @@ if __name__ == "__main__":
                     X_test=X_test,
                     y_test=y_test,
                     symbolic_models=symbolic_models,
-                    parameters=function.cs.get_hyperparameters(),
+                    parameters=function.configspace.get_hyperparameters(),
                     function_name=function.name.lower().replace(" ", "_"),
                     function_expression=function.expression,
                     plot_dir=plot_dir,

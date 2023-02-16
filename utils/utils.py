@@ -1,8 +1,11 @@
 import os
 import time
+
+import pandas as pd
 import sympy
 import numpy as np
 import matplotlib.pyplot as plt
+from functools import partial
 from gplearn.genetic import SymbolicRegressor
 from symbolic_meta_model_wrapper import (
     SymbolicMetaModelWrapper,
@@ -10,7 +13,7 @@ from symbolic_meta_model_wrapper import (
 )
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 import configparser as cfgparse
-from ConfigSpace import UniformIntegerHyperparameter
+from ConfigSpace import Configuration, UniformIntegerHyperparameter
 
 plt.style.use("tableau-colorblind10")
 
@@ -19,8 +22,8 @@ def get_output_dirs() -> [str, str, str]:
     """
     Create directory for current run as well as a plot and result subdirectory.
     """
-    if not os.path.exists("runs"):
-        os.makedirs("runs")
+    if not os.path.exists("../runs"):
+        os.makedirs("../runs")
     run_dir = f"runs/run_{time.strftime('%Y%m%d-%H%M%S')}"
     res_dir = f"{run_dir}/results"
     plot_dir = f"{run_dir}/plots"
@@ -148,6 +151,27 @@ def append_scores(
     return df_scores
 
 
+def get_scores(
+    X_train,
+    y_train,
+    X_test,
+    y_test,
+    symb_model
+):
+    """
+    Get scores.
+    """
+    df_scores = pd.DataFrame.from_dict({
+        "mae_train_smac": [mean_absolute_error(y_train, symb_model.predict(X_train))],
+        "mae_test_smac": [mean_absolute_error(y_test, symb_model.predict(X_test))],
+        "mse_train_smac": [mean_squared_error(y_train, symb_model.predict(X_train))],
+        "mse_test_smac": [mean_squared_error(y_test, symb_model.predict(X_test))],
+        "r2_train_smac": [r2_score(y_train, symb_model.predict(X_train))],
+        "r2_test_smac": [r2_score(y_test, symb_model.predict(X_test))],
+    })
+    return df_scores
+
+
 def write_dict_to_cfg_file(dictionary: dict, target_file_path: str):
     parser = cfgparse.ConfigParser()
     section = "symbolic_regression"
@@ -157,6 +181,83 @@ def write_dict_to_cfg_file(dictionary: dict, target_file_path: str):
         parser.set(section, key, str(dictionary[key]))
     with open(target_file_path, "w") as f:
         parser.write(f)
+
+
+def get_hpo_test_data(classifier, optimized_parameters, n_test_samples):
+    X_test_dimensions = []
+    n_test_steps = (
+        int(np.sqrt(n_test_samples))
+        if len(optimized_parameters) == 2
+        else n_test_samples
+        if len(optimized_parameters) == 1
+        else None
+    )
+    for i in range(len(optimized_parameters)):
+        space = (
+            partial(np.logspace, base=np.e)
+            if optimized_parameters[i].log
+            else np.linspace
+        )
+        if optimized_parameters[i].log:
+            lower = np.log(optimized_parameters[i].lower)
+            upper = np.log(optimized_parameters[i].upper)
+        else:
+            lower = optimized_parameters[i].lower
+            upper = optimized_parameters[i].upper
+        param_space = space(
+            lower + 0.5 * (upper - lower) / n_test_steps,
+            upper - (0.5 * (upper - lower) / n_test_steps),
+            n_test_steps,
+        )
+        if isinstance(optimized_parameters[i], UniformIntegerHyperparameter):
+            int_spacing = np.unique(
+                ([int(i) for i in param_space])
+            )  # + [optimized_parameters[i].upper]))
+            X_test_dimensions.append(int_spacing)
+        else:
+            X_test_dimensions.append(param_space)
+
+    param_dict = {}
+    if len(optimized_parameters) == 1:
+        X_test = X_test_dimensions[0]
+        y_test = np.zeros(len(X_test_dimensions[0]))
+        for n in range(len(X_test_dimensions[0])):
+            param_dict[optimized_parameters[0].name] = X_test[n]
+            conf = Configuration(
+                configuration_space=classifier.configspace, values=param_dict
+            )
+            y_test[n] = classifier.train(config=conf, seed=0)
+        X_test, y_test = X_test.astype(float).reshape(
+            1, X_test.shape[0]
+        ), y_test.reshape(-1)
+    elif len(optimized_parameters) == 2:
+        X_test = np.array(
+            np.meshgrid(
+                X_test_dimensions[0],
+                X_test_dimensions[1],
+            )
+        ).astype(float)
+        y_test = np.zeros((X_test.shape[1], X_test.shape[2]))
+        for n in range(X_test.shape[1]):
+            for m in range(X_test.shape[2]):
+                for i, param in enumerate(optimized_parameters):
+                    if isinstance(
+                        optimized_parameters[i], UniformIntegerHyperparameter
+                    ):
+                        param_dict[optimized_parameters[i].name] = int(X_test[i, n, m])
+                    else:
+                        param_dict[optimized_parameters[i].name] = X_test[i, n, m]
+                conf = Configuration(
+                    configuration_space=classifier.configspace, values=param_dict
+                )
+                y_test[n, m] = classifier.train(config=conf, seed=0)
+    else:
+        X_test = None
+        y_test = None
+        print("Not yet supported.")
+
+    return X_test, y_test
+
 
 
 def plot_symb1d(

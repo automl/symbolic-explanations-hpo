@@ -3,7 +3,7 @@ import numpy as np
 from pathlib import Path
 from ConfigSpace import ConfigurationSpace
 from typing import Type
-from smac import Scenario
+from smac import Scenario, Callback
 from smac.facade import AbstractFacade
 
 
@@ -15,6 +15,7 @@ def run_smac_optimization(
     n_eval: int,
     run_dir: str,
     seed: int,
+    callback: Callback | None = None
 ) -> [np.ndarray, np.ndarray]:
     """Runs SMAC Hyperparameter Optimization on the given function within the hyperparameter space.
 
@@ -27,6 +28,7 @@ def run_smac_optimization(
     n_eval : Desired number of function evaluations.
     run_dir : Run directory to save SMAC output to.
     seed : Seed to be used in SMAC scenario.
+    callback : Custom callback to be passed to smac.
 
     Returns
     ----------
@@ -49,6 +51,7 @@ def run_smac_optimization(
         target_function=target_function,
         logging_level=Path("logging_smac.yml"),
         config_selector=config_selector,
+        callbacks=[callback] if callback else []
     )
 
     # re-add log dir handler to logger as it is destroyed everytime a new SMAC facade is created
@@ -80,4 +83,4 @@ def run_smac_optimization(
 
     conf_hp, conf_res = np.array(conf_hp), np.array(conf_res)
 
-    return conf_hp, conf_res.reshape(-1), smac
+    return conf_hp, conf_res.reshape(-1), conf_hp
