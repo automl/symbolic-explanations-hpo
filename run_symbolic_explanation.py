@@ -1,5 +1,7 @@
+import os
 import logging
 import dill as pickle
+import argparse
 
 import numpy as np
 import pandas as pd
@@ -10,15 +12,30 @@ from utils.symb_reg_utils import get_function_set
 
 
 if __name__ == "__main__":
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--job_id')
+    args = parser.parse_args()
+    job_id = args.job_id
+
     n_test_samples = 100
+    n_seeds = 5
     symb_reg = True
-    sampling_run_name = "smac_Quadratic function A_x_20230216_092250"
+    sampling_run_names = ["smac_Branin_2D_X0_X1_20230216_202959",
+                          "smac_Camelback_2D_X0_X1_20230216_202959",
+                          "smac_Exponential_function_2D_X0_X1_20230216_202958",
+                          "smac_Linear_2D_X0_X1_20230216_200839",
+                          "smac_Polynom_function_2D_X0_X1_20230216_200840",
+                          "smac_Rosenbrock_2D_X0_X1_20230216_202959"
+                          ]
+    sampling_run_name = sampling_run_names[job_id]
 
     # setup logging
     logger = logging.getLogger(__name__)
 
     run_dir = f"learning_curves/runs/{sampling_run_name}"
     sampling_dir = f"{run_dir}/sampling"
+    os.makedirs(f"{run_dir}/symb_models")
     model = sampling_run_name.split("_")[0]
 
     with open(f"{sampling_dir}/classifier.pkl", "rb") as classifier_file:
@@ -30,10 +47,9 @@ if __name__ == "__main__":
     X_test, y_test = get_hpo_test_data(classifier, optimized_parameters, n_test_samples)
 
     df_train_samples = pd.read_csv(f"{sampling_dir}/samples.csv")
-    seeds = df_train_samples.seed.unique()
-    #n_samples_max = max(df_train_samples.groupby("seed")["cost"].count())
+    sampling_seeds = df_train_samples.seed.unique()
 
-    n_samples_spacing = np.linspace(20, 100, 9)
+    n_samples_spacing = np.linspace(10, 200, 20)
 
     df_all_metrics = pd.DataFrame()
     df_all_expr = pd.DataFrame()
@@ -63,39 +79,50 @@ if __name__ == "__main__":
         target_file_path=f"{run_dir}/symbolic_regression_params.cfg",
     )
 
-    for seed in seeds:
-        X_train_all_samples = df_train_samples.query(f"seed == {seed}")[param_names]
-        y_train_all_samples = df_train_samples.query(f"seed == {seed}")["cost"]
+    for sampling_seed in sampling_seeds:
+        X_train_all_samples = df_train_samples.query(f"seed == {sampling_seed}")[param_names]
+        y_train_all_samples = df_train_samples.query(f"seed == {sampling_seed}")["cost"]
 
         for n_samples in n_samples_spacing.astype(int):
 
             X_train = X_train_all_samples[:n_samples]
             y_train = y_train_all_samples[:n_samples]
 
-            logger.info(f"Fit Symbolic Model for {n_samples} samples and seed {seed}.")
-
-            symbolic_models = {}
+            logger.info(f"Fit Symbolic Model for {n_samples} samples and sampling seed {sampling_seed}.")
 
             if symb_reg:
-                # run SR on SMAC samples
-                symb_model = SymbolicRegressor(**symb_params)
-                symb_model.fit(X_train, y_train)
+                for i in range(n_seeds):
+                    symb_seed = i * 3
 
-                df_metrics = get_scores(X_train,
-                                y_train,
-                                X_test.reshape(len(optimized_parameters), -1).T,
-                                y_test.reshape(-1),
-                                symb_model)
-                df_metrics.insert(0, "n_samples", n_samples)
-                df_metrics.insert(0, "seed", seed)
+                    logger.info(f"Using seed {symb_seed} for symbolic regression.")
 
-                df_expr = pd.DataFrame(
-                    {"expr": [convert_symb(symb_model, n_dim=len(optimized_parameters), n_decimals=3)]})
-                df_expr.insert(0, "n_samples", n_samples)
-                df_expr.insert(0, "seed", seed)
+                    # run SR on SMAC samples
+                    symb_model = SymbolicRegressor(**symb_params, random_state=symb_seed)
+                    symb_model.fit(X_train, y_train)
 
-                df_all_metrics = pd.concat((df_all_metrics, df_metrics))
-                df_all_expr = pd.concat((df_all_expr, df_expr))
+                    # pickle symbolic regression model
+                    with open(
+                            f"{run_dir}/symb_models/n_samples{n_samples}sampling_seed{sampling_seed}_"
+                            f"symb_seed{symb_seed}.pkl", "wb") as symb_model_file:
+                        pickle.dump(symb_model, symb_model_file)
+
+                    df_metrics = get_scores(X_train,
+                                    y_train,
+                                    X_test.reshape(len(optimized_parameters), -1).T,
+                                    y_test.reshape(-1),
+                                    symb_model)
+                    df_metrics.insert(0, "n_samples", n_samples)
+                    df_metrics.insert(0, "sampling_seed", sampling_seed)
+                    df_metrics.insert(0, "symb_seed", symb_seed)
+
+                    df_expr = pd.DataFrame(
+                        {"expr": [convert_symb(symb_model, n_dim=len(optimized_parameters), n_decimals=3)]})
+                    df_expr.insert(0, "n_samples", n_samples)
+                    df_expr.insert(0, "sampling_seed", sampling_seed)
+                    df_metrics.insert(0, "", symb_seed)
+
+                    df_all_metrics = pd.concat((df_all_metrics, df_metrics))
+                    df_all_expr = pd.concat((df_all_expr, df_expr))
 
     df_all_metrics.to_csv(f"{run_dir}/error_metrics.csv", index=False)
     df_all_expr.to_csv(f"{run_dir}/expressions.csv", index=False)
