@@ -2,13 +2,16 @@ import os
 import logging
 import dill as pickle
 import argparse
-
+import sys
 import numpy as np
 import pandas as pd
 from gplearn.genetic import SymbolicRegressor
 
 from utils.utils import write_dict_to_cfg_file, get_hpo_test_data, get_scores, convert_symb
 from utils.symb_reg_utils import get_function_set
+from utils import functions
+
+sys.modules['functions'] = functions
 
 
 if __name__ == "__main__":
@@ -19,7 +22,7 @@ if __name__ == "__main__":
     job_id = args.job_id
 
     n_test_samples = 100
-    n_seeds = 5
+    n_seeds = 3
     symb_reg = True
     sampling_run_names = ["smac_Branin_2D_X0_X1_20230216_202959",
                           "smac_Camelback_2D_X0_X1_20230216_202959",
@@ -28,15 +31,30 @@ if __name__ == "__main__":
                           "smac_Polynom_function_2D_X0_X1_20230216_200840",
                           "smac_Rosenbrock_2D_X0_X1_20230216_202959"
                           ]
-    sampling_run_name = sampling_run_names[job_id]
-
-    # setup logging
-    logger = logging.getLogger(__name__)
+    sampling_run_name = sampling_run_names[int(job_id)]
 
     run_dir = f"learning_curves/runs/{sampling_run_name}"
     sampling_dir = f"{run_dir}/sampling"
-    os.makedirs(f"{run_dir}/symb_models")
-    model = sampling_run_name.split("_")[0]
+    if not os.path.exists(f"{run_dir}/symb_models"):
+        os.makedirs(f"{run_dir}/symb_models")
+    model = sampling_run_name.split("_")[1]
+
+    # setup logging
+    logger = logging.getLogger(__name__)
+    handler = logging.FileHandler(filename=f"{run_dir}/symb_log.log", encoding="utf8")
+    handler.setLevel("INFO")
+    handler.setFormatter(
+        logging.Formatter("[%(levelname)s][%(filename)s:%(lineno)d] %(message)s")
+    )
+    logger.root.addHandler(handler)
+    handler2 = logging.StreamHandler()
+    handler2.setLevel("INFO")
+    handler2.setFormatter(
+        logging.Formatter("[%(levelname)s][%(filename)s:%(lineno)d] %(message)s")
+    )
+    handler2.setStream(sys.stdout)
+    logger.root.addHandler(handler2)
+    logger.root.setLevel("INFO")
 
     with open(f"{sampling_dir}/classifier.pkl", "rb") as classifier_file:
         classifier = pickle.load(classifier_file)
@@ -44,12 +62,14 @@ if __name__ == "__main__":
     optimized_parameters = classifier.configspace.get_hyperparameters()
     param_names = [param.name for param in optimized_parameters]
 
+    logger.info(f"Fit Symbolic Model for model {model} and parameters {param_names}")
+
     X_test, y_test = get_hpo_test_data(classifier, optimized_parameters, n_test_samples)
 
     df_train_samples = pd.read_csv(f"{sampling_dir}/samples.csv")
     sampling_seeds = df_train_samples.seed.unique()
 
-    n_samples_spacing = np.linspace(10, 200, 20)
+    n_samples_spacing = np.linspace(10, 200, 11)
 
     df_all_metrics = pd.DataFrame()
     df_all_expr = pd.DataFrame()
@@ -66,7 +86,6 @@ if __name__ == "__main__":
         parsimony_coefficient=0.01,
         function_set=get_function_set(),
         metric="mse",  # "mean absolute error",
-        random_state=0,
         verbose=1,
         const_range=(
             100,
@@ -102,7 +121,7 @@ if __name__ == "__main__":
 
                     # pickle symbolic regression model
                     with open(
-                            f"{run_dir}/symb_models/n_samples{n_samples}sampling_seed{sampling_seed}_"
+                            f"{run_dir}/symb_models/n_samples{n_samples}_sampling_seed{sampling_seed}_"
                             f"symb_seed{symb_seed}.pkl", "wb") as symb_model_file:
                         pickle.dump(symb_model, symb_model_file)
 

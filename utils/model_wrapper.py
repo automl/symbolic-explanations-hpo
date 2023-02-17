@@ -32,6 +32,7 @@ class MLP:
         optimize_batch_size=False,
         optimize_learning_rate_init=False,
         optimize_max_iter=False,
+        name="MLP",
         seed=0,
     ):
         self.optimize_n_neurons = optimize_n_neurons
@@ -41,6 +42,7 @@ class MLP:
         self.optimize_batch_size = optimize_batch_size
         self.optimize_learning_rate_init = optimize_learning_rate_init
         self.optimize_max_iter = optimize_max_iter
+        self.name = name
         self.seed = seed
 
     def set_seed(self, seed):
@@ -129,10 +131,12 @@ class BDT:
         self,
         optimize_learning_rate=False,
         optimize_n_estimators=False,
+        name="BDT",
         seed=0,
     ):
         self.optimize_learning_rate = optimize_learning_rate
         self.optimize_n_estimators = optimize_n_estimators
+        self.name = name
         self.seed = seed
 
     def set_seed(self, seed):
@@ -181,10 +185,12 @@ class DT:
         self,
         optimize_max_depth=False,
         optimize_min_samples_leaf=False,
+        name="DT",
         seed=0,
     ):
         self.optimize_max_depth = optimize_max_depth
         self.optimize_min_samples_leaf = optimize_min_samples_leaf
+        self.name = name
         self.seed = seed
 
     def set_seed(self, seed):
@@ -243,6 +249,7 @@ class SVM:
         optimize_degree=False,
         optimize_coef=False,
         optimize_gamma=False,
+        name="SVM",
         seed=0,
     ):
         self.optimize_kernel = optimize_kernel
@@ -251,6 +258,7 @@ class SVM:
         self.optimize_degree = optimize_degree
         self.optimize_coef = optimize_coef
         self.optimize_gamma = optimize_gamma
+        self.name = name
         self.seed = seed
 
     def set_seed(self, seed):

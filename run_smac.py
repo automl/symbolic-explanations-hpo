@@ -73,8 +73,10 @@ if __name__ == "__main__":
     run_dir = f"learning_curves/runs/smac_{function_name.replace(' ', '_')}_{'_'.join(parameter_names)}_" \
               f"{time.strftime('%Y%m%d_%H%M%S')}"
     sampling_dir = f"{run_dir}/sampling"
-    os.makedirs(sampling_dir)
-    os.makedirs(f"{sampling_dir}/surrogates")
+    if not os.path.exists(sampling_dir):
+        os.makedirs(sampling_dir)
+    if not os.path.exists(f"{sampling_dir}/surrogates"):
+        os.makedirs(f"{sampling_dir}/surrogates")
 
     with open(f"{sampling_dir}/classifier.pkl", "wb") as classifier_file:
         pickle.dump(classifier, classifier_file)

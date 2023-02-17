@@ -17,5 +17,7 @@ dependencies:
   - xgboost
   - black
   - dill
+  - loguru
+  - tqdm
   - pip:
     - smac==v2.0.0b1
