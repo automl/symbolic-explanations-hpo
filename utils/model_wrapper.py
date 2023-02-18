@@ -32,6 +32,7 @@ class MLP:
         optimize_batch_size=False,
         optimize_learning_rate_init=False,
         optimize_max_iter=False,
+        data_set=None,
         name="MLP",
         seed=0,
     ):
@@ -42,6 +43,10 @@ class MLP:
         self.optimize_batch_size = optimize_batch_size
         self.optimize_learning_rate_init = optimize_learning_rate_init
         self.optimize_max_iter = optimize_max_iter
+        if data_set is None:
+            self.data_set = datasets.load_digits()
+        else:
+            self.data_set = data_set
         self.name = name
         self.seed = seed
 
@@ -52,8 +57,8 @@ class MLP:
     def configspace(self) -> ConfigurationSpace:
         cs = ConfigurationSpace(seed=self.seed)
 
-        n_layer = Integer("n_layer", (1, 5), default=1)
-        n_neurons = Integer("n_neurons", (8, 256), log=True, default=10)
+        n_layer = Integer("n_layer", (1, 5), default=2)
+        n_neurons = Integer("n_neurons", (8, 256), log=True, default=16)
         activation = Categorical(
             "activation", ["logistic", "tanh", "relu"], default="tanh"
         )
@@ -94,8 +99,8 @@ class MLP:
     def train(self, config: Configuration, seed: int) -> float:
         """Train an MLP based on a configuration and evaluate it on the
         digit-dataset using cross-validation."""
-        n_layer = config["n_layer"] if "n_layer" in config else 1
-        n_neurons = config["n_neurons"] if "n_neurons" in config else 10
+        n_layer = config["n_layer"] if "n_layer" in config else 2
+        n_neurons = config["n_neurons"] if "n_neurons" in config else 16
         activation = config["activation"] if "activation" in config else "tanh"
         solver = config["solver"] if "solver" in config else "adam"
         batch_size = config["batch_size"] if "batch_size" in config else 200
@@ -120,7 +125,7 @@ class MLP:
 
             cv = StratifiedKFold(n_splits=5, random_state=self.seed, shuffle=True)
             score = cross_val_score(
-                classifier, digits.data, digits.target, cv=cv, error_score="raise"
+                classifier, self.data_set.data, self.data_set.target, cv=cv, error_score="raise"
             )
 
         return 1 - np.mean(score)
@@ -132,11 +137,16 @@ class BDT:
         optimize_learning_rate=False,
         optimize_n_estimators=False,
         name="BDT",
+        data_set=None,
         seed=0,
     ):
         self.optimize_learning_rate = optimize_learning_rate
         self.optimize_n_estimators = optimize_n_estimators
         self.name = name
+        if data_set is None:
+            self.data_set = datasets.load_digits()
+        else:
+            self.data_set = data_set
         self.seed = seed
 
     def set_seed(self, seed):
@@ -174,7 +184,7 @@ class BDT:
 
             cv = StratifiedKFold(n_splits=5, random_state=self.seed, shuffle=True)
             score = cross_val_score(
-                classifier, digits.data, digits.target, cv=cv, error_score="raise"
+                classifier, self.data_set.data, self.data_set.target, cv=cv, error_score="raise"
             )
 
         return 1 - np.mean(score)
@@ -186,11 +196,16 @@ class DT:
         optimize_max_depth=False,
         optimize_min_samples_leaf=False,
         name="DT",
+        data_set=None,
         seed=0,
     ):
         self.optimize_max_depth = optimize_max_depth
         self.optimize_min_samples_leaf = optimize_min_samples_leaf
         self.name = name
+        if data_set is None:
+            self.data_set = datasets.load_digits()
+        else:
+            self.data_set = data_set
         self.seed = seed
 
     def set_seed(self, seed):
@@ -234,7 +249,7 @@ class DT:
 
             cv = StratifiedKFold(n_splits=5, random_state=self.seed, shuffle=True)
             score = cross_val_score(
-                classifier, digits.data, digits.target, cv=cv, error_score="raise"
+                classifier, self.data_set.data, self.data_set.target, cv=cv, error_score="raise"
             )
 
         return 1 - np.mean(score)
@@ -250,6 +265,7 @@ class SVM:
         optimize_coef=False,
         optimize_gamma=False,
         name="SVM",
+        data_set=None,
         seed=0,
     ):
         self.optimize_kernel = optimize_kernel
@@ -259,6 +275,10 @@ class SVM:
         self.optimize_coef = optimize_coef
         self.optimize_gamma = optimize_gamma
         self.name = name
+        if data_set is None:
+            self.data_set = datasets.load_digits()
+        else:
+            self.data_set = data_set
         self.seed = seed
 
     def set_seed(self, seed):
@@ -325,7 +345,7 @@ class SVM:
             random_state=self.seed,
         )
         scores = cross_val_score(
-            classifier, digits.data, digits.target, cv=5
+            classifier, self.data_set.data, self.data_set.target, cv=5
         )  # score: accuracy
         cost = 1 - np.mean(scores)
 

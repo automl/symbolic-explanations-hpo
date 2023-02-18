@@ -6,6 +6,8 @@ import time
 import argparse
 import dill as pickle
 from smac import BlackBoxFacade, Callback
+from sklearn import datasets
+from itertools import combinations
 
 from utils.smac_utils import run_smac_optimization
 from utils.model_wrapper import SVM, MLP, BDT, DT
@@ -31,29 +33,50 @@ if __name__ == "__main__":
     functions = get_functions2d()
     n_seeds = 5
     n_smac_samples = 200
-    #model = "MLP"
-    model = functions[int(args.job_id)]
+    model = "BDT"
+    #model = functions[int(args.job_id)]
     symb_reg = True
 
     if model == "MLP":
-        classifier = MLP(
-            optimize_n_neurons=True,
-            optimize_n_layer=True,
-            optimize_batch_size=False,
-            optimize_learning_rate_init=False,
-            optimize_max_iter=False
-        )
-    elif model == "SVM":  # set lower tolerance, iris (stopping_criteria=0.00001)
-        classifier = SVM(
-            optimize_C=False,
-            optimize_degree=True,
-            optimize_coef=True,
-            optimize_gamma=False
-        )
+        hyperparams = [
+            "optimize_n_neurons",
+            "optimize_n_layer",
+            "optimize_learning_rate_init",
+            "optimize_max_iter"
+        ]
+    elif model == "SVM":
+        hyperparams = [
+            "optimize_C",
+            "optimize_degree",
+            "optimize_coef",
+            "optimize_gamma"
+        ]
     elif model == "BDT":
-        classifier = BDT(optimize_learning_rate=True, optimize_n_estimators=True)
+        hyperparams = [
+            "optimize_learning_rate", "optimize_n_estimators"
+        ]
     elif model == "DT":
-        classifier = DT(optimize_max_depth=True, optimize_min_samples_leaf=True)
+        hyperparams = [
+            "optimize_max_depth", "optimize_min_samples_leaf"
+        ]
+    else:
+        hyperparams = None
+
+    hp_comb = combinations(hyperparams, 2)
+    config_list = []
+    for hp_conf in hp_comb:
+        for dataset in [datasets.load_digits(), datasets.load_iris()]:
+            config_list.append({hp_conf[0]: True, hp_conf[1]: True, "data_set": dataset})
+    hp_data_conf = config_list[int(job_id)]
+
+    if model == "MLP":
+        classifier = MLP(**hp_data_conf)
+    elif model == "SVM":  # set lower tolerance, iris (stopping_criteria=0.00001)
+        classifier = SVM(**hp_data_conf)
+    elif model == "BDT":
+        classifier = BDT(**hp_data_conf)
+    elif model == "DT":
+        classifier = DT(**hp_data_conf)
     elif isinstance(model, NamedFunction):
         classifier = model
     else:
