@@ -6,7 +6,6 @@ import time
 import argparse
 import dill as pickle
 from smac import BlackBoxFacade, Callback
-from sklearn import datasets
 from itertools import combinations
 
 from utils.smac_utils import run_smac_optimization
@@ -32,11 +31,17 @@ if __name__ == "__main__":
 
     functions = get_functions2d()
     n_seeds = 5
-    n_smac_samples = 200
-    model = "MLP"
+    n_samples = 200
+    model = "DT"
     #model = functions[int(args.job_id)]
     data_sets = ["digits", "iris"]
+    use_random_samples = True
     symb_reg = True
+
+    if use_random_samples:
+        run_type = "rand"
+    else:
+        run_type = "smac"
 
     if model == "MLP":
         hyperparams = [
@@ -92,10 +97,10 @@ if __name__ == "__main__":
     optimized_parameters = classifier.configspace.get_hyperparameters()
     parameter_names = [param.name for param in optimized_parameters]
 
-    sampling_run_name = f"smac_{function_name.replace(' ', '_')}_{'_'.join(parameter_names)}_" \
+    sampling_run_name = f"{run_type}_{function_name.replace(' ', '_')}_{'_'.join(parameter_names)}_" \
                         f"{hp_data_conf['data_set_name']}_{time.strftime('%Y%m%d_%H%M%S')}"
 
-    logger.info(f"Run SMAC run for {sampling_run_name}.")
+    logger.info(f"Start sampling for {sampling_run_name}.")
 
     if not os.path.exists("learning_curves/runs"):
         os.makedirs("learning_curves/runs")
@@ -103,13 +108,13 @@ if __name__ == "__main__":
     sampling_dir = f"{run_dir}/sampling"
     if not os.path.exists(sampling_dir):
         os.makedirs(sampling_dir)
-    if not os.path.exists(f"{sampling_dir}/surrogates"):
+    if not use_random_samples and not os.path.exists(f"{sampling_dir}/surrogates"):
         os.makedirs(f"{sampling_dir}/surrogates")
 
     with open(f"{sampling_dir}/classifier.pkl", "wb") as classifier_file:
         pickle.dump(classifier, classifier_file)
 
-    df_smac_samples = pd.DataFrame()
+    df_samples = pd.DataFrame()
 
     for i in range(n_seeds):
         seed = i * 3
@@ -119,26 +124,34 @@ if __name__ == "__main__":
         if not isinstance(classifier, NamedFunction):
             classifier.set_seed(seed)
 
-        logger.info(f"Run SMAC to sample configs and train {function_name} with seed {seed}.")
+        logger.info(f"Sample configs and train {function_name} with seed {seed}.")
 
-        smac_configurations, smac_performances, smac_facade = run_smac_optimization(
-            configspace=classifier.configspace,
-            facade=BlackBoxFacade,  # HyperparameterOptimizationFacade,
-            target_function=classifier.train,
-            function_name=function_name,
-            n_eval=n_smac_samples,
-            run_dir=run_dir,
-            seed=seed,
-            callback=SurrogateModelCallback()
-        )
+        if use_random_samples:
+            configurations = classifier.configspace.sample_configuration(size=n_samples)
+            performances = np.array(
+                [classifier.train(config=x, seed=seed) for x in configurations]
+            )
+            configurations = np.array(
+                [list(i.get_dictionary().values()) for i in configurations]
+            )
+        else:
+            configurations, performances, _ = run_smac_optimization(
+                configspace=classifier.configspace,
+                facade=BlackBoxFacade,  # HyperparameterOptimizationFacade,
+                target_function=classifier.train,
+                function_name=function_name,
+                n_eval=n_samples,
+                run_dir=run_dir,
+                seed=seed,
+                callback=SurrogateModelCallback()
+            )
 
         df = pd.DataFrame(
-            data=np.concatenate((smac_configurations.T,
-                                 smac_performances.reshape(-1, 1)), axis=1),
+            data=np.concatenate((configurations,
+                                 performances.reshape(-1, 1)), axis=1),
             columns=parameter_names + ["cost"])
         df.insert(0, "seed", seed)
+        df_samples = pd.concat((df_samples, df))
 
-        df_smac_samples = pd.concat((df_smac_samples, df))
-
-    df_smac_samples.to_csv(f"{sampling_dir}/samples.csv", index=False)
+    df_samples.to_csv(f"{sampling_dir}/samples.csv", index=False)
 
