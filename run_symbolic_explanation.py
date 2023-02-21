@@ -24,13 +24,47 @@ if __name__ == "__main__":
     n_test_samples = 100
     n_seeds = 3
     symb_reg = True
-    sampling_run_names = ["smac_Branin_2D_X0_X1_20230216_202959",
-                          "smac_Camelback_2D_X0_X1_20230216_202959",
-                          "smac_Exponential_function_2D_X0_X1_20230216_202958",
-                          "smac_Linear_2D_X0_X1_20230216_200839",
-                          "smac_Polynom_function_2D_X0_X1_20230216_200840",
-                          "smac_Rosenbrock_2D_X0_X1_20230216_202959"
-                          ]
+    sampling_run_names = [
+        # "smac_Branin_2D_X0_X1_20230216_202959",
+        # "smac_Camelback_2D_X0_X1_20230216_202959",
+        # "smac_Exponential_function_2D_X0_X1_20230216_202958",
+        # "smac_Rosenbrock_2D_X0_X1_20230216_202959",
+        #"smac_BDT_learning_rate_n_estimators_digits_20230218_141037",
+        #"smac_BDT_learning_rate_n_estimators_iris_20230218_123429",
+        # "smac_SVM_C_coef0_digits_20230218_124032",
+        # "smac_SVM_C_coef0_iris_20230218_124032",
+        # "smac_SVM_C_degree_digits_20230218_124029",
+        # "smac_SVM_C_degree_iris_20230218_124029",
+        # "smac_SVM_C_gamma_digits_20230218_124031",
+        # "smac_SVM_C_gamma_iris_20230218_124032",
+        # "smac_SVM_coef0_degree_digits_20230218_124029",
+        # "smac_SVM_coef0_degree_iris_20230218_124031",
+        # "smac_SVM_coef0_gamma_digits_20230218_124031",
+        # "smac_SVM_coef0_gamma_iris_20230218_124030",
+        # "smac_SVM_degree_gamma_digits_20230218_124031",
+        # "smac_SVM_degree_gamma_iris_20230218_124031",
+        # "smac_MLP_max_iter_n_neurons_iris_20230218_134154",
+        # "smac_MLP_n_layer_n_neurons_digits_20230218_140256",
+        # "smac_MLP_n_layer_n_neurons_iris_20230218_140254",
+        # "smac_MLP_learning_rate_init_max_iter_iris_20230218_134148",
+        # "smac_MLP_learning_rate_init_n_layer_digits_20230218_145001",
+        # "smac_MLP_learning_rate_init_n_layer_iris_20230218_134149",
+        # "smac_MLP_learning_rate_init_n_neurons_digits_20230218_145001",
+        # "smac_MLP_learning_rate_init_n_neurons_iris_20230218_134149",
+        # "smac_MLP_max_iter_n_layer_digits_20230218_134149",
+        # "smac_MLP_max_iter_n_layer_iris_20230218_134146",
+        # "smac_MLP_max_iter_n_neurons_digits_20230218_155636"
+        # "smac_SVM_C_coef0_iris_20230218_124032",
+        # "smac_SVM_C_degree_digits_20230218_124029"
+        # "smac_SVM_C_degree_iris_20230218_124029",
+        # "smac_SVM_C_gamma_iris_20230218_124032",
+        # "smac_SVM_coef0_gamma_iris_20230218_124030",
+        # "smac_SVM_degree_gamma_digits_20230218_124031",
+        # "smac_SVM_degree_gamma_iris_20230218_124031"
+        "smac_MLP_n_layer_n_neurons_iris_20230218_140254",
+        "smac_MLP_max_iter_n_neurons_digits_20230218_155636",
+        "smac_MLP_max_iter_n_neurons_iris_20230218_134154"
+    ]
     sampling_run_name = sampling_run_names[int(job_id)]
 
     run_dir = f"learning_curves/runs/{sampling_run_name}"
@@ -62,7 +96,7 @@ if __name__ == "__main__":
     optimized_parameters = classifier.configspace.get_hyperparameters()
     param_names = [param.name for param in optimized_parameters]
 
-    logger.info(f"Fit Symbolic Model for model {model} and parameters {param_names}")
+    logger.info(f"Fit Symbolic Model for {sampling_run_name}.")
 
     X_test, y_test = get_hpo_test_data(classifier, optimized_parameters, n_test_samples)
 
@@ -133,15 +167,19 @@ if __name__ == "__main__":
                     df_metrics.insert(0, "n_samples", n_samples)
                     df_metrics.insert(0, "sampling_seed", sampling_seed)
                     df_metrics.insert(0, "symb_seed", symb_seed)
+                    df_all_metrics = pd.concat((df_all_metrics, df_metrics))
 
-                    df_expr = pd.DataFrame(
-                        {"expr": [convert_symb(symb_model, n_dim=len(optimized_parameters), n_decimals=3)]})
+                    try:
+                        df_expr = pd.DataFrame(
+                            {"expr": [convert_symb(symb_model, n_dim=len(optimized_parameters), n_decimals=3)]})
+                    except:
+                        df_expr = pd.DataFrame({"expr": [""]})
+                        print(f"Could not convert expression for n_samples: {n_samples}, sampling_seed: {sampling_seed}"
+                              f", symb_seed: {symb_seed}.")
                     df_expr.insert(0, "n_samples", n_samples)
                     df_expr.insert(0, "sampling_seed", sampling_seed)
-                    df_metrics.insert(0, "", symb_seed)
-
-                    df_all_metrics = pd.concat((df_all_metrics, df_metrics))
+                    df_expr.insert(0, "symb_seed", symb_seed)
                     df_all_expr = pd.concat((df_all_expr, df_expr))
 
-    df_all_metrics.to_csv(f"{run_dir}/error_metrics.csv", index=False)
-    df_all_expr.to_csv(f"{run_dir}/expressions.csv", index=False)
+                    df_all_metrics.to_csv(f"{run_dir}/error_metrics.csv", index=False)
+                    df_all_expr.to_csv(f"{run_dir}/expressions.csv", index=False)

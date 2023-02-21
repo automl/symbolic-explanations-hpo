@@ -136,3 +136,4 @@ dmypy.json
 smac3-output*
 runs/
 learning_curves/runs
+learning_curves/plots*

@@ -33,8 +33,9 @@ if __name__ == "__main__":
     functions = get_functions2d()
     n_seeds = 5
     n_smac_samples = 200
-    model = "BDT"
+    model = "MLP"
     #model = functions[int(args.job_id)]
+    data_sets = ["digits", "iris"]
     symb_reg = True
 
     if model == "MLP":
@@ -65,8 +66,8 @@ if __name__ == "__main__":
     hp_comb = combinations(hyperparams, 2)
     config_list = []
     for hp_conf in hp_comb:
-        for dataset in [datasets.load_digits(), datasets.load_iris()]:
-            config_list.append({hp_conf[0]: True, hp_conf[1]: True, "data_set": dataset})
+        for data_set_name in data_sets:
+            config_list.append({hp_conf[0]: True, hp_conf[1]: True, "data_set_name": data_set_name})
     hp_data_conf = config_list[int(job_id)]
 
     if model == "MLP":
@@ -91,10 +92,14 @@ if __name__ == "__main__":
     optimized_parameters = classifier.configspace.get_hyperparameters()
     parameter_names = [param.name for param in optimized_parameters]
 
+    sampling_run_name = f"smac_{function_name.replace(' ', '_')}_{'_'.join(parameter_names)}_" \
+                        f"{hp_data_conf['data_set_name']}_{time.strftime('%Y%m%d_%H%M%S')}"
+
+    logger.info(f"Run SMAC run for {sampling_run_name}.")
+
     if not os.path.exists("learning_curves/runs"):
         os.makedirs("learning_curves/runs")
-    run_dir = f"learning_curves/runs/smac_{function_name.replace(' ', '_')}_{'_'.join(parameter_names)}_" \
-              f"{time.strftime('%Y%m%d_%H%M%S')}"
+    run_dir = f"learning_curves/runs/{sampling_run_name}"
     sampling_dir = f"{run_dir}/sampling"
     if not os.path.exists(sampling_dir):
         os.makedirs(sampling_dir)
@@ -129,7 +134,7 @@ if __name__ == "__main__":
 
         df = pd.DataFrame(
             data=np.concatenate((smac_configurations.T,
-                                 smac_performances.reshape(n_smac_samples, 1)), axis=1),
+                                 smac_performances.reshape(-1, 1)), axis=1),
             columns=parameter_names + ["cost"])
         df.insert(0, "seed", seed)
 

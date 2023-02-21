@@ -20,6 +20,7 @@ from sklearn.tree import DecisionTreeClassifier
 
 iris = datasets.load_iris()
 digits = load_digits()
+datasets = {"digits": digits, "iris": iris}
 
 
 class MLP:
@@ -32,7 +33,7 @@ class MLP:
         optimize_batch_size=False,
         optimize_learning_rate_init=False,
         optimize_max_iter=False,
-        data_set=None,
+        data_set_name="digits",
         name="MLP",
         seed=0,
     ):
@@ -43,10 +44,7 @@ class MLP:
         self.optimize_batch_size = optimize_batch_size
         self.optimize_learning_rate_init = optimize_learning_rate_init
         self.optimize_max_iter = optimize_max_iter
-        if data_set is None:
-            self.data_set = datasets.load_digits()
-        else:
-            self.data_set = data_set
+        self.data_set = datasets[data_set_name]
         self.name = name
         self.seed = seed
 
@@ -137,16 +135,13 @@ class BDT:
         optimize_learning_rate=False,
         optimize_n_estimators=False,
         name="BDT",
-        data_set=None,
+        data_set_name="digits",
         seed=0,
     ):
         self.optimize_learning_rate = optimize_learning_rate
         self.optimize_n_estimators = optimize_n_estimators
         self.name = name
-        if data_set is None:
-            self.data_set = datasets.load_digits()
-        else:
-            self.data_set = data_set
+        self.data_set = datasets[data_set_name]
         self.seed = seed
 
     def set_seed(self, seed):
@@ -196,16 +191,13 @@ class DT:
         optimize_max_depth=False,
         optimize_min_samples_leaf=False,
         name="DT",
-        data_set=None,
+        data_set_name="digits",
         seed=0,
     ):
         self.optimize_max_depth = optimize_max_depth
         self.optimize_min_samples_leaf = optimize_min_samples_leaf
         self.name = name
-        if data_set is None:
-            self.data_set = datasets.load_digits()
-        else:
-            self.data_set = data_set
+        self.data_set = datasets[data_set_name]
         self.seed = seed
 
     def set_seed(self, seed):
@@ -265,7 +257,7 @@ class SVM:
         optimize_coef=False,
         optimize_gamma=False,
         name="SVM",
-        data_set=None,
+        data_set_name="digits",
         seed=0,
     ):
         self.optimize_kernel = optimize_kernel
@@ -275,10 +267,7 @@ class SVM:
         self.optimize_coef = optimize_coef
         self.optimize_gamma = optimize_gamma
         self.name = name
-        if data_set is None:
-            self.data_set = datasets.load_digits()
-        else:
-            self.data_set = data_set
+        self.data_set = datasets[data_set_name]
         self.seed = seed
 
     def set_seed(self, seed):
