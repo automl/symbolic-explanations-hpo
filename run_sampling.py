@@ -69,14 +69,16 @@ if __name__ == "__main__":
         hyperparams = None
 
     if isinstance(model, NamedFunction):
+        data_set_prefix = ""
         classifier = model
     else:
         hp_comb = combinations(hyperparams, 2)
         run_configs = []
         for hp_conf in hp_comb:
-            for data_set_name in data_sets:
-                run_configs.append({hp_conf[0]: True, hp_conf[1]: True, "data_set_name": data_set_name})
+            for ds in data_sets:
+                run_configs.append({hp_conf[0]: True, hp_conf[1]: True, "data_set_name": ds})
         run_conf = run_configs[int(job_id)]
+        data_set_prefix = f"_{run_conf['data_set_name']}"
         if model == "MLP":
             classifier = MLP(**run_conf)
         elif model == "SVM":  # set lower tolerance, iris (stopping_criteria=0.00001)
@@ -97,8 +99,8 @@ if __name__ == "__main__":
     optimized_parameters = classifier.configspace.get_hyperparameters()
     parameter_names = [param.name for param in optimized_parameters]
 
-    sampling_run_name = f"{run_type}_{function_name.replace(' ', '_')}_{'_'.join(parameter_names)}_" \
-                        f"{run_conf['data_set_name']}_{time.strftime('%Y%m%d_%H%M%S')}"
+    sampling_run_name = f"{run_type}_{function_name.replace(' ', '_')}_{'_'.join(parameter_names)}" \
+                        f"{data_set_prefix}_{time.strftime('%Y%m%d_%H%M%S')}"
 
     logger.info(f"Start sampling for {sampling_run_name}.")
 
