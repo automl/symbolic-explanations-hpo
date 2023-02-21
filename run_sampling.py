@@ -135,7 +135,7 @@ if __name__ == "__main__":
             )
             configurations = np.array(
                 [list(i.get_dictionary().values()) for i in configurations]
-            )
+            ).T
         else:
             configurations, performances, _ = run_smac_optimization(
                 configspace=classifier.configspace,
@@ -149,7 +149,7 @@ if __name__ == "__main__":
             )
 
         df = pd.DataFrame(
-            data=np.concatenate((configurations,
+            data=np.concatenate((configurations.T,
                                  performances.reshape(-1, 1)), axis=1),
             columns=parameter_names + ["cost"])
         df.insert(0, "seed", seed)

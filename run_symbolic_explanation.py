@@ -154,11 +154,12 @@ if __name__ == "__main__":
                             f"symb_seed{symb_seed}.pkl", "wb") as symb_model_file:
                         pickle.dump(symb_model, symb_model_file)
 
-                    df_metrics = get_scores(X_train,
-                                    y_train,
-                                    X_test.reshape(len(optimized_parameters), -1).T,
-                                    y_test.reshape(-1),
-                                    symb_model)
+                    df_metrics = get_scores(
+                        y_train,
+                        symb_model.predict(X_train),
+                        y_test.reshape(-1),
+                        symb_model.predict(X_test.reshape(len(optimized_parameters), -1).T)
+                    )
                     df_metrics.insert(0, "n_samples", n_samples)
                     df_metrics.insert(0, "sampling_seed", sampling_seed)
                     df_metrics.insert(0, "symb_seed", symb_seed)

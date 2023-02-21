@@ -14,6 +14,7 @@ from symbolic_meta_model_wrapper import (
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 import configparser as cfgparse
 from ConfigSpace import Configuration, UniformIntegerHyperparameter
+from smac.runhistory.encoder.encoder import convert_configurations_to_array
 
 plt.style.use("tableau-colorblind10")
 
@@ -152,24 +153,38 @@ def append_scores(
 
 
 def get_scores(
-    X_train,
     y_train,
-    X_test,
+    pred_train,
     y_test,
-    symb_model
+    pred_test
 ):
     """
     Get scores.
     """
     df_scores = pd.DataFrame.from_dict({
-        "mae_train_smac": [mean_absolute_error(y_train, symb_model.predict(X_train))],
-        "mae_test_smac": [mean_absolute_error(y_test, symb_model.predict(X_test))],
-        "mse_train_smac": [mean_squared_error(y_train, symb_model.predict(X_train))],
-        "mse_test_smac": [mean_squared_error(y_test, symb_model.predict(X_test))],
-        "r2_train_smac": [r2_score(y_train, symb_model.predict(X_train))],
-        "r2_test_smac": [r2_score(y_test, symb_model.predict(X_test))],
+        "mae_train_smac": [mean_absolute_error(y_train, pred_train)],
+        "mae_test_smac": [mean_absolute_error(y_test, pred_test)],
+        "mse_train_smac": [mean_squared_error(y_train, pred_train)],
+        "mse_test_smac": [mean_squared_error(y_test, pred_test)],
+        "r2_train_smac": [r2_score(y_train, pred_train)],
+        "r2_test_smac": [r2_score(y_test, pred_test)],
     })
     return df_scores
+
+
+def get_surrogate_predictions(X, classifier, surrogate_model):
+    y_surrogate = []
+    optimized_parameters = classifier.configspace.get_hyperparameters()
+    for i in range(X.shape[0]):
+        conf = Configuration(
+            configuration_space=classifier.configspace,
+            values={
+                optimized_parameters[0].name: X[i][0],
+                optimized_parameters[1].name: X[i][1],
+            },
+        )
+        y_surrogate.append(surrogate_model.predict(convert_configurations_to_array([conf]))[0][0][0])
+    return y_surrogate
 
 
 def write_dict_to_cfg_file(dictionary: dict, target_file_path: str):
