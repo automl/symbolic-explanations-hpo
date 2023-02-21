@@ -32,8 +32,8 @@ if __name__ == "__main__":
     functions = get_functions2d()
     n_seeds = 5
     n_samples = 200
-    model = "DT"
-    #model = functions[int(args.job_id)]
+    #model = "DT"
+    model = functions[int(args.job_id)]
     data_sets = ["digits", "iris"]
     use_random_samples = True
     symb_reg = True
@@ -68,26 +68,26 @@ if __name__ == "__main__":
     else:
         hyperparams = None
 
-    hp_comb = combinations(hyperparams, 2)
-    config_list = []
-    for hp_conf in hp_comb:
-        for data_set_name in data_sets:
-            config_list.append({hp_conf[0]: True, hp_conf[1]: True, "data_set_name": data_set_name})
-    hp_data_conf = config_list[int(job_id)]
-
-    if model == "MLP":
-        classifier = MLP(**hp_data_conf)
-    elif model == "SVM":  # set lower tolerance, iris (stopping_criteria=0.00001)
-        classifier = SVM(**hp_data_conf)
-    elif model == "BDT":
-        classifier = BDT(**hp_data_conf)
-    elif model == "DT":
-        classifier = DT(**hp_data_conf)
-    elif isinstance(model, NamedFunction):
+    if isinstance(model, NamedFunction):
         classifier = model
     else:
-        print(f"Unknown model: {model}")
-        classifier = None
+        hp_comb = combinations(hyperparams, 2)
+        run_configs = []
+        for hp_conf in hp_comb:
+            for data_set_name in data_sets:
+                run_configs.append({hp_conf[0]: True, hp_conf[1]: True, "data_set_name": data_set_name})
+        run_conf = run_configs[int(job_id)]
+        if model == "MLP":
+            classifier = MLP(**run_conf)
+        elif model == "SVM":  # set lower tolerance, iris (stopping_criteria=0.00001)
+            classifier = SVM(**run_conf)
+        elif model == "BDT":
+            classifier = BDT(**run_conf)
+        elif model == "DT":
+            classifier = DT(**run_conf)
+        else:
+            print(f"Unknown model: {model}")
+            classifier = None
 
     function_name = classifier.name if isinstance(classifier, NamedFunction) else model
 
@@ -98,7 +98,7 @@ if __name__ == "__main__":
     parameter_names = [param.name for param in optimized_parameters]
 
     sampling_run_name = f"{run_type}_{function_name.replace(' ', '_')}_{'_'.join(parameter_names)}_" \
-                        f"{hp_data_conf['data_set_name']}_{time.strftime('%Y%m%d_%H%M%S')}"
+                        f"{run_conf['data_set_name']}_{time.strftime('%Y%m%d_%H%M%S')}"
 
     logger.info(f"Start sampling for {sampling_run_name}.")
 
