@@ -6,6 +6,7 @@ import dill as pickle
 import matplotlib.pyplot as plt
 import numpy as np
 
+from utils.utils import get_hpo_test_data
 from utils.functions import NamedFunction
 from utils import functions
 
@@ -99,7 +100,6 @@ if __name__ == "__main__":
             df_error_metrics = pd.read_csv(f"{run_dir}/surrogate_error_metrics.csv")
         else:
             df_error_metrics = pd.read_csv(f"{run_dir}/error_metrics.csv")
-        df_samples = pd.read_csv(f"{run_dir}/sampling/samples.csv")
         with open(f"{run_dir}/sampling/classifier.pkl", "rb") as classifier_file:
             classifier = pickle.load(classifier_file)
         if isinstance(classifier, NamedFunction):
@@ -109,8 +109,10 @@ if __name__ == "__main__":
         optimized_parameters = classifier.configspace.get_hyperparameters()
         parameter_names = [param.name for param in optimized_parameters]
 
-        avg_cost = df_samples.mean()["cost"]
-        std_cost = df_samples.std()["cost"]
+        X_test, y_test = get_hpo_test_data(classifier, optimized_parameters, 100)
+
+        avg_cost = y_test.mean()
+        std_cost = y_test.std()
 
         df_all_complexity = pd.DataFrame()
         df_error_metrics["rmse_test_smac"] = np.sqrt(df_error_metrics["mse_test_smac"])
@@ -120,9 +122,12 @@ if __name__ == "__main__":
             for n_samples in df_error_metrics.n_samples.unique():
                 for sampling_seed in df_error_metrics.sampling_seed.unique():
                     for symb_seed in df_error_metrics.symb_seed.unique():
-                        print(f"Evaluate n_samples{n_samples}_sampling_seed{sampling_seed}_symb_seed{symb_seed}")
+                        print(
+                            f"Evaluate complexity for n_samples{n_samples}_sampling_seed{sampling_seed}_symb_seed{symb_seed}")
                         try:
-                            with open(f"{run_dir}/symb_models/n_samples{n_samples}_sampling_seed{sampling_seed}_symb_seed{symb_seed}.pkl", "rb") as symb_model_file:
+                            with open(
+                                    f"{run_dir}/symb_models/n_samples{n_samples}_sampling_seed{sampling_seed}_symb_seed{symb_seed}.pkl",
+                                    "rb") as symb_model_file:
                                 symb_model = pickle.load(symb_model_file)
                                 complexity = symb_model._program.length_
                                 df_complexity = pd.DataFrame({
@@ -156,12 +161,12 @@ if __name__ == "__main__":
             })
             postfix = ""
         else:
-            postfix = "smac"
+            postfix = "_smac"
 
         logger.info(f"Save plots to {mse_plot_dir}.")
 
         # Plot MSE (Mean + Std)
-        df_avg_std_error_metrics.plot(x="n_samples", y=f"mse_test_{postfix}_mean", yerr=f"mse_test_{postfix}_std",
+        df_avg_std_error_metrics.plot(x="n_samples", y=f"mse_test{postfix}_mean", yerr=f"mse_test{postfix}_std",
                                       linestyle="", marker="o")
         plt.suptitle(f"{model_name}: {', '.join(parameter_names)}")
         plt.title(f"Function Value Avg: {avg_cost:.2f} / Std: {std_cost:.2f}", fontsize=10)
@@ -187,7 +192,7 @@ if __name__ == "__main__":
         logger.info(f"Save plots to {rmse_plot_dir}.")
 
         # Plot RMSE (Mean + Std)
-        df_avg_std_error_metrics.plot(x="n_samples", y=f"rmse_test_{postfix}_mean", yerr=f"rmse_test_{postfix}_std",
+        df_avg_std_error_metrics.plot(x="n_samples", y=f"rmse_test{postfix}_mean", yerr=f"rmse_test{postfix}_std",
                                       linestyle="", marker="o")
         plt.suptitle(f"{model_name}: {', '.join(parameter_names)}")
         plt.title(f"Function Value Avg: {avg_cost:.2f} / Std: {std_cost:.2f}", fontsize=10)
