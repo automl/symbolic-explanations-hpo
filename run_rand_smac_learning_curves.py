@@ -64,7 +64,7 @@ if __name__ == "__main__":
     ]
 
     # set up directories
-    plot_dir = f"learning_curves/plots/combined_plots"
+    plot_dir = f"learning_curves/plots/combined_plots_smac_rand"
     complexity_plot_dir = f"{plot_dir}/complexity"
     mse_plot_dir = f"{plot_dir}/mse"
     rmse_plot_dir = f"{plot_dir}/rmse"
@@ -88,10 +88,15 @@ if __name__ == "__main__":
 
     logger.info(f"Save plots to {plot_dir}.")
 
-    run_names_cut = set([run.split("_")[1:5] for run in run_names])
+    run_names_cut = ["_".join(run.split("_")[1:5]) for run in run_names]
+    run_names_cut = set(run_names_cut)
 
     for sampling_run_name in run_names_cut:
-        classifier_dir = f"learning_curves/runs/{sampling_run_name}"
+
+        smac_run_name = [filename for filename in
+                         os.listdir(f"../symbolic-reg-hpo-cluster/learning_curves/runs/") if
+                         filename.startswith(f"smac_{sampling_run_name}")]
+        classifier_dir = f"learning_curves/runs/{smac_run_name}"
 
         logger.info(f"Create plot for {sampling_run_name}.")
 
