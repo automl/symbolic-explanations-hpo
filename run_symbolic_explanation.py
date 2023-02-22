@@ -24,7 +24,7 @@ if __name__ == "__main__":
     n_test_samples = 100
     n_seeds = 3
     symb_reg = True
-    symb_dir_postfix = "fixed_const_range"
+    symb_dir_postfix = "generations150"
     sampling_run_names = [
         "rand_BDT_learning_rate_n_estimators_digits_20230221_114624",
         "rand_MLP_max_iter_n_neurons_iris_20230221_114330",
@@ -107,8 +107,8 @@ if __name__ == "__main__":
 
     symb_params = dict(
         population_size=5000,
-        generations=50,
-        stopping_criteria=0.001,
+        generations=150,
+        stopping_criteria=0.0001,
         p_crossover=0.7,
         p_subtree_mutation=0.1,
         p_hoist_mutation=0.05,
@@ -119,8 +119,8 @@ if __name__ == "__main__":
         metric="mse",  # "mean absolute error",
         verbose=1,
         const_range=(
-            -1,
-            1,
+            -100,
+            100,
         ),  # Range for constants, rather arbitrary setting here?
     )
 
