@@ -37,11 +37,11 @@ if __name__ == "__main__":
         "rand_DT_max_depth_min_samples_leaf_digits_20230221_114653",
         "rand_Rosenbrock_2D_X0_X1_20230221_120527",
         "rand_DT_max_depth_min_samples_leaf_iris_20230221_114651",
-        "rand_SVM_C_coef0_digits_20230221_114754",
+        #"rand_SVM_C_coef0_digits_20230221_114754",
         "rand_Exponential_function_2D_X0_X1_20230221_120528",
         "rand_SVM_C_coef0_iris_20230221_114755",
         "rand_Linear_2D_X0_X1_20230221_120527",
-        "rand_SVM_C_degree_digits_20230221_114756",
+        #"rand_SVM_C_degree_digits_20230221_114756",
         "rand_MLP_learning_rate_init_max_iter_digits_20230221_114330",
         "rand_SVM_C_degree_iris_20230221_114756",
         "rand_MLP_learning_rate_init_max_iter_iris_20230221_114330",
@@ -49,9 +49,9 @@ if __name__ == "__main__":
         "rand_MLP_learning_rate_init_n_layer_digits_20230221_114329",
         "rand_SVM_C_gamma_iris_20230221_114755",
         "rand_MLP_learning_rate_init_n_layer_iris_20230221_114329",
-        "rand_SVM_coef0_degree_digits_20230221_114754",
+        #"rand_SVM_coef0_degree_digits_20230221_114754",
         "rand_MLP_learning_rate_init_n_neurons_digits_20230221_114330",
-        "rand_SVM_coef0_degree_iris_20230221_114756",
+        #"rand_SVM_coef0_degree_iris_20230221_114756",
         "rand_MLP_learning_rate_init_n_neurons_iris_20230221_114330",
         "rand_SVM_coef0_gamma_digits_20230221_114755",
         "rand_MLP_max_iter_n_layer_digits_20230221_114332",
@@ -119,8 +119,8 @@ if __name__ == "__main__":
         metric="mse",  # "mean absolute error",
         verbose=1,
         const_range=(
-            -100,
-            100,
+            -1,
+            1,
         ),  # Range for constants, rather arbitrary setting here?
     )
 
