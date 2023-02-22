@@ -153,8 +153,6 @@ if __name__ == "__main__":
             for n_samples in df_error_metrics.n_samples.unique():
                 for sampling_seed in df_error_metrics.sampling_seed.unique():
                     for symb_seed in df_error_metrics.symb_seed.unique():
-                        print(
-                            f"Evaluate complexity for n_samples{n_samples}_sampling_seed{sampling_seed}_symb_seed{symb_seed}")
                         try:
                             with open(
                                     f"{model_dir}/symb_models/n_samples{n_samples}_sampling_seed{sampling_seed}_symb_seed{symb_seed}.pkl",
@@ -196,46 +194,51 @@ if __name__ == "__main__":
 
         logger.info(f"Save plots to {mse_plot_dir}.")
 
+        n_outliers_mse = np.sum(df_error_metrics.mse_test_smac > 2*std_cost**2)
+
         # Plot MSE (Mean + Std)
         # df_avg_std_error_metrics.plot(x="n_samples", y=f"mse_test{postfix}_mean", yerr=f"mse_test{postfix}_std",
         #                               linestyle="", marker="o")
         # plt.suptitle(f"{model_name}: {', '.join(parameter_names)}")
-        # plt.title(f"Function Value Avg: {avg_cost:.2f} / Std: {std_cost:.2f}", fontsize=10)
+        # plt.title(f"Function Value Avg: {avg_cost:.2f} / Std: {std_cost:.2f}, n_outliers={n_outliers_mse}", fontsize=10)
         # plt.ylabel("Test MSE")
+        # plt.gca().set_ylim(top=2*std_cost**2)
         # plt.tight_layout()
         # plt.savefig(f"{mse_plot_dir}/{sampling_run_name}_mean_std_plot.png", dpi=200)
 
-        # # mse_q3 = np.percentile(df_error_metrics.mse_test_smac, 75)
-        # # mse_q1 = np.percentile(df_error_metrics.mse_test_smac, 25)
-        # # iqr = mse_q3 - mse_q1
-        # # cut_off = mse_q3 + 10*iqr
-        # # df_outliers = df_error_metrics[df_error_metrics.mse_test_smac > cut_off]
-        # # df_error_metrics = df_error_metrics.drop(df_outliers.index)
+        #df_outliers = df_error_metrics[df_error_metrics.rmse_test_smac > 2*std_cost]
+        #df_error_metrics = df_error_metrics.drop(df_outliers.index)
 
         # Plot MSE (Boxplot)
         df_error_metrics.boxplot("mse_test_smac", by="n_samples")
         plt.suptitle(f"{model_name}: {', '.join(parameter_names)}")
-        plt.title(f"Function Value Avg: {avg_cost:.2f} / Std: {std_cost:.2f}", fontsize=10),# n_outliers={len(df_outliers.index)}", fontsize=10)
+        plt.title(f"Function Value Avg: {avg_cost:.2f} / Std: {std_cost:.2f}, n_outliers={n_outliers_mse}",
+                  fontsize=10)
         plt.ylabel("Test MSE")
+        plt.gca().set_ylim(top=2*std_cost**2)
         plt.tight_layout()
         plt.savefig(f"{mse_plot_dir}/{sampling_run_name}_boxplot.png", dpi=200)
 
         logger.info(f"Save plots to {rmse_plot_dir}.")
 
+        n_outliers_rmse = np.sum(df_error_metrics.rmse_test_smac > 2*std_cost)
+
         # Plot RMSE (Mean + Std)
         # df_avg_std_error_metrics.plot(x="n_samples", y=f"rmse_test{postfix}_mean", yerr=f"rmse_test{postfix}_std",
         #                               linestyle="", marker="o")
         # plt.suptitle(f"{model_name}: {', '.join(parameter_names)}")
-        # plt.title(f"Function Value Avg: {avg_cost:.2f} / Std: {std_cost:.2f}", fontsize=10)
+        # plt.title(f"Function Value Avg: {avg_cost:.2f} / Std: {std_cost:.2f}, n_outliers={n_outliers_rmse}", fontsize=10)
         # plt.ylabel("Test RMSE")
+        # plt.gca().set_ylim(top=2*std_cost)
         # plt.tight_layout()
         # plt.savefig(f"{rmse_plot_dir}/{sampling_run_name}_mean_std_plot.png", dpi=200)
 
         # Plot RMSE (Boxplot)
         df_error_metrics.boxplot("rmse_test_smac", by="n_samples")
         plt.suptitle(f"{model_name}: {', '.join(parameter_names)}")
-        plt.title(f"Function Value Avg: {avg_cost:.2f} / Std: {std_cost:.2f}", fontsize=10),# n_outliers={len(df_outliers.index)}", fontsize=10)
+        plt.title(f"Function Value Avg: {avg_cost:.2f} / Std: {std_cost:.2f}, n_outliers={n_outliers_rmse}", fontsize=10),
         plt.ylabel("Test RMSE")
+        plt.gca().set_ylim(top=2*std_cost)
         plt.tight_layout()
         plt.savefig(f"{rmse_plot_dir}/{sampling_run_name}_boxplot.png", dpi=200)
 
