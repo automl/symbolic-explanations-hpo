@@ -16,8 +16,9 @@ sys.modules['functions'] = functions
 
 
 if __name__ == "__main__":
-    model_names = ["symb", "surrogate"]
-    symb_dir_postfixes = ["_defaults", "_fixed_const_range", "_small_const_range", "_generations150_stopping_small_const_range"]
+    model_name = "symb"
+    symb_dir_postfixes = ["", "_defaults", "_fixed_const_range", "_small_const_range",
+                          "_generations150_stopping_small_const_range"]
     run_names = [
         "rand_BDT_learning_rate_n_estimators_digits_20230221_114624",
         "rand_MLP_max_iter_n_neurons_iris_20230221_114330",
@@ -123,37 +124,37 @@ if __name__ == "__main__":
         std_cost = y_test.std()
 
         df_error_metrics_all = pd.DataFrame()
+
         for symb_dir_postfix in symb_dir_postfixes:
-            for model_name in model_names:
 
-                if model_name == "surrogate" and symb_dir_postfix != "":
-                    continue
+            if symb_dir_postfix == "":
+                model_name = "surrogate"
 
-                logger.info(f"Get error metrics for {model_name}{symb_dir_postfix}.")
+            logger.info(f"Get error metrics for {model_name}{symb_dir_postfix}.")
 
-                model_dir = f"{run_dir}/{model_name}{symb_dir_postfix}"
+            model_dir = f"{run_dir}/{model_name}{symb_dir_postfix}"
 
-                if model_name == "surrogate":
-                    df_error_metrics = pd.read_csv(f"{model_dir}/surrogate_error_metrics.csv")
-                else:
-                    df_error_metrics = pd.read_csv(f"{model_dir}/error_metrics.csv")
+            if model_name == "surrogate":
+                df_error_metrics = pd.read_csv(f"{model_dir}/surrogate_error_metrics.csv")
+            else:
+                df_error_metrics = pd.read_csv(f"{model_dir}/error_metrics.csv")
 
-                df_error_metrics["rmse_test_smac"] = np.sqrt(df_error_metrics["mse_test_smac"])
-                df_error_metrics["rmse_train_smac"] = np.sqrt(df_error_metrics["mse_train_smac"])
-                df_error_metrics.insert(0, "Experiment", f"{model_name}{symb_dir_postfix}")
-                df_error_metrics_all = pd.concat((df_error_metrics_all, df_error_metrics))
+            df_error_metrics["rmse_test_smac"] = np.sqrt(df_error_metrics["mse_test_smac"])
+            df_error_metrics["rmse_train_smac"] = np.sqrt(df_error_metrics["mse_train_smac"])
+            df_error_metrics.insert(0, "Experiment", f"{model_name}{symb_dir_postfix}")
+            df_error_metrics_all = pd.concat((df_error_metrics_all, df_error_metrics))
 
         logger.info(f"Create boxplot.")
 
         # Plot RMSE (Boxplot)
         plt.figure()
-        sns.boxplot(data=df_error_metrics_all, x="n_samples", y="rmse_test_smac", hue="Experiment")
+        sns.boxplot(data=df_error_metrics_all, x="n_samples", y="rmse_test_smac", hue="Experiment", showfliers=False)
         #df_error_metrics.boxplot("rmse_test_smac", by="n_samples")
         plt.suptitle(f"{classifier_name}: {', '.join(parameter_names)}")
         plt.title(f"Function Value Avg: {avg_cost:.2f} / Std: {std_cost:.2f}", fontsize=10),
         plt.ylabel("Test RMSE")
         plt.xlabel("Number of Samples")
-        plt.gca().set_ylim(top=2*std_cost)
+        #plt.gca().set_ylim(top=2*std_cost)
         plt.tight_layout()
 
         plt.savefig(f"{rmse_plot_dir}/{sampling_run_name}_boxplot.png", dpi=200)
