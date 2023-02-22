@@ -24,7 +24,7 @@ if __name__ == "__main__":
     n_test_samples = 100
     n_seeds = 3
     symb_reg = True
-    symb_dir_postfix = "generations150"
+    symb_dir_postfix = "_default_gen50_size5000"
     sampling_run_names = [
         "rand_BDT_learning_rate_n_estimators_digits_20230221_114624",
         "rand_MLP_max_iter_n_neurons_iris_20230221_114330",
@@ -101,27 +101,28 @@ if __name__ == "__main__":
     sampling_seeds = df_train_samples.seed.unique()
 
     n_samples_spacing = np.linspace(10, 200, 11)
+    n_samples_spacing = n_samples_spacing[:5]
 
     df_all_metrics = pd.DataFrame()
     df_all_expr = pd.DataFrame()
 
     symb_params = dict(
         population_size=5000,
-        generations=150,
-        stopping_criteria=0.0001,
-        p_crossover=0.7,
-        p_subtree_mutation=0.1,
-        p_hoist_mutation=0.05,
-        p_point_mutation=0.1,
-        max_samples=0.9,
-        parsimony_coefficient=0.01,
+        generations=50,
+        #stopping_criteria=0.0001,
+        #p_crossover=0.7,
+        #p_subtree_mutation=0.1,
+        #p_hoist_mutation=0.05,
+        #p_point_mutation=0.1,
+        #max_samples=0.9,
+        #parsimony_coefficient=0.01,
         function_set=get_function_set(),
         metric="mse",  # "mean absolute error",
         verbose=1,
-        const_range=(
-            -100,
-            100,
-        ),  # Range for constants, rather arbitrary setting here?
+        #const_range=(
+        #    -100,
+        #    100,
+        #),  # Range for constants, rather arbitrary setting here?
     )
 
     write_dict_to_cfg_file(
