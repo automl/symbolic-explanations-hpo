@@ -79,9 +79,6 @@ if __name__ == "__main__":
         # "smac_SVM_C_gamma_digits_20230218_124031",
     ]
 
-    # setup logging
-    logger = logging.getLogger(__name__)
-
     # set up directories
     plot_dir = f"learning_curves/plots/combined_plots"
     complexity_plot_dir = f"{plot_dir}/complexity"
