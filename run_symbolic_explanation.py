@@ -24,6 +24,7 @@ if __name__ == "__main__":
     n_test_samples = 100
     n_seeds = 3
     symb_reg = True
+    symb_dir_postfix = "fixed_const_range"
     sampling_run_names = [
         "rand_BDT_learning_rate_n_estimators_digits_20230221_114624",
         "rand_MLP_max_iter_n_neurons_iris_20230221_114330",
@@ -64,13 +65,14 @@ if __name__ == "__main__":
 
     run_dir = f"learning_curves/runs/{sampling_run_name}"
     sampling_dir = f"{run_dir}/sampling"
-    if not os.path.exists(f"{run_dir}/symb_models"):
-        os.makedirs(f"{run_dir}/symb_models")
+    symb_dir = f"{run_dir}/symb_{symb_dir_postfix}"
+    if not os.path.exists(f"{symb_dir}/symb_models"):
+        os.makedirs(f"{symb_dir}/symb_models")
     model = sampling_run_name.split("_")[1]
 
     # setup logging
     logger = logging.getLogger(__name__)
-    handler = logging.FileHandler(filename=f"{run_dir}/symb_log.log", encoding="utf8")
+    handler = logging.FileHandler(filename=f"{symb_dir}/symb_log.log", encoding="utf8")
     handler.setLevel("INFO")
     handler.setFormatter(
         logging.Formatter("[%(levelname)s][%(filename)s:%(lineno)d] %(message)s")
@@ -124,7 +126,7 @@ if __name__ == "__main__":
 
     write_dict_to_cfg_file(
         dictionary=symb_params,
-        target_file_path=f"{run_dir}/symbolic_regression_params.cfg",
+        target_file_path=f"{symb_dir}/symbolic_regression_params.cfg",
     )
 
     for sampling_seed in sampling_seeds:
@@ -150,7 +152,7 @@ if __name__ == "__main__":
 
                     # pickle symbolic regression model
                     with open(
-                            f"{run_dir}/symb_models/n_samples{n_samples}_sampling_seed{sampling_seed}_"
+                            f"{symb_dir}/symb_models/n_samples{n_samples}_sampling_seed{sampling_seed}_"
                             f"symb_seed{symb_seed}.pkl", "wb") as symb_model_file:
                         pickle.dump(symb_model, symb_model_file)
 
@@ -177,5 +179,5 @@ if __name__ == "__main__":
                     df_expr.insert(0, "symb_seed", symb_seed)
                     df_all_expr = pd.concat((df_all_expr, df_expr))
 
-                    df_all_metrics.to_csv(f"{run_dir}/error_metrics.csv", index=False)
-                    df_all_expr.to_csv(f"{run_dir}/expressions.csv", index=False)
+                    df_all_metrics.to_csv(f"{symb_dir}/error_metrics.csv", index=False)
+                    df_all_expr.to_csv(f"{symb_dir}/expressions.csv", index=False)
