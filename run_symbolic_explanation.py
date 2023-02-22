@@ -117,7 +117,7 @@ if __name__ == "__main__":
         metric="mse",  # "mean absolute error",
         verbose=1,
         const_range=(
-            100,
+            -100,
             100,
         ),  # Range for constants, rather arbitrary setting here?
     )
