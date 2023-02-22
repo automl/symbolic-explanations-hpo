@@ -42,7 +42,6 @@ if __name__ == "__main__":
         "smac_Branin_2D_X0_X1_20230216_202959",
         "smac_MLP_learning_rate_init_max_iter_iris_20230218_134148",
         "smac_MLP_n_layer_n_neurons_digits_20230218_140256",
-        "smac_SVM_C_coef0_digits_20230218_124032",
         "smac_SVM_coef0_degree_digits_20230218_124029",
         "smac_SVM_coef0_degree_iris_20230218_124031",
         "smac_SVM_coef0_gamma_digits_20230218_124031",
@@ -88,15 +87,15 @@ if __name__ == "__main__":
 
     logger.info(f"Save plots to {plot_dir}.")
 
-    run_names_cut = ["_".join(run.split("_")[1:5]) for run in run_names]
+    run_names_cut = ["_".join(run.split("_")[1:-2]) for run in run_names]
     run_names_cut = set(run_names_cut)
 
     for sampling_run_name in run_names_cut:
 
         smac_run_name = [filename for filename in
                          os.listdir(f"../symbolic-reg-hpo-cluster/learning_curves/runs/") if
-                         filename.startswith(f"smac_{sampling_run_name}")]
-        classifier_dir = f"learning_curves/runs/{smac_run_name}"
+                         filename.startswith(f"smac_{sampling_run_name}")][0]
+        classifier_dir = f"../symbolic-reg-hpo-cluster/learning_curves/runs/{smac_run_name}"
 
         logger.info(f"Create plot for {sampling_run_name}.")
 
@@ -122,13 +121,13 @@ if __name__ == "__main__":
             if sampling_type == "smac" or sampling_type == "surrogate":
                 smac_run_name = [filename for filename in
                                  os.listdir(f"../symbolic-reg-hpo-cluster/learning_curves/runs/") if
-                                 filename.startswith(f"smac_{sampling_run_name}")]
+                                 filename.startswith(f"smac_{sampling_run_name}")][0]
                 run_dir = f"../symbolic-reg-hpo-cluster/learning_curves/runs/{smac_run_name}"
                 model_dir = run_dir
             else:
                 rand_run_name = [filename for filename in
                                  os.listdir(f"learning_curves/runs/") if
-                                 filename.startswith(f"rand_{sampling_run_name}")]
+                                 filename.startswith(f"rand_{sampling_run_name}")][0]
                 run_dir = f"learning_curves/runs/{rand_run_name}"
                 model_dir = f"{run_dir}/{model_name}"
 
@@ -151,6 +150,7 @@ if __name__ == "__main__":
         plt.title(f"Function Value Avg: {avg_cost:.2f} / Std: {std_cost:.2f}", fontsize=10),
         plt.ylabel("Test RMSE")
         plt.xlabel("Number of Samples")
+        plt.axhline(y=std_cost, color='r', linestyle='--')
         #plt.gca().set_ylim(top=2*std_cost)
         plt.tight_layout()
 
