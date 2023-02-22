@@ -147,6 +147,7 @@ if __name__ == "__main__":
         logger.info(f"Create boxplot.")
 
         # Plot RMSE (Boxplot)
+        plt.figure()
         sns.boxplot(data=df_error_metrics_all, x="n_samples", y="rmse_test_smac", hue="Experiment")
         #df_error_metrics.boxplot("rmse_test_smac", by="n_samples")
         plt.suptitle(f"{classifier_name}: {', '.join(parameter_names)}")
@@ -157,4 +158,3 @@ if __name__ == "__main__":
         plt.tight_layout()
 
         plt.savefig(f"{rmse_plot_dir}/{sampling_run_name}_boxplot.png", dpi=200)
-        plt.close()
