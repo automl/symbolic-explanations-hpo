@@ -17,40 +17,95 @@ sys.modules['functions'] = functions
 if __name__ == "__main__":
     rand = False
     evaluate_surrogate = False
-    symb_dir_postfix = ""
+    symb_dir_postfix = "symb_defaults"
     run_names = [
-        "smac_Linear_2D_X0_X1_20230216_200839",
-        "smac_Branin_2D_X0_X1_20230216_202959",
-        "smac_MLP_learning_rate_init_max_iter_iris_20230218_134148",
-        "smac_MLP_n_layer_n_neurons_digits_20230218_140256",
-        "smac_SVM_C_coef0_digits_20230218_124032",
-        "smac_SVM_coef0_degree_digits_20230218_124029",
-        "smac_SVM_coef0_degree_iris_20230218_124031",
-        "smac_SVM_coef0_gamma_digits_20230218_124031",
-        "smac_BDT_learning_rate_n_estimators_digits_20230218_141037",
-        "smac_BDT_learning_rate_n_estimators_iris_20230218_123429",
-        "smac_Camelback_2D_X0_X1_20230216_202959",
-        "smac_DT_max_depth_min_samples_leaf_digits_20230218_103755",
-        "smac_DT_max_depth_min_samples_leaf_iris_20230218_103751",
-        "smac_Exponential_function_2D_X0_X1_20230216_202958",
-        "smac_MLP_learning_rate_init_n_layer_digits_20230218_145001",
-        "smac_MLP_learning_rate_init_n_layer_iris_20230218_134149",
-        "smac_MLP_learning_rate_init_n_neurons_digits_20230218_145001",
-        "smac_MLP_learning_rate_init_n_neurons_iris_20230218_134149",
-        "smac_MLP_max_iter_n_layer_digits_20230218_134149",
-        "smac_MLP_max_iter_n_layer_iris_20230218_134146",
-        "smac_Polynom_function_2D_X0_X1_20230216_200840",
-        "smac_Rosenbrock_2D_X0_X1_20230216_202959",
-        "smac_SVM_C_gamma_digits_20230218_124031",
+        "rand_BDT_learning_rate_n_estimators_digits_20230221_114624",
+        "rand_MLP_max_iter_n_neurons_iris_20230221_114330",
+        "rand_BDT_learning_rate_n_estimators_iris_20230221_114624",
+        "rand_MLP_n_layer_n_neurons_digits_20230221_114330",
+        "rand_Branin_2D_X0_X1_20230221_120527",
+        "rand_MLP_n_layer_n_neurons_iris_20230221_114330",
+        "rand_Camelback_2D_X0_X1_20230221_120527",
+        "rand_Polynom_function_2D_X0_X1_20230221_120528",
+        "rand_DT_max_depth_min_samples_leaf_digits_20230221_114653",
+        "rand_Rosenbrock_2D_X0_X1_20230221_120527",
+        "rand_DT_max_depth_min_samples_leaf_iris_20230221_114651",
+        # "rand_SVM_C_coef0_digits_20230221_114754",
+        "rand_Exponential_function_2D_X0_X1_20230221_120528",
+        "rand_SVM_C_coef0_iris_20230221_114755",
+        "rand_Linear_2D_X0_X1_20230221_120527",
+        # "rand_SVM_C_degree_digits_20230221_114756",
+        "rand_MLP_learning_rate_init_max_iter_digits_20230221_114330",
+        "rand_SVM_C_degree_iris_20230221_114756",
+        "rand_MLP_learning_rate_init_max_iter_iris_20230221_114330",
+        "rand_SVM_C_gamma_digits_20230221_114754",
+        "rand_MLP_learning_rate_init_n_layer_digits_20230221_114329",
+        "rand_SVM_C_gamma_iris_20230221_114755",
+        "rand_MLP_learning_rate_init_n_layer_iris_20230221_114329",
+        # "rand_SVM_coef0_degree_digits_20230221_114754",
+        "rand_MLP_learning_rate_init_n_neurons_digits_20230221_114330",
+        # "rand_SVM_coef0_degree_iris_20230221_114756",
+        "rand_MLP_learning_rate_init_n_neurons_iris_20230221_114330",
+        "rand_SVM_coef0_gamma_digits_20230221_114755",
+        "rand_MLP_max_iter_n_layer_digits_20230221_114332",
+        "rand_SVM_coef0_gamma_iris_20230221_114755",
+        "rand_MLP_max_iter_n_layer_iris_20230221_114330",
+        "rand_SVM_degree_gamma_digits_20230221_114754",
+        "rand_MLP_max_iter_n_neurons_digits_20230221_114332",
+        "rand_SVM_degree_gamma_iris_20230221_114754",
+        # "smac_Linear_2D_X0_X1_20230216_200839",
+        # "smac_Branin_2D_X0_X1_20230216_202959",
+        # "smac_MLP_learning_rate_init_max_iter_iris_20230218_134148",
+        # "smac_MLP_n_layer_n_neurons_digits_20230218_140256",
+        # "smac_SVM_C_coef0_digits_20230218_124032",
+        # "smac_SVM_coef0_degree_digits_20230218_124029",
+        # "smac_SVM_coef0_degree_iris_20230218_124031",
+        # "smac_SVM_coef0_gamma_digits_20230218_124031",
+        # "smac_BDT_learning_rate_n_estimators_digits_20230218_141037",
+        # "smac_BDT_learning_rate_n_estimators_iris_20230218_123429",
+        # "smac_Camelback_2D_X0_X1_20230216_202959",
+        # "smac_DT_max_depth_min_samples_leaf_digits_20230218_103755",
+        # "smac_DT_max_depth_min_samples_leaf_iris_20230218_103751",
+        # "smac_Exponential_function_2D_X0_X1_20230216_202958",
+        # "smac_MLP_learning_rate_init_n_layer_digits_20230218_145001",
+        # "smac_MLP_learning_rate_init_n_layer_iris_20230218_134149",
+        # "smac_MLP_learning_rate_init_n_neurons_digits_20230218_145001",
+        # "smac_MLP_learning_rate_init_n_neurons_iris_20230218_134149",
+        # "smac_MLP_max_iter_n_layer_digits_20230218_134149",
+        # "smac_MLP_max_iter_n_layer_iris_20230218_134146",
+        # "smac_Polynom_function_2D_X0_X1_20230216_200840",
+        # "smac_Rosenbrock_2D_X0_X1_20230216_202959",
+        # "smac_SVM_C_gamma_digits_20230218_124031",
     ]
 
     # setup logging
     logger = logging.getLogger(__name__)
 
     for sampling_run_name in run_names:
+
+        # set up directories
+        run_dir = f"learning_curves/runs/{sampling_run_name}"
+        symb_dir = f"{run_dir}/symb{symb_dir_postfix}"
+        plot_dir = f"learning_curves/plots/plots_{symb_dir_postfix}"
+        complexity_plot_dir = f"{plot_dir}/complexity"
+        if evaluate_surrogate:
+            mse_plot_dir = f"{plot_dir}/surrogate_mse"
+            rmse_plot_dir = f"{plot_dir}/surrogate_rmse"
+        else:
+            mse_plot_dir = f"{plot_dir}/mse"
+            rmse_plot_dir = f"{plot_dir}/rmse"
+        if not os.path.exists(plot_dir):
+            os.makedirs(plot_dir)
+        if not os.path.exists(complexity_plot_dir):
+            os.makedirs(complexity_plot_dir)
+        if not os.path.exists(mse_plot_dir):
+            os.makedirs(mse_plot_dir)
+        if not os.path.exists(rmse_plot_dir):
+            os.makedirs(rmse_plot_dir)
+
         # setup logging
         logger = logging.getLogger(__name__)
-        handler = logging.FileHandler(filename=f"learning_curves/runs/{sampling_run_name}/plot_log.log",
+        handler = logging.FileHandler(filename=f"{symb_dir}/plot_log{symb_dir_postfix}.log",
                                       encoding="utf8")
         handler.setLevel("INFO")
         handler.setFormatter(
@@ -67,25 +122,6 @@ if __name__ == "__main__":
         logger.root.setLevel("INFO")
 
         logger.info(f"Create plots for {sampling_run_name}.")
-
-        run_dir = f"learning_curves/runs/{sampling_run_name}"
-        symb_dir = f"{run_dir}/symb{symb_dir_postfix}"
-        plot_dir = f"learning_curves/plots/plots_{symb_dir_postfix}"
-        complexity_plot_dir = f"learning_curves/plots/complexity"
-        if evaluate_surrogate:
-            mse_plot_dir = f"learning_curves/plots/surrogate_mse"
-            rmse_plot_dir = f"learning_curves/plots/surrogate_rmse"
-        else:
-            mse_plot_dir = f"learning_curves/plots/mse"
-            rmse_plot_dir = f"learning_curves/plots/rmse"
-        if not os.path.exists(plot_dir):
-            os.makedirs(plot_dir)
-        if not os.path.exists(complexity_plot_dir):
-            os.makedirs(complexity_plot_dir)
-        if not os.path.exists(mse_plot_dir):
-            os.makedirs(mse_plot_dir)
-        if not os.path.exists(rmse_plot_dir):
-            os.makedirs(rmse_plot_dir)
 
         if evaluate_surrogate:
             df_error_metrics = pd.read_csv(f"{symb_dir}/surrogate_error_metrics.csv")
