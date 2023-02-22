@@ -4,6 +4,7 @@ import sys
 import logging
 import dill as pickle
 import matplotlib.pyplot as plt
+import seaborn as sns
 import numpy as np
 
 from utils.utils import get_hpo_test_data
@@ -134,9 +135,9 @@ if __name__ == "__main__":
         with open(f"{run_dir}/sampling/classifier.pkl", "rb") as classifier_file:
             classifier = pickle.load(classifier_file)
         if isinstance(classifier, NamedFunction):
-            model_name = classifier.name
+            classifier_name = classifier.name
         else:
-            model_name = classifier.name
+            classifier_name = classifier.name
         optimized_parameters = classifier.configspace.get_hyperparameters()
         parameter_names = [param.name for param in optimized_parameters]
 
@@ -199,7 +200,7 @@ if __name__ == "__main__":
         # Plot MSE (Mean + Std)
         # df_avg_std_error_metrics.plot(x="n_samples", y=f"mse_test{postfix}_mean", yerr=f"mse_test{postfix}_std",
         #                               linestyle="", marker="o")
-        # plt.suptitle(f"{model_name}: {', '.join(parameter_names)}")
+        # plt.suptitle(f"{classifier_name}: {', '.join(parameter_names)}")
         # plt.title(f"Function Value Avg: {avg_cost:.2f} / Std: {std_cost:.2f}, n_outliers={n_outliers_mse}", fontsize=10)
         # plt.ylabel("Test MSE")
         # plt.gca().set_ylim(top=2*std_cost**2)
@@ -210,8 +211,9 @@ if __name__ == "__main__":
         #df_error_metrics = df_error_metrics.drop(df_outliers.index)
 
         # Plot MSE (Boxplot)
-        df_error_metrics.boxplot("mse_test_smac", by="n_samples")
-        plt.suptitle(f"{model_name}: {', '.join(parameter_names)}")
+        sns.boxplot(data=df_error_metrics, x="n_samples", y="mse_test_smac")
+
+        plt.suptitle(f"{classifier_name}: {', '.join(parameter_names)}")
         plt.title(f"Function Value Avg: {avg_cost:.2f} / Std: {std_cost:.2f}, n_outliers={n_outliers_mse}",
                   fontsize=10)
         plt.ylabel("Test MSE")
@@ -226,7 +228,7 @@ if __name__ == "__main__":
         # Plot RMSE (Mean + Std)
         # df_avg_std_error_metrics.plot(x="n_samples", y=f"rmse_test{postfix}_mean", yerr=f"rmse_test{postfix}_std",
         #                               linestyle="", marker="o")
-        # plt.suptitle(f"{model_name}: {', '.join(parameter_names)}")
+        # plt.suptitle(f"{classifier_name}: {', '.join(parameter_names)}")
         # plt.title(f"Function Value Avg: {avg_cost:.2f} / Std: {std_cost:.2f}, n_outliers={n_outliers_rmse}", fontsize=10)
         # plt.ylabel("Test RMSE")
         # plt.gca().set_ylim(top=2*std_cost)
@@ -234,8 +236,8 @@ if __name__ == "__main__":
         # plt.savefig(f"{rmse_plot_dir}/{sampling_run_name}_mean_std_plot.png", dpi=200)
 
         # Plot RMSE (Boxplot)
-        df_error_metrics.boxplot("rmse_test_smac", by="n_samples")
-        plt.suptitle(f"{model_name}: {', '.join(parameter_names)}")
+        sns.boxplot(data=df_error_metrics, x="n_samples", y="rmse_test_smac")
+        plt.suptitle(f"{classifier_name}: {', '.join(parameter_names)}")
         plt.title(f"Function Value Avg: {avg_cost:.2f} / Std: {std_cost:.2f}, n_outliers={n_outliers_rmse}", fontsize=10),
         plt.ylabel("Test RMSE")
         plt.gca().set_ylim(top=2*std_cost)
@@ -248,15 +250,15 @@ if __name__ == "__main__":
             # Plot Complexity (Mean + Std)
             # df_avg_std_complexity.plot(x="n_samples", y="complexity_mean", yerr="complexity_std",
             #                               linestyle="", marker="o")
-            # plt.suptitle(f"{model_name}: {', '.join(parameter_names)}")
+            # plt.suptitle(f"{classifier_name}: {', '.join(parameter_names)}")
             # plt.title("Complexity")
             # plt.ylabel("Program Length")
             # plt.tight_layout()
             # plt.savefig(f"{complexity_plot_dir}/{sampling_run_name}_complexity_mean_std_plot.png", dpi=200)
 
             # Plot Complexity (Boxplot)
-            df_all_complexity.boxplot("complexity", by="n_samples")
-            plt.suptitle(f"{model_name}: {', '.join(parameter_names)}")
+            sns.boxplot(data=df_all_complexity, x="n_samples", y="complexity")
+            plt.suptitle(f"{classifier_name}: {', '.join(parameter_names)}")
             plt.title("Complexity")
             plt.ylabel("Program Length")
             plt.tight_layout()
