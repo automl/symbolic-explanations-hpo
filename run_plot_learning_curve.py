@@ -15,9 +15,9 @@ sys.modules['functions'] = functions
 
 
 if __name__ == "__main__":
-    rand = False
+    rand = True
     evaluate_surrogate = False
-    symb_dir_postfix = "symb_defaults"
+    symb_dir_postfix = "_defaults"
     run_names = [
         "rand_BDT_learning_rate_n_estimators_digits_20230221_114624",
         "rand_MLP_max_iter_n_neurons_iris_20230221_114330",
@@ -85,8 +85,12 @@ if __name__ == "__main__":
 
         # set up directories
         run_dir = f"learning_curves/runs/{sampling_run_name}"
-        symb_dir = f"{run_dir}/symb{symb_dir_postfix}"
-        plot_dir = f"learning_curves/plots/plots_{symb_dir_postfix}"
+        if evaluate_surrogate:
+            model_name = "surrogate"
+        else:
+            model_name = "symb"
+        model_dir = f"{run_dir}/{model_name}{symb_dir_postfix}"
+        plot_dir = f"learning_curves/plots/{model_name}{symb_dir_postfix}"
         complexity_plot_dir = f"{plot_dir}/complexity"
         if evaluate_surrogate:
             mse_plot_dir = f"{plot_dir}/surrogate_mse"
@@ -105,7 +109,7 @@ if __name__ == "__main__":
 
         # setup logging
         logger = logging.getLogger(__name__)
-        handler = logging.FileHandler(filename=f"{symb_dir}/plot_log{symb_dir_postfix}.log",
+        handler = logging.FileHandler(filename=f"{model_dir}/plot_log{symb_dir_postfix}.log",
                                       encoding="utf8")
         handler.setLevel("INFO")
         handler.setFormatter(
@@ -124,9 +128,9 @@ if __name__ == "__main__":
         logger.info(f"Create plots for {sampling_run_name}.")
 
         if evaluate_surrogate:
-            df_error_metrics = pd.read_csv(f"{symb_dir}/surrogate_error_metrics.csv")
+            df_error_metrics = pd.read_csv(f"{model_dir}/surrogate_error_metrics.csv")
         else:
-            df_error_metrics = pd.read_csv(f"{symb_dir}/error_metrics.csv")
+            df_error_metrics = pd.read_csv(f"{model_dir}/error_metrics.csv")
         with open(f"{run_dir}/sampling/classifier.pkl", "rb") as classifier_file:
             classifier = pickle.load(classifier_file)
         if isinstance(classifier, NamedFunction):
@@ -153,7 +157,7 @@ if __name__ == "__main__":
                             f"Evaluate complexity for n_samples{n_samples}_sampling_seed{sampling_seed}_symb_seed{symb_seed}")
                         try:
                             with open(
-                                    f"{symb_dir}/symb_models/n_samples{n_samples}_sampling_seed{sampling_seed}_symb_seed{symb_seed}.pkl",
+                                    f"{model_dir}/symb_models/n_samples{n_samples}_sampling_seed{sampling_seed}_symb_seed{symb_seed}.pkl",
                                     "rb") as symb_model_file:
                                 symb_model = pickle.load(symb_model_file)
                                 complexity = symb_model._program.length_
