@@ -120,6 +120,7 @@ if __name__ == "__main__":
         optimized_parameters = classifier.configspace.get_hyperparameters()
         parameter_names = [param.name for param in optimized_parameters]
 
+        logger.info(f"Get test data for {classifier_name}.")
         X_test, y_test = get_hpo_test_data(classifier, optimized_parameters, 100)
 
         avg_cost = y_test.mean()
@@ -143,18 +144,20 @@ if __name__ == "__main__":
 
                 df_error_metrics["rmse_test_smac"] = np.sqrt(df_error_metrics["mse_test_smac"])
                 df_error_metrics["rmse_train_smac"] = np.sqrt(df_error_metrics["mse_train_smac"])
-                df_error_metrics.insert(0, "exp_name", f"{model_name}{symb_dir_postfix}")
+                df_error_metrics.insert(0, "Experiment", f"{model_name}{symb_dir_postfix}")
                 df_error_metrics_all = pd.concat((df_error_metrics_all, df_error_metrics))
 
         logger.info(f"Create boxplot.")
 
         # Plot RMSE (Boxplot)
-        sns.boxplot(data=df_error_metrics_all, x="n_samples", y="rmse_test_smac", hue="exp_name")
+        sns.boxplot(data=df_error_metrics_all, x="n_samples", y="rmse_test_smac", hue="Experiment")
         #df_error_metrics.boxplot("rmse_test_smac", by="n_samples")
         plt.suptitle(f"{classifier_name}: {', '.join(parameter_names)}")
         plt.title(f"Function Value Avg: {avg_cost:.2f} / Std: {std_cost:.2f}", fontsize=10),
         plt.ylabel("Test RMSE")
+        plt.xlabel("Number of Samples")
         #plt.gca().set_ylim(top=2*std_cost)
         plt.tight_layout()
 
-        plt.savefig(f"{plot_dir}/{sampling_run_name}_boxplot.png", dpi=200)
+        plt.savefig(f"{rmse_plot_dir}/{sampling_run_name}_boxplot.png", dpi=200)
+        plt.close()
