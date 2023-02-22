@@ -87,8 +87,6 @@ if __name__ == "__main__":
     complexity_plot_dir = f"{plot_dir}/complexity"
     mse_plot_dir = f"{plot_dir}/mse"
     rmse_plot_dir = f"{plot_dir}/rmse"
-    if not os.path.exists(plot_dir):
-        os.makedirs(plot_dir)
     if not os.path.exists(complexity_plot_dir):
         os.makedirs(complexity_plot_dir)
     if not os.path.exists(mse_plot_dir):
@@ -111,7 +109,7 @@ if __name__ == "__main__":
 
     for sampling_run_name in run_names:
         run_dir = f"learning_curves/runs/{sampling_run_name}"
-        logger.info(f"Create plots for {sampling_run_name}.")
+        logger.info(f"Create plot for {sampling_run_name}.")
 
         with open(f"{run_dir}/sampling/classifier.pkl", "rb") as classifier_file:
             classifier = pickle.load(classifier_file)
@@ -134,6 +132,8 @@ if __name__ == "__main__":
                 if model_name == "surrogate" and symb_dir_postfix != "":
                     continue
 
+                logger.info(f"Get error metrics for {model_name}{symb_dir_postfix}.")
+
                 model_dir = f"{run_dir}/{model_name}{symb_dir_postfix}"
 
                 if model_name == "surrogate":
@@ -146,13 +146,15 @@ if __name__ == "__main__":
                 df_error_metrics.insert(0, "exp_name", f"{model_name}{symb_dir_postfix}")
                 df_error_metrics_all = pd.concat((df_error_metrics_all, df_error_metrics))
 
-                # Plot RMSE (Boxplot)
-                sns.boxplot(data=df_error_metrics, x="n_samples", y="rmse_test_smac", hue="exp_name")
-                #df_error_metrics.boxplot("rmse_test_smac", by="n_samples")
-                plt.suptitle(f"{classifier_name}: {', '.join(parameter_names)}")
-                plt.title(f"Function Value Avg: {avg_cost:.2f} / Std: {std_cost:.2f}", fontsize=10),
-                plt.ylabel("Test RMSE")
-                #plt.gca().set_ylim(top=2*std_cost)
-                plt.tight_layout()
+        logger.info(f"Create boxplot.")
+
+        # Plot RMSE (Boxplot)
+        sns.boxplot(data=df_error_metrics_all, x="n_samples", y="rmse_test_smac", hue="exp_name")
+        #df_error_metrics.boxplot("rmse_test_smac", by="n_samples")
+        plt.suptitle(f"{classifier_name}: {', '.join(parameter_names)}")
+        plt.title(f"Function Value Avg: {avg_cost:.2f} / Std: {std_cost:.2f}", fontsize=10),
+        plt.ylabel("Test RMSE")
+        #plt.gca().set_ylim(top=2*std_cost)
+        plt.tight_layout()
 
         plt.savefig(f"{plot_dir}/{sampling_run_name}_boxplot.png", dpi=200)
