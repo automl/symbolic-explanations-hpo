@@ -70,14 +70,14 @@ if __name__ == "__main__":
 
         run_dir = f"learning_curves/runs/{sampling_run_name}"
         symb_dir = f"{run_dir}/symb{symb_dir_postfix}"
-        plot_dir = f"learning_curves/plots"
-        complexity_plot_dir = f"learning_curves/plots/complexity{symb_dir_postfix}"
+        plot_dir = f"learning_curves/plots/plots_{symb_dir_postfix}"
+        complexity_plot_dir = f"learning_curves/plots/complexity"
         if evaluate_surrogate:
-            mse_plot_dir = f"learning_curves/plots/surrogate_mse{symb_dir_postfix}"
-            rmse_plot_dir = f"learning_curves/plots/surrogate_rmse{symb_dir_postfix}"
+            mse_plot_dir = f"learning_curves/plots/surrogate_mse"
+            rmse_plot_dir = f"learning_curves/plots/surrogate_rmse"
         else:
-            mse_plot_dir = f"learning_curves/plots/mse{symb_dir_postfix}"
-            rmse_plot_dir = f"learning_curves/plots/rmse{symb_dir_postfix}"
+            mse_plot_dir = f"learning_curves/plots/mse"
+            rmse_plot_dir = f"learning_curves/plots/rmse"
         if not os.path.exists(plot_dir):
             os.makedirs(plot_dir)
         if not os.path.exists(complexity_plot_dir):
