@@ -24,7 +24,7 @@ if __name__ == "__main__":
     n_test_samples = 100
     n_seeds = 3
     symb_reg = True
-    symb_dir_postfix = "_default_gen50_size5000"
+    symb_dir_postfix = "_def_gen100_size5000"
     sampling_run_names = [
         "rand_BDT_learning_rate_n_estimators_digits_20230221_114624",
         "rand_MLP_max_iter_n_neurons_iris_20230221_114330",
@@ -101,7 +101,6 @@ if __name__ == "__main__":
     sampling_seeds = df_train_samples.seed.unique()
 
     n_samples_spacing = np.linspace(10, 200, 11)
-    n_samples_spacing = n_samples_spacing[:5]
 
     df_all_metrics = pd.DataFrame()
     df_all_expr = pd.DataFrame()

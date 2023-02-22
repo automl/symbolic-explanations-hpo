@@ -148,7 +148,7 @@ if __name__ == "__main__":
         plt.title(f"Function Value Avg: {avg_cost:.2f} / Std: {std_cost:.2f}", fontsize=10),
         plt.ylabel("Test RMSE")
         plt.xlabel("Number of Samples")
-        plt.axhline(y=std_cost, color='darkred', linestyle='--', linewidth=2)
+        plt.axhline(y=std_cost, color='darkred', linestyle='--', linewidth=0.5)
         #plt.gca().set_ylim(top=2*std_cost)
         plt.tight_layout()
 
