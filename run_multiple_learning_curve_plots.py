@@ -16,9 +16,8 @@ sys.modules['functions'] = functions
 
 
 if __name__ == "__main__":
-    rand = True
-    model_names = ["symb"]#, "surrogate"]
-    symb_dir_postfixes = ["_defaults", "_fixed_const_range"]
+    model_names = ["symb", "surrogate"]
+    symb_dir_postfixes = ["_defaults", "_fixed_const_range", "_small_const_range", "_generations150_stopping_small_const_range"]
     run_names = [
         "rand_BDT_learning_rate_n_estimators_digits_20230221_114624",
         "rand_MLP_max_iter_n_neurons_iris_20230221_114330",
@@ -154,7 +153,7 @@ if __name__ == "__main__":
         plt.title(f"Function Value Avg: {avg_cost:.2f} / Std: {std_cost:.2f}", fontsize=10),
         plt.ylabel("Test RMSE")
         plt.xlabel("Number of Samples")
-        #plt.gca().set_ylim(top=2*std_cost)
+        plt.gca().set_ylim(top=2*std_cost)
         plt.tight_layout()
 
         plt.savefig(f"{rmse_plot_dir}/{sampling_run_name}_boxplot.png", dpi=200)

@@ -211,6 +211,7 @@ if __name__ == "__main__":
         #df_error_metrics = df_error_metrics.drop(df_outliers.index)
 
         # Plot MSE (Boxplot)
+        plt.figure()
         sns.boxplot(data=df_error_metrics, x="n_samples", y="mse_test_smac")
 
         plt.suptitle(f"{classifier_name}: {', '.join(parameter_names)}")
@@ -236,6 +237,7 @@ if __name__ == "__main__":
         # plt.savefig(f"{rmse_plot_dir}/{sampling_run_name}_mean_std_plot.png", dpi=200)
 
         # Plot RMSE (Boxplot)
+        plt.figure()
         sns.boxplot(data=df_error_metrics, x="n_samples", y="rmse_test_smac")
         plt.suptitle(f"{classifier_name}: {', '.join(parameter_names)}")
         plt.title(f"Function Value Avg: {avg_cost:.2f} / Std: {std_cost:.2f}, n_outliers={n_outliers_rmse}", fontsize=10),
@@ -257,6 +259,7 @@ if __name__ == "__main__":
             # plt.savefig(f"{complexity_plot_dir}/{sampling_run_name}_complexity_mean_std_plot.png", dpi=200)
 
             # Plot Complexity (Boxplot)
+            plt.figure()
             sns.boxplot(data=df_all_complexity, x="n_samples", y="complexity")
             plt.suptitle(f"{classifier_name}: {', '.join(parameter_names)}")
             plt.title("Complexity")
