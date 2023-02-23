@@ -19,7 +19,7 @@ if __name__ == "__main__":
     model_name = "symb__def_gen100_size5000"
     run_names = [
         "rand_BDT_learning_rate_n_estimators_digits_20230221_114624",
-        "rand_MLP_max_iter_n_neurons_iris_20230221_114330",
+        #"rand_MLP_max_iter_n_neurons_iris_20230221_114330", # no surrogate
         "rand_BDT_learning_rate_n_estimators_iris_20230221_114624",
         "rand_MLP_n_layer_n_neurons_digits_20230221_114330",
         "rand_Branin_2D_X0_X1_20230221_120527",
@@ -68,7 +68,7 @@ if __name__ == "__main__":
         "smac_MLP_max_iter_n_layer_digits_20230218_134149",
         "smac_MLP_max_iter_n_layer_iris_20230218_134146",
         "smac_MLP_max_iter_n_neurons_digits_20230218_155636",
-        "smac_MLP_max_iter_n_neurons_iris_20230218_134154",
+        #"smac_MLP_max_iter_n_neurons_iris_20230218_134154", # no surrogate
         "smac_MLP_n_layer_n_neurons_digits_20230218_140256",
         #"smac_MLP_n_layer_n_neurons_iris_20230218_140254",  # no surrogate
         "smac_Polynom_function_2D_X0_X1_20230216_200840",
