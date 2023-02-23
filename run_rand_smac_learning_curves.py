@@ -34,7 +34,7 @@ if __name__ == "__main__":
         #"rand_SVM_C_coef0_iris_20230221_114755", # no surrogate
         "rand_Linear_2D_X0_X1_20230221_120527",
         #"rand_SVM_C_degree_digits_20230221_114756",
-        "rand_MLP_learning_rate_init_max_iter_digits_20230221_114330",
+        #"rand_MLP_learning_rate_init_max_iter_digits_20230221_114330", # not in smac
         #"rand_SVM_C_degree_iris_20230221_114756", # no surrogate
         "rand_MLP_learning_rate_init_max_iter_iris_20230221_114330",
         "rand_SVM_C_gamma_digits_20230221_114754",
@@ -140,6 +140,7 @@ if __name__ == "__main__":
         std_cost = y_test.std()
 
         df_error_metrics_all = pd.DataFrame()
+        df_all_complexity = pd.DataFrame()
 
         for sampling_type in ["rand", "smac", "surrogate"]:
 
