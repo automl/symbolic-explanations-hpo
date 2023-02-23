@@ -110,20 +110,23 @@ if __name__ == "__main__":
 
             logger.info(f"Evaluate Surrogate Model for {n_samples} samples and sampling seed {sampling_seed}.")
 
-            # load surrogate model
-            with open(f"{run_dir}/sampling/surrogates/seed{sampling_seed}_samples{n_samples}.pkl",
-                      "rb") as surrogate_file:
-                surrogate_model = pickle.load(surrogate_file)
+            try:
+                # load surrogate model
+                with open(f"{run_dir}/sampling/surrogates/seed{sampling_seed}_samples{n_samples}.pkl",
+                          "rb") as surrogate_file:
+                    surrogate_model = pickle.load(surrogate_file)
 
-            df_metrics = get_scores(
-                y_train,
-                get_surrogate_predictions(np.array(X_train), classifier, surrogate_model),
-                y_test.reshape(-1),
-                get_surrogate_predictions(X_test.reshape(len(optimized_parameters), -1).T, classifier, surrogate_model),
-            )
+                df_metrics = get_scores(
+                    y_train,
+                    get_surrogate_predictions(np.array(X_train), classifier, surrogate_model),
+                    y_test.reshape(-1),
+                    get_surrogate_predictions(X_test.reshape(len(optimized_parameters), -1).T, classifier, surrogate_model),
+                )
 
-            df_metrics.insert(0, "n_samples", n_samples)
-            df_metrics.insert(0, "sampling_seed", sampling_seed)
-            df_all_metrics = pd.concat((df_all_metrics, df_metrics))
+                df_metrics.insert(0, "n_samples", n_samples)
+                df_metrics.insert(0, "sampling_seed", sampling_seed)
+                df_all_metrics = pd.concat((df_all_metrics, df_metrics))
+            except:
+                logger.warning(f"File seed{sampling_seed}_samples{n_samples}.pkl could not be loaded, skip.")
 
             df_all_metrics.to_csv(f"{run_dir}/surrogate_error_metrics.csv", index=False)
