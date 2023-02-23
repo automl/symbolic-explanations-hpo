@@ -50,7 +50,7 @@ if __name__ == "__main__":
         #"rand_SVM_coef0_gamma_iris_20230221_114755", # no surrogate
         "rand_MLP_max_iter_n_layer_iris_20230221_114330",
         #"rand_SVM_degree_gamma_digits_20230221_114754", # no surrogate
-        "rand_MLP_max_iter_n_neurons_digits_20230221_114332",
+        #"rand_MLP_max_iter_n_neurons_digits_20230221_114332", # no surrogate
         #"rand_SVM_degree_gamma_iris_20230221_114754", # no surrogate
         "smac_BDT_learning_rate_n_estimators_digits_20230218_141037",
         "smac_BDT_learning_rate_n_estimators_iris_20230218_123429",
@@ -67,7 +67,7 @@ if __name__ == "__main__":
         "smac_MLP_learning_rate_init_n_neurons_iris_20230218_134149",
         "smac_MLP_max_iter_n_layer_digits_20230218_134149",
         "smac_MLP_max_iter_n_layer_iris_20230218_134146",
-        "smac_MLP_max_iter_n_neurons_digits_20230218_155636",
+        #"smac_MLP_max_iter_n_neurons_digits_20230218_155636", # no surrogate
         #"smac_MLP_max_iter_n_neurons_iris_20230218_134154", # no surrogate
         "smac_MLP_n_layer_n_neurons_digits_20230218_140256",
         #"smac_MLP_n_layer_n_neurons_iris_20230218_140254",  # no surrogate
@@ -167,9 +167,31 @@ if __name__ == "__main__":
             df_error_metrics.insert(0, "Experiment", f"{sampling_type}")
             df_error_metrics_all = pd.concat((df_error_metrics_all, df_error_metrics))
 
+            if not sampling_type == "surrogate":
+                for n_samples in df_error_metrics.n_samples.unique():
+                    for sampling_seed in df_error_metrics.sampling_seed.unique():
+                        for symb_seed in df_error_metrics.symb_seed.unique():
+                            try:
+                                with open(
+                                        f"{model_dir}/symb_models/n_samples{n_samples}_sampling_seed{sampling_seed}_symb_seed{symb_seed}.pkl",
+                                        "rb") as symb_model_file:
+                                    symb_model = pickle.load(symb_model_file)
+                                    complexity = symb_model._program.length_
+                                    df_complexity = pd.DataFrame({
+                                        "complexity": [complexity],
+                                        "n_samples": [n_samples],
+                                        "sampling_seed": [sampling_seed],
+                                        "symb_seed": [symb_seed]
+                                    })
+                                    df_complexity.insert(0, "Experiment", f"{sampling_type}")
+                                    df_all_complexity = pd.concat((df_all_complexity, df_complexity))
+                            except:
+                                continue
+
         logger.info(f"Create boxplot.")
 
         df_error_metrics_all = df_error_metrics_all[df_error_metrics_all.n_samples > 10]
+        df_all_complexity = df_all_complexity[df_all_complexity.n_samples > 10]
 
         # Plot RMSE (Boxplot)
         plt.figure()
@@ -181,5 +203,14 @@ if __name__ == "__main__":
         plt.axhline(y=std_cost, color='darkred', linestyle='--', linewidth=0.5)
         #plt.gca().set_ylim(top=2*std_cost)
         plt.tight_layout()
-
         plt.savefig(f"{rmse_plot_dir}/{sampling_run_name}_boxplot.png", dpi=200)
+
+        # Plot Complexity (Boxplot)
+        plt.figure()
+        sns.boxplot(data=df_all_complexity, x="n_samples", y="complexity", hue="Experiment", showfliers=False)
+        plt.suptitle(f"{classifier_name}: {', '.join(parameter_names)}")
+        plt.title("Complexity")
+        plt.ylabel("Program Length")
+        plt.tight_layout()
+        plt.savefig(f"{complexity_plot_dir}/{sampling_run_name}_complexity_boxplot.png", dpi=200)
+

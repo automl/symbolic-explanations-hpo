@@ -52,7 +52,7 @@ if __name__ == "__main__":
         "rand_SVM_coef0_gamma_iris_20230221_114755",
         "rand_MLP_max_iter_n_layer_iris_20230221_114330",
         "rand_SVM_degree_gamma_digits_20230221_114754",
-        "rand_MLP_max_iter_n_neurons_digits_20230221_114332",
+        #"rand_MLP_max_iter_n_neurons_digits_20230221_114332", # no surrogate
         "rand_SVM_degree_gamma_iris_20230221_114754",
         # "smac_Linear_2D_X0_X1_20230216_200839",
         # "smac_Branin_2D_X0_X1_20230216_202959",
