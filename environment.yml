@@ -12,6 +12,7 @@ dependencies:
   - scikit-learn
   - jupyter
   - matplotlib
+  - seaborn
   - gplearn
   - sympy
   - xgboost
