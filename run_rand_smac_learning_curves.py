@@ -23,7 +23,7 @@ if __name__ == "__main__":
         "rand_BDT_learning_rate_n_estimators_iris_20230221_114624",
         "rand_MLP_n_layer_n_neurons_digits_20230221_114330",
         "rand_Branin_2D_X0_X1_20230221_120527",
-        "rand_MLP_n_layer_n_neurons_iris_20230221_114330",
+        #"rand_MLP_n_layer_n_neurons_iris_20230221_114330",  # no surrogate
         "rand_Camelback_2D_X0_X1_20230221_120527",
         "rand_Polynom_function_2D_X0_X1_20230221_120528",
         "rand_DT_max_depth_min_samples_leaf_digits_20230221_114653",
@@ -70,7 +70,7 @@ if __name__ == "__main__":
         "smac_MLP_max_iter_n_neurons_digits_20230218_155636",
         "smac_MLP_max_iter_n_neurons_iris_20230218_134154",
         "smac_MLP_n_layer_n_neurons_digits_20230218_140256",
-        "smac_MLP_n_layer_n_neurons_iris_20230218_140254",
+        #"smac_MLP_n_layer_n_neurons_iris_20230218_140254",  # no surrogate
         "smac_Polynom_function_2D_X0_X1_20230216_200840",
         "smac_Rosenbrock_2D_X0_X1_20230216_202959",
         #"smac_SVM_C_coef0_digits_20230218_124032",
@@ -117,12 +117,12 @@ if __name__ == "__main__":
 
     for sampling_run_name in run_names_cut:
 
+        logger.info(f"Create plot for {sampling_run_name}.")
+
         smac_run_name = [filename for filename in
                          os.listdir(f"../symbolic-reg-hpo-cluster/learning_curves/runs/") if
                          filename.startswith(f"smac_{sampling_run_name}")][0]
         classifier_dir = f"../symbolic-reg-hpo-cluster/learning_curves/runs/{smac_run_name}"
-
-        logger.info(f"Create plot for {sampling_run_name}.")
 
         with open(f"{classifier_dir}/sampling/classifier.pkl", "rb") as classifier_file:
             classifier = pickle.load(classifier_file)

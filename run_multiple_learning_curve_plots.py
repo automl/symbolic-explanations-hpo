@@ -18,7 +18,7 @@ sys.modules['functions'] = functions
 if __name__ == "__main__":
     model_name = "symb"
     symb_dir_postfixes = ["_defaults", "_fixed_const_range", #"_small_const_range",
-                          "_generations150_stopping_small_const_range", "__default_gen50_size5000"]
+                          "_generations150_stopping_small_const_range", "__def_gen100_size5000"]
     run_names = [
         "rand_BDT_learning_rate_n_estimators_digits_20230221_114624",
         "rand_MLP_max_iter_n_neurons_iris_20230221_114330",
