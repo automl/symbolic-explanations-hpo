@@ -24,7 +24,7 @@ if __name__ == "__main__":
     n_test_samples = 100
     n_seeds = 3
     symb_reg = True
-    symb_dir_postfix = "_def_gen100_size5000"
+    symb_dir_postfix = "best"
     sampling_run_names = [
         # "rand_BDT_learning_rate_n_estimators_digits_20230221_114624",
         # "rand_MLP_max_iter_n_neurons_iris_20230221_114330",
@@ -60,39 +60,44 @@ if __name__ == "__main__":
         # "rand_SVM_degree_gamma_digits_20230221_114754",
         # "rand_MLP_max_iter_n_neurons_digits_20230221_114332",
         # "rand_SVM_degree_gamma_iris_20230221_114754",
-        "smac_BDT_learning_rate_n_estimators_digits_20230218_141037",
-        "smac_BDT_learning_rate_n_estimators_iris_20230218_123429",
-        "smac_Branin_2D_X0_X1_20230216_202959",
-        "smac_Camelback_2D_X0_X1_20230216_202959",
-        "smac_DT_max_depth_min_samples_leaf_digits_20230218_103755",
-        "smac_DT_max_depth_min_samples_leaf_iris_20230218_103751",
-        "smac_Exponential_function_2D_X0_X1_20230216_202958",
-        "smac_Linear_2D_X0_X1_20230216_200839",
-        "smac_MLP_learning_rate_init_max_iter_iris_20230218_134148",
-        "smac_MLP_learning_rate_init_n_layer_digits_20230218_145001",
-        "smac_MLP_learning_rate_init_n_layer_iris_20230218_134149",
-        "smac_MLP_learning_rate_init_n_neurons_digits_20230218_145001",
-        "smac_MLP_learning_rate_init_n_neurons_iris_20230218_134149",
-        "smac_MLP_max_iter_n_layer_digits_20230218_134149",
-        "smac_MLP_max_iter_n_layer_iris_20230218_134146",
-        "smac_MLP_max_iter_n_neurons_digits_20230218_155636",
-        "smac_MLP_max_iter_n_neurons_iris_20230218_134154",
-        "smac_MLP_n_layer_n_neurons_digits_20230218_140256",
-        "smac_MLP_n_layer_n_neurons_iris_20230218_140254",
-        "smac_Polynom_function_2D_X0_X1_20230216_200840",
-        "smac_Rosenbrock_2D_X0_X1_20230216_202959",
-        #"smac_SVM_C_coef0_digits_20230218_124032",
-        "smac_SVM_C_coef0_iris_20230218_124032",
-        #"smac_SVM_C_degree_digits_20230218_124029",
-        "smac_SVM_C_degree_iris_20230218_124029",
-        "smac_SVM_C_gamma_digits_20230218_124031",
-        "smac_SVM_C_gamma_iris_20230218_124032",
-        #"smac_SVM_coef0_degree_digits_20230218_124029",
-        #"smac_SVM_coef0_degree_iris_20230218_124031",
-        "smac_SVM_coef0_gamma_digits_20230218_124031",
-        "smac_SVM_coef0_gamma_iris_20230218_124030",
-        "smac_SVM_degree_gamma_digits_20230218_124031",
-        "smac_SVM_degree_gamma_iris_20230218_124031",
+        "smac_BDT_learning_rate_n_estimators_digits_20230223_162249",
+        "smac_BDT_learning_rate_n_estimators_digits_20230223_162320",
+        "smac_BDT_learning_rate_n_estimators_digits_20230223_162336",
+        "smac_BDT_learning_rate_n_estimators_iris_20230223_162249",
+        "smac_BDT_learning_rate_n_estimators_iris_20230223_162320",
+        "smac_BDT_learning_rate_n_estimators_iris_20230223_162334",
+        "smac_Branin_2D_X0_X1_20230223_162155",
+        "smac_Camelback_2D_X0_X1_20230223_162155",
+        "smac_Exponential_function_2D_X0_X1_20230223_162156",
+        "smac_Linear_2D_X0_X1_20230223_162155",
+        "smac_MLP_learning_rate_init_max_iter_digits_20230223_162437",
+        "smac_MLP_learning_rate_init_max_iter_iris_20230223_162436",
+        "smac_MLP_learning_rate_init_n_layer_digits_20230223_162436",
+        "smac_MLP_learning_rate_init_n_layer_iris_20230223_162436",
+        "smac_MLP_learning_rate_init_n_neurons_digits_20230223_162436",
+        "smac_MLP_learning_rate_init_n_neurons_iris_20230223_162436",
+        "smac_MLP_max_iter_n_layer_digits_20230223_162436",
+        "smac_MLP_max_iter_n_layer_iris_20230223_162436",
+        "smac_MLP_max_iter_n_neurons_digits_20230223_162436",
+        "smac_MLP_max_iter_n_neurons_iris_20230223_162436",
+        "smac_MLP_n_layer_n_neurons_digits_20230223_162436",
+        "smac_MLP_n_layer_n_neurons_iris_20230223_162437",
+        "smac_Polynom_function_2D_X0_X1_20230223_162156",
+        "smac_Rosenbrock_2D_X0_X1_20230223_162155",
+        "smac_SVM_C_coef0_digits_20230223_162857",
+        "smac_SVM_C_coef0_digits_20230223_164415",
+        "smac_SVM_C_coef0_iris_20230223_162859",
+        "smac_SVM_C_degree_digits_20230223_162900",
+        "smac_SVM_C_degree_iris_20230223_162900",
+        "smac_SVM_C_degree_iris_20230223_164415",
+        "smac_SVM_C_gamma_digits_20230223_162900",
+        "smac_SVM_C_gamma_iris_20230223_162859",
+        "smac_SVM_coef0_degree_digits_20230223_162859",
+        "smac_SVM_coef0_degree_iris_20230223_162859",
+        "smac_SVM_coef0_gamma_digits_20230223_162859",
+        "smac_SVM_coef0_gamma_iris_20230223_162859",
+        "smac_SVM_degree_gamma_digits_20230223_162900",
+        "smac_SVM_degree_gamma_iris_20230223_162859"
     ]
     sampling_run_name = sampling_run_names[int(job_id)]
 
@@ -133,9 +138,10 @@ if __name__ == "__main__":
     df_train_samples = pd.read_csv(f"{sampling_dir}/samples.csv")
     sampling_seeds = df_train_samples.seed.unique()
 
-    n_samples_spacing = np.linspace(10, 200, 11)
+    n_samples_spacing = np.linspace(20, 200, 10)
 
     df_all_metrics = pd.DataFrame()
+    df_all_complexity = pd.DataFrame()
     df_all_expr = pd.DataFrame()
 
     symb_params = dict(
@@ -187,6 +193,8 @@ if __name__ == "__main__":
                     with open(
                             f"{symb_dir}/symb_models/n_samples{n_samples}_sampling_seed{sampling_seed}_"
                             f"symb_seed{symb_seed}.pkl", "wb") as symb_model_file:
+                        # pickling all programs lead to huge files
+                        delattr(symb_model, "_programs")
                         pickle.dump(symb_model, symb_model_file)
 
                     df_metrics = get_scores(
@@ -199,6 +207,15 @@ if __name__ == "__main__":
                     df_metrics.insert(0, "sampling_seed", sampling_seed)
                     df_metrics.insert(0, "symb_seed", symb_seed)
                     df_all_metrics = pd.concat((df_all_metrics, df_metrics))
+
+                    complexity = symb_model._program.length_
+                    df_complexity = pd.DataFrame({
+                        "complexity": [complexity],
+                        "n_samples": [n_samples],
+                        "sampling_seed": [sampling_seed],
+                        "symb_seed": [symb_seed]
+                    })
+                    df_all_complexity = pd.concat((df_all_complexity, df_complexity))
 
                     try:
                         df_expr = pd.DataFrame(
@@ -213,4 +230,5 @@ if __name__ == "__main__":
                     df_all_expr = pd.concat((df_all_expr, df_expr))
 
                     df_all_metrics.to_csv(f"{symb_dir}/error_metrics.csv", index=False)
+                    df_all_complexity.to_csv(f"{symb_dir}/complexity.csv", index=False)
                     df_all_expr.to_csv(f"{symb_dir}/expressions.csv", index=False)
