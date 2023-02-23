@@ -31,15 +31,15 @@ if __name__ == "__main__":
         "rand_DT_max_depth_min_samples_leaf_iris_20230221_114651",
         #"rand_SVM_C_coef0_digits_20230221_114754",
         "rand_Exponential_function_2D_X0_X1_20230221_120528",
-        "rand_SVM_C_coef0_iris_20230221_114755",
+        #"rand_SVM_C_coef0_iris_20230221_114755", # no surrogate
         "rand_Linear_2D_X0_X1_20230221_120527",
         #"rand_SVM_C_degree_digits_20230221_114756",
         "rand_MLP_learning_rate_init_max_iter_digits_20230221_114330",
-        "rand_SVM_C_degree_iris_20230221_114756",
+        #"rand_SVM_C_degree_iris_20230221_114756", # no surrogate
         "rand_MLP_learning_rate_init_max_iter_iris_20230221_114330",
         "rand_SVM_C_gamma_digits_20230221_114754",
         "rand_MLP_learning_rate_init_n_layer_digits_20230221_114329",
-        "rand_SVM_C_gamma_iris_20230221_114755",
+        #"rand_SVM_C_gamma_iris_20230221_114755", # no surrogate
         "rand_MLP_learning_rate_init_n_layer_iris_20230221_114329",
         #"rand_SVM_coef0_degree_digits_20230221_114754",
         "rand_MLP_learning_rate_init_n_neurons_digits_20230221_114330",
@@ -47,11 +47,11 @@ if __name__ == "__main__":
         "rand_MLP_learning_rate_init_n_neurons_iris_20230221_114330",
         "rand_SVM_coef0_gamma_digits_20230221_114755",
         "rand_MLP_max_iter_n_layer_digits_20230221_114332",
-        "rand_SVM_coef0_gamma_iris_20230221_114755",
+        #"rand_SVM_coef0_gamma_iris_20230221_114755", # no surrogate
         "rand_MLP_max_iter_n_layer_iris_20230221_114330",
-        "rand_SVM_degree_gamma_digits_20230221_114754",
+        #"rand_SVM_degree_gamma_digits_20230221_114754", # no surrogate
         "rand_MLP_max_iter_n_neurons_digits_20230221_114332",
-        "rand_SVM_degree_gamma_iris_20230221_114754",
+        #"rand_SVM_degree_gamma_iris_20230221_114754", # no surrogate
         "smac_BDT_learning_rate_n_estimators_digits_20230218_141037",
         "smac_BDT_learning_rate_n_estimators_iris_20230218_123429",
         "smac_Branin_2D_X0_X1_20230216_202959",
@@ -74,17 +74,17 @@ if __name__ == "__main__":
         "smac_Polynom_function_2D_X0_X1_20230216_200840",
         "smac_Rosenbrock_2D_X0_X1_20230216_202959",
         #"smac_SVM_C_coef0_digits_20230218_124032",
-        "smac_SVM_C_coef0_iris_20230218_124032",
+        #"smac_SVM_C_coef0_iris_20230218_124032", # no surrogate
         #"smac_SVM_C_degree_digits_20230218_124029",
-        "smac_SVM_C_degree_iris_20230218_124029",
+        #"smac_SVM_C_degree_iris_20230218_124029", # no surrogate
         "smac_SVM_C_gamma_digits_20230218_124031",
-        "smac_SVM_C_gamma_iris_20230218_124032",
+        #"smac_SVM_C_gamma_iris_20230218_124032", # no surrogate
         #"smac_SVM_coef0_degree_digits_20230218_124029",
         #"smac_SVM_coef0_degree_iris_20230218_124031",
         "smac_SVM_coef0_gamma_digits_20230218_124031",
-        "smac_SVM_coef0_gamma_iris_20230218_124030",
-        "smac_SVM_degree_gamma_digits_20230218_124031",
-        "smac_SVM_degree_gamma_iris_20230218_124031",
+        #"smac_SVM_coef0_gamma_iris_20230218_124030", # no surrogate
+        #"smac_SVM_degree_gamma_digits_20230218_124031", # no surrogate
+        #"smac_SVM_degree_gamma_iris_20230218_124031", # no surrogate
     ]
 
     # set up directories
