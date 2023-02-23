@@ -153,11 +153,11 @@ if __name__ == "__main__":
                                  os.listdir(f"learning_curves/runs/") if
                                  filename.startswith(f"rand_{sampling_run_name}")][0]
                 run_dir = f"learning_curves/runs/{rand_run_name}"
-            
+
             model_dir = f"{run_dir}/{model_name}"
 
             if sampling_type == "surrogate":
-                df_error_metrics = pd.read_csv(f"{model_dir}/surrogate_error_metrics.csv")
+                df_error_metrics = pd.read_csv(f"{run_dir}/surrogate_error_metrics.csv")
             else:
                 df_error_metrics = pd.read_csv(f"{model_dir}/error_metrics.csv")
 
@@ -167,6 +167,8 @@ if __name__ == "__main__":
             df_error_metrics_all = pd.concat((df_error_metrics_all, df_error_metrics))
 
         logger.info(f"Create boxplot.")
+
+        df_error_metrics_all = df_error_metrics_all[df_error_metrics_all.n_samples > 10]
 
         # Plot RMSE (Boxplot)
         plt.figure()
