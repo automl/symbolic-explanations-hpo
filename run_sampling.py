@@ -35,7 +35,7 @@ if __name__ == "__main__":
     #model = "DT"
     model = functions[int(args.job_id)]
     data_sets = ["digits", "iris"]
-    use_random_samples = True
+    use_random_samples = False
     symb_reg = True
 
     if use_random_samples:
