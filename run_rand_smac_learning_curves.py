@@ -121,9 +121,12 @@ if __name__ == "__main__":
         logger.info(f"Create plot for {sampling_run_name}.")
 
         smac_run_name = [filename for filename in
-                         os.listdir(f"../symbolic-reg-hpo-cluster/learning_curves/runs/") if
+                         os.listdir(f"learning_curves/runs/") if
                          filename.startswith(f"smac_{sampling_run_name}")][0]
-        classifier_dir = f"../symbolic-reg-hpo-cluster/learning_curves/runs/{smac_run_name}"
+        rand_run_name = [filename for filename in
+                         os.listdir(f"learning_curves/runs/") if
+                         filename.startswith(f"rand_{sampling_run_name}")][0]
+        classifier_dir = f"learning_curves/runs/{smac_run_name}"
 
         with open(f"{classifier_dir}/sampling/classifier.pkl", "rb") as classifier_file:
             classifier = pickle.load(classifier_file)
@@ -146,14 +149,8 @@ if __name__ == "__main__":
         for sampling_type in ["rand", "smac", "surrogate"]:
 
             if sampling_type == "smac" or sampling_type == "surrogate":
-                smac_run_name = [filename for filename in
-                                 os.listdir(f"../symbolic-reg-hpo-cluster/learning_curves/runs/") if
-                                 filename.startswith(f"smac_{sampling_run_name}")][0]
-                run_dir = f"../symbolic-reg-hpo-cluster/learning_curves/runs/{smac_run_name}"
+                run_dir = f"learning_curves/runs/{smac_run_name}"
             else:
-                rand_run_name = [filename for filename in
-                                 os.listdir(f"learning_curves/runs/") if
-                                 filename.startswith(f"rand_{sampling_run_name}")][0]
                 run_dir = f"learning_curves/runs/{rand_run_name}"
 
             model_dir = f"{run_dir}/{model_name}"
