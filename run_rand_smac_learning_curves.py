@@ -141,7 +141,7 @@ if __name__ == "__main__":
         std_cost = y_test.std()
 
         df_error_metrics_all = pd.DataFrame()
-        df_all_complexity = pd.DataFrame()
+        df_complexity_all = pd.DataFrame()
 
         for sampling_type in ["rand", "smac", "surrogate"]:
 
@@ -162,37 +162,37 @@ if __name__ == "__main__":
                 df_error_metrics = pd.read_csv(f"{run_dir}/surrogate_error_metrics.csv")
             else:
                 df_error_metrics = pd.read_csv(f"{model_dir}/error_metrics.csv")
+                df_complexity = pd.read_csv(f"{model_dir}/complexity.csv")
+                df_complexity.insert(0, "Experiment", f"{sampling_type}")
+                df_complexity_all = pd.concat((df_complexity_all, df_complexity))
 
             df_error_metrics["rmse_test_smac"] = np.sqrt(df_error_metrics["mse_test_smac"])
             df_error_metrics["rmse_train_smac"] = np.sqrt(df_error_metrics["mse_train_smac"])
             df_error_metrics.insert(0, "Experiment", f"{sampling_type}")
             df_error_metrics_all = pd.concat((df_error_metrics_all, df_error_metrics))
 
-            if not sampling_type == "surrogate":
-                for n_samples in df_error_metrics.n_samples.unique():
-                    for sampling_seed in df_error_metrics.sampling_seed.unique():
-                        for symb_seed in df_error_metrics.symb_seed.unique():
-                            try:
-                                with open(
-                                        f"{model_dir}/symb_models/n_samples{n_samples}_sampling_seed{sampling_seed}_symb_seed{symb_seed}.pkl",
-                                        "rb") as symb_model_file:
-                                    symb_model = pickle.load(symb_model_file)
-                                    complexity = symb_model._program.length_
-                                    df_complexity = pd.DataFrame({
-                                        "complexity": [complexity],
-                                        "n_samples": [n_samples],
-                                        "sampling_seed": [sampling_seed],
-                                        "symb_seed": [symb_seed]
-                                    })
-                                    df_complexity.insert(0, "Experiment", f"{sampling_type}")
-                                    df_all_complexity = pd.concat((df_all_complexity, df_complexity))
-                            except:
-                                continue
+            # if not sampling_type == "surrogate":
+            #     for n_samples in df_error_metrics.n_samples.unique():
+            #         for sampling_seed in df_error_metrics.sampling_seed.unique():
+            #             for symb_seed in df_error_metrics.symb_seed.unique():
+            #                 try:
+            #                     with open(
+            #                             f"{model_dir}/symb_models/n_samples{n_samples}_sampling_seed{sampling_seed}_symb_seed{symb_seed}.pkl",
+            #                             "rb") as symb_model_file:
+            #                         symb_model = pickle.load(symb_model_file)
+            #                         complexity = symb_model._program.length_
+            #                         df_complexity = pd.DataFrame({
+            #                             "complexity": [complexity],
+            #                             "n_samples": [n_samples],
+            #                             "sampling_seed": [sampling_seed],
+            #                             "symb_seed": [symb_seed]
+            #                         })
+            #                         df_complexity.insert(0, "Experiment", f"{sampling_type}")
+            #                         df_all_complexity = pd.concat((df_all_complexity, df_complexity))
+            #                 except:
+            #                     continue
 
         logger.info(f"Create boxplot.")
-
-        df_error_metrics_all = df_error_metrics_all[df_error_metrics_all.n_samples > 10]
-        df_all_complexity = df_all_complexity[df_all_complexity.n_samples > 10]
 
         # Plot RMSE (Boxplot)
         plt.figure()
@@ -208,7 +208,7 @@ if __name__ == "__main__":
 
         # Plot Complexity (Boxplot)
         plt.figure()
-        sns.boxplot(data=df_all_complexity, x="n_samples", y="complexity", hue="Experiment", showfliers=False)
+        sns.boxplot(data=df_complexity_all, x="n_samples", y="complexity", hue="Experiment", showfliers=False)
         plt.suptitle(f"{classifier_name}: {', '.join(parameter_names)}")
         plt.title("Complexity")
         plt.ylabel("Program Length")
