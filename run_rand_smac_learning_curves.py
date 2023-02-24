@@ -179,13 +179,13 @@ if __name__ == "__main__":
         plt.ylabel("Test RMSE")
         plt.xlabel("Number of Samples")
         plt.axhline(y=std_cost, color='darkred', linestyle='--', linewidth=0.5)
+        plt.tight_layout(rect=(0, 0.05, 1, 1))
         sns.move_legend(
             ax, "lower center",
-            bbox_to_anchor=(0.5, -.2),
+            bbox_to_anchor=(0.45, -0.23),
             ncol=3,
             title=None, frameon=False,
         )
-        plt.tight_layout()
         plt.savefig(f"{rmse_plot_dir}/{sampling_run_name}_boxplot.png", dpi=200)
 
         # Plot Complexity (Boxplot)
@@ -195,10 +195,11 @@ if __name__ == "__main__":
         plt.suptitle(f"{classifier_name}: {', '.join(parameter_names)}")
        # plt.title("Symbolic Regression Program Length")
         plt.ylabel("Program Length")
+        plt.tight_layout(rect=(0, 0.05, 1, 1))
         sns.move_legend(
             ax, "lower center",
-            bbox_to_anchor=(0.5, -.2),
-            ncol=3,
+            bbox_to_anchor=(0.45, -0.23),
+            ncol=2,
             title=None, frameon=False,
         )
         plt.tight_layout()
