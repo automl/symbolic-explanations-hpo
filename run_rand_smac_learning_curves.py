@@ -174,18 +174,18 @@ if __name__ == "__main__":
         plt.figure()
         _, ax = plt.subplots(figsize=(8, 5))
         sns.boxplot(data=df_error_metrics_all, x="n_samples", y="rmse_test_smac", hue="Experiment", showfliers=False)
-        plt.suptitle(f"Model: {classifier_name}, Hyperparameters: {', '.join(parameter_names)}")
-        plt.title(f"Test Mean: {avg_cost:.3f}, Test Std.: {std_cost:.3f}", fontsize=10),
+        plt.title(f"{classifier_name}: {', '.join(parameter_names)}")
+        #plt.title(f"Test Mean: {avg_cost:.3f}, Test Std.: {std_cost:.3f}", fontsize=10),
         plt.ylabel("Test RMSE")
         plt.xlabel("Number of Samples")
         plt.axhline(y=std_cost, color='darkred', linestyle='--', linewidth=0.5)
-        plt.tight_layout()
         sns.move_legend(
             ax, "lower center",
-            bbox_to_anchor=(0.5, -.05),
+            bbox_to_anchor=(0.5, -.2),
             ncol=3,
             title=None, frameon=False,
         )
+        plt.tight_layout()
         plt.savefig(f"{rmse_plot_dir}/{sampling_run_name}_boxplot.png", dpi=200)
 
         # Plot Complexity (Boxplot)
@@ -193,11 +193,11 @@ if __name__ == "__main__":
         _, ax = plt.subplots(figsize=(8, 5))
         sns.boxplot(data=df_complexity_all, x="n_samples", y="complexity", hue="Experiment", showfliers=False)
         plt.suptitle(f"{classifier_name}: {', '.join(parameter_names)}")
-        plt.title("Symbolic Regression Program Length")
+       # plt.title("Symbolic Regression Program Length")
         plt.ylabel("Program Length")
         sns.move_legend(
             ax, "lower center",
-            bbox_to_anchor=(0.5, -.05),
+            bbox_to_anchor=(0.5, -.2),
             ncol=3,
             title=None, frameon=False,
         )
