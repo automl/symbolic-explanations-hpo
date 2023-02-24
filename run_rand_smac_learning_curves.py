@@ -152,9 +152,9 @@ if __name__ == "__main__":
         df_error_metrics_all = pd.DataFrame()
         df_complexity_all = pd.DataFrame()
 
-        for sampling_type in ["Symbolic Regr. (Random)", "Symbolic Regr. (BO)", "Gaussian Process (BO)"]:
+        for sampling_type in ["Symbolic Regression (Random)", "Symbolic Regression (BO)", "Gaussian Process (BO)"]:
 
-            if sampling_type == "Symbolic Regr. (BO)" or sampling_type == "Gaussian Process (BO)":
+            if sampling_type == "Symbolic Regression (BO)" or sampling_type == "Gaussian Process (BO)":
                 run_dir = f"learning_curves/runs/{smac_run_name}"
             else:
                 run_dir = f"learning_curves/runs/{rand_run_name}"
@@ -206,9 +206,8 @@ if __name__ == "__main__":
         plt.tight_layout(rect=(0, 0.05, 1, 1))
         sns.move_legend(
             ax, "lower center",
-            labelspacing=0.2,
             bbox_to_anchor=(0.45, -0.24),
-            ncol=3,
+            ncol=4,
             title=None, frameon=False,
         )
         plt.savefig(f"{rmse_plot_dir}/{sampling_run_name}_pointplot.png", dpi=200)
