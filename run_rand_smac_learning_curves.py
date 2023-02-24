@@ -153,9 +153,9 @@ if __name__ == "__main__":
         df_error_metrics_all = pd.DataFrame()
         df_complexity_all = pd.DataFrame()
 
-        for sampling_type in ["Symbolic Regression (Random)", "Symbolic Regression (BO)", "Gaussian Process (BO)"]:
+        for sampling_type in ["Symbolic Regr. (Random)", "Symbolic Regr. (BO)", "Gaussian Process (BO)"]:
 
-            if sampling_type == "Symbolic Regression (BO)" or sampling_type == "Gaussian Process (BO)":
+            if sampling_type == "Symbolic Regr. (BO)" or sampling_type == "Gaussian Process (BO)":
                 run_dir = f"learning_curves/runs/{smac_run_name}"
             else:
                 run_dir = f"learning_curves/runs/{rand_run_name}"
