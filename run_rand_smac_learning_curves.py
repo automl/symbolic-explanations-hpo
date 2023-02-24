@@ -203,6 +203,7 @@ if __name__ == "__main__":
         plt.tight_layout(rect=(0, 0.05, 1, 1))
         sns.move_legend(
             ax, "lower center",
+            labelspacing=0.2,
             bbox_to_anchor=(0.45, -0.24),
             ncol=3,
             title=None, frameon=False,
