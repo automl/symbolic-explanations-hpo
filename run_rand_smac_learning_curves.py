@@ -199,7 +199,7 @@ if __name__ == "__main__":
         #plt.title(f"Test Mean: {avg_cost:.3f}, Test Std.: {std_cost:.3f}", fontsize=10),
         plt.ylabel("Test RMSE")
         plt.xlabel("Number of Samples")
-        plt.axhline(y=std_cost, color='darkred', linestyle='--', linewidth=0.5, label="Test Std.")
+        line = plt.axhline(y=std_cost, color='darkred', linestyle='--', linewidth=0.5, label="Test Std.")
         plt.tight_layout(rect=(0, 0.05, 1, 1))
         sns.move_legend(
             ax, "lower center",
@@ -207,9 +207,8 @@ if __name__ == "__main__":
             ncol=3,
             title=None, frameon=False,
         )
-        labels = "Test Std."
-        handles, _ = ax.get_legend_handles_labels()
-        plt.legend(handles=handles[1:], labels=labels, loc="upper right")
+        labels = ["Test Std."]
+        plt.legend(handles=[line], labels=labels, loc="upper right")
         plt.savefig(f"{rmse_plot_dir}/{sampling_run_name}_pointplot.png", dpi=200)
 
         # Plot Complexity
