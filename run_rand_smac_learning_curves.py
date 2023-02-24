@@ -120,6 +120,13 @@ if __name__ == "__main__":
 
         logger.info(f"Create plot for {sampling_run_name}.")
 
+        if "iris" in sampling_run_name:
+            data_set = "Iris"
+        elif "digits" in sampling_run_name:
+            data_set = "Digits"
+        else:
+            data_set = None
+
         smac_run_name = [filename for filename in
                          os.listdir(f"learning_curves/runs/") if
                          filename.startswith(f"smac_{sampling_run_name}")][0]
@@ -146,16 +153,16 @@ if __name__ == "__main__":
         df_error_metrics_all = pd.DataFrame()
         df_complexity_all = pd.DataFrame()
 
-        for sampling_type in ["Symbolic Regression (Random)", "Symbolic Regression (SMAC)", "Gaussian Process (SMAC)"]:
+        for sampling_type in ["Symbolic Regression (Random)", "Symbolic Regression (BO)", "Gaussian Process (BO)"]:
 
-            if sampling_type == "Symbolic Regression (SMAC)" or sampling_type == "Gaussian Process (SMAC)":
+            if sampling_type == "Symbolic Regression (BO)" or sampling_type == "Gaussian Process (BO)":
                 run_dir = f"learning_curves/runs/{smac_run_name}"
             else:
                 run_dir = f"learning_curves/runs/{rand_run_name}"
 
             model_dir = f"{run_dir}/{model_name}"
 
-            if sampling_type == "Gaussian Process (SMAC)":
+            if sampling_type == "Gaussian Process (BO)":
                 df_error_metrics = pd.read_csv(f"{run_dir}/surrogate_error_metrics.csv")
             else:
                 df_error_metrics = pd.read_csv(f"{model_dir}/error_metrics.csv")
@@ -170,11 +177,19 @@ if __name__ == "__main__":
 
         logger.info(f"Create plots.")
 
+        classifier_titles = {
+            "BDT": "Boosted Decision Tree",
+            "DT": "Decision Tree",
+            "SVM": "Support Vector Machine",
+            "MLP": "Neural Network",
+        }
+
         # Plot RMSE
         plt.figure()
         _, ax = plt.subplots(figsize=(8, 5))
-        sns.pointplot(data=df_error_metrics_all, x="n_samples", y="rmse_test_smac", hue="Experiment")#, showfliers=False)
-        plt.title(f"{classifier_name}: {', '.join(parameter_names)}")
+        sns.pointplot(data=df_error_metrics_all, x="n_samples", y="rmse_test_smac", hue="Experiment", errorbar="sd", 
+                      linestyles="", capsize=0.2, errwidth=0.5, scale=0.5)#, showfliers=False)
+        plt.title(f"{classifier_titles[classifier_name]}: {', '.join(parameter_names)}")
         #plt.title(f"Test Mean: {avg_cost:.3f}, Test Std.: {std_cost:.3f}", fontsize=10),
         plt.ylabel("Test RMSE")
         plt.xlabel("Number of Samples")
@@ -182,7 +197,7 @@ if __name__ == "__main__":
         plt.tight_layout(rect=(0, 0.05, 1, 1))
         sns.move_legend(
             ax, "lower center",
-            bbox_to_anchor=(0.45, -0.23),
+            box_to_anchor=(0.45, -0.23),
             ncol=3,
             title=None, frameon=False,
         )
@@ -191,14 +206,15 @@ if __name__ == "__main__":
         # Plot Complexity
         plt.figure()
         _, ax = plt.subplots(figsize=(8, 5))
-        sns.pointplot(data=df_complexity_all, x="n_samples", y="complexity", hue="Experiment")#, showfliers=False)
-        plt.suptitle(f"{classifier_name}: {', '.join(parameter_names)}")
+        sns.pointplot(data=df_complexity_all, x="n_samples", y="complexity", hue="Experiment", errorbar="sd",
+                      linestyles="", capsize=0.2, errwidth=0.5)#, showfliers=False)
+        plt.suptitle(f"{classifier_titles[classifier_name]}, Dataset: {data_set} \n {', '.join(parameter_names)}")
        # plt.title("Symbolic Regression Program Length")
         plt.ylabel("Program Length")
         plt.tight_layout(rect=(0, 0.05, 1, 1))
         sns.move_legend(
             ax, "lower center",
-            bbox_to_anchor=(0.45, -0.23),
+            box_to_anchor=(0.45, -0.23),
             ncol=2,
             title=None, frameon=False,
         )
