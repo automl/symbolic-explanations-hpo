@@ -197,7 +197,7 @@ if __name__ == "__main__":
         plt.tight_layout(rect=(0, 0.05, 1, 1))
         sns.move_legend(
             ax, "lower center",
-            box_to_anchor=(0.45, -0.23),
+            bbox_to_anchor=(0.45, -0.23),
             ncol=3,
             title=None, frameon=False,
         )
@@ -214,7 +214,7 @@ if __name__ == "__main__":
         plt.tight_layout(rect=(0, 0.05, 1, 1))
         sns.move_legend(
             ax, "lower center",
-            box_to_anchor=(0.45, -0.23),
+            bbox_to_anchor=(0.45, -0.23),
             ncol=2,
             title=None, frameon=False,
         )
