@@ -207,8 +207,6 @@ if __name__ == "__main__":
             ncol=3,
             title=None, frameon=False,
         )
-        labels = ["Test Std."]
-        plt.legend(handles=[line], labels=labels, loc="upper right")
         plt.savefig(f"{rmse_plot_dir}/{sampling_run_name}_pointplot.png", dpi=200)
 
         # Plot Complexity
