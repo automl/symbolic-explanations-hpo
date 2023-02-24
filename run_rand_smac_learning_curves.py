@@ -209,7 +209,7 @@ if __name__ == "__main__":
             title=None, frameon=False,
         )
         plt.legend(
-            handels = handles + [line],
+            handles = handles + [line],
             labels = labels + ["Test Std."]
         )
         plt.savefig(f"{rmse_plot_dir}/{sampling_run_name}_pointplot.png", dpi=200)
