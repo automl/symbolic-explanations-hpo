@@ -142,7 +142,6 @@ if __name__ == "__main__":
         else:
             classifier_name = classifier.name
         optimized_parameters = classifier.configspace.get_hyperparameters()
-        parameter_names = [param.name for param in optimized_parameters]
 
         logger.info(f"Get test data for {classifier_name}.")
         X_test, y_test = get_hpo_test_data(classifier, optimized_parameters, 100)
@@ -188,15 +187,19 @@ if __name__ == "__main__":
         else:
             classifier_title = classifier_name
 
+        param0 = f"log({optimized_parameters[0].name}" if optimized_parameters[0].log else optimized_parameters[0].name
+        param1 = f"log({optimized_parameters[1].name}" if optimized_parameters[1].log else optimized_parameters[1].name
+
         # Plot RMSE
         plt.figure()
         _, ax = plt.subplots(figsize=(8, 5))
         line = plt.axhline(y=std_cost, color='darkred', linestyle='--', linewidth=0.5, label="Test Std.")
         sns.pointplot(data=df_error_metrics_all, x="n_samples", y="rmse_test_smac", hue="Experiment", errorbar="sd", 
                       linestyles="", capsize=0.2, errwidth=0.7, scale=0.7, dodge=0.5)#, showfliers=False)
-        plt.suptitle(f"{classifier_title}, Dataset: {data_set}")
         if data_set:
-            plt.title(f"X0: {parameter_names[0]}, X1: {parameter_names[1]}")
+            plt.title(f"{classifier_title}, Dataset: {data_set}\nX0: {param0}, X1: {param1}")
+        else:
+            plt.title(f"{classifier_title}\nX0: {param0}, X1: {param1}")
         #plt.title(f"Test Mean: {avg_cost:.3f}, Test Std.: {std_cost:.3f}", fontsize=10),
         plt.ylabel("Test RMSE")
         plt.xlabel("Number of Samples")
@@ -217,7 +220,9 @@ if __name__ == "__main__":
                       linestyles="", capsize=0.2, errwidth=0.7, scale=0.7, dodge=0.5)#, showfliers=False)
         plt.suptitle(f"{classifier_title}, Dataset: {data_set}")
         if data_set:
-            plt.title(f"X0: {parameter_names[0]}, X1: {parameter_names[1]}")
+            plt.title(f"{classifier_title}, Dataset: {data_set}\nX0: {param0}, X1: {param1}")
+        else:
+            plt.title(f"{classifier_title}\nX0: {param0}, X1: {param1}")
        # plt.title("Symbolic Regression Program Length")
         plt.ylabel("Program Length")
         plt.tight_layout(rect=(0, 0.05, 1, 1))
