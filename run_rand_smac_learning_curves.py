@@ -168,12 +168,12 @@ if __name__ == "__main__":
             df_error_metrics.insert(0, "Experiment", f"{sampling_type}")
             df_error_metrics_all = pd.concat((df_error_metrics_all, df_error_metrics))
 
-        logger.info(f"Create boxplot.")
+        logger.info(f"Create plots.")
 
-        # Plot RMSE (Boxplot)
+        # Plot RMSE
         plt.figure()
         _, ax = plt.subplots(figsize=(8, 5))
-        sns.boxplot(data=df_error_metrics_all, x="n_samples", y="rmse_test_smac", hue="Experiment", showfliers=False)
+        sns.pointplot(data=df_error_metrics_all, x="n_samples", y="rmse_test_smac", hue="Experiment")#, showfliers=False)
         plt.title(f"{classifier_name}: {', '.join(parameter_names)}")
         #plt.title(f"Test Mean: {avg_cost:.3f}, Test Std.: {std_cost:.3f}", fontsize=10),
         plt.ylabel("Test RMSE")
@@ -186,12 +186,12 @@ if __name__ == "__main__":
             ncol=3,
             title=None, frameon=False,
         )
-        plt.savefig(f"{rmse_plot_dir}/{sampling_run_name}_boxplot.png", dpi=200)
+        plt.savefig(f"{rmse_plot_dir}/{sampling_run_name}_pointplot.png", dpi=200)
 
-        # Plot Complexity (Boxplot)
+        # Plot Complexity
         plt.figure()
         _, ax = plt.subplots(figsize=(8, 5))
-        sns.boxplot(data=df_complexity_all, x="n_samples", y="complexity", hue="Experiment", showfliers=False)
+        sns.pointplot(data=df_complexity_all, x="n_samples", y="complexity", hue="Experiment")#, showfliers=False)
         plt.suptitle(f"{classifier_name}: {', '.join(parameter_names)}")
        # plt.title("Symbolic Regression Program Length")
         plt.ylabel("Program Length")
@@ -203,5 +203,5 @@ if __name__ == "__main__":
             title=None, frameon=False,
         )
         plt.tight_layout()
-        plt.savefig(f"{complexity_plot_dir}/{sampling_run_name}_complexity_boxplot.png", dpi=200)
+        plt.savefig(f"{complexity_plot_dir}/{sampling_run_name}_complexity_pointplot.png", dpi=200)
 
