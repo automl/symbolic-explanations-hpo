@@ -201,16 +201,11 @@ if __name__ == "__main__":
         plt.xlabel("Number of Samples")
         line = plt.axhline(y=std_cost, color='darkred', linestyle='--', linewidth=0.5, label="Test Std.")
         plt.tight_layout(rect=(0, 0.05, 1, 1))
-        handles, labels = ax.get_legend_handles_labels()
         sns.move_legend(
             ax, "lower center",
             bbox_to_anchor=(0.45, -0.24),
             ncol=3,
             title=None, frameon=False,
-        )
-        plt.legend(
-            handles = handles + [line],
-            labels = labels + ["Test Std."]
         )
         plt.savefig(f"{rmse_plot_dir}/{sampling_run_name}_pointplot.png", dpi=200)
 
