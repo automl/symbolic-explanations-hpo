@@ -19,73 +19,73 @@ if __name__ == "__main__":
     model_name = "symb_best"
     run_names = [
         "rand_BDT_learning_rate_n_estimators_digits_20230221_114624",
-        "rand_BDT_learning_rate_n_estimators_iris_20230221_114624",
-        "rand_Branin_2D_X0_X1_20230221_120527",
-        "rand_Camelback_2D_X0_X1_20230221_120527",
-        #"rand_DT_max_depth_min_samples_leaf_digits_20230221_114653",
-        #"rand_DT_max_depth_min_samples_leaf_iris_20230221_114651",
-        "rand_Exponential_function_2D_X0_X1_20230221_120528",
-        "rand_Linear_2D_X0_X1_20230221_120527",
-        "rand_MLP_learning_rate_init_max_iter_digits_20230221_114330",
-        "rand_MLP_learning_rate_init_max_iter_iris_20230221_114330",
-        "rand_MLP_learning_rate_init_n_layer_digits_20230221_114329",
-        "rand_MLP_learning_rate_init_n_layer_iris_20230221_114329",
-        "rand_MLP_learning_rate_init_n_neurons_digits_20230221_114330",
-        "rand_MLP_learning_rate_init_n_neurons_iris_20230221_114330",
-        "rand_MLP_max_iter_n_layer_digits_20230221_114332",
-        "rand_MLP_max_iter_n_layer_iris_20230221_114330",
-        "rand_MLP_max_iter_n_neurons_digits_20230221_114332",
-        "rand_MLP_max_iter_n_neurons_iris_20230221_114330",
-        "rand_MLP_n_layer_n_neurons_digits_20230221_114330",
-        "rand_MLP_n_layer_n_neurons_iris_20230221_114330",
-        "rand_Polynom_function_2D_X0_X1_20230221_120528",
-        "rand_Rosenbrock_2D_X0_X1_20230221_120527",
-        "rand_SVM_C_coef0_digits_20230221_114754",
-        "rand_SVM_C_coef0_iris_20230221_114755",
-        "rand_SVM_C_degree_digits_20230221_114756",
-        "rand_SVM_C_degree_iris_20230221_114756",
-        "rand_SVM_C_gamma_digits_20230221_114754",
-        "rand_SVM_C_gamma_iris_20230221_114755",
-        "rand_SVM_coef0_degree_digits_20230221_114754",
-        "rand_SVM_coef0_degree_iris_20230221_114756",
-        "rand_SVM_coef0_gamma_digits_20230221_114755",
-        "rand_SVM_coef0_gamma_iris_20230221_114755",
-        "rand_SVM_degree_gamma_digits_20230221_114754",
-        "rand_SVM_degree_gamma_iris_20230221_114754",
+        # "rand_BDT_learning_rate_n_estimators_iris_20230221_114624",
+        # "rand_Branin_2D_X0_X1_20230221_120527",
+        # "rand_Camelback_2D_X0_X1_20230221_120527",
+        # #"rand_DT_max_depth_min_samples_leaf_digits_20230221_114653",
+        # #"rand_DT_max_depth_min_samples_leaf_iris_20230221_114651",
+        # "rand_Exponential_function_2D_X0_X1_20230221_120528",
+        # "rand_Linear_2D_X0_X1_20230221_120527",
+        # "rand_MLP_learning_rate_init_max_iter_digits_20230221_114330",
+        # "rand_MLP_learning_rate_init_max_iter_iris_20230221_114330",
+        # "rand_MLP_learning_rate_init_n_layer_digits_20230221_114329",
+        # "rand_MLP_learning_rate_init_n_layer_iris_20230221_114329",
+        # "rand_MLP_learning_rate_init_n_neurons_digits_20230221_114330",
+        # "rand_MLP_learning_rate_init_n_neurons_iris_20230221_114330",
+        # "rand_MLP_max_iter_n_layer_digits_20230221_114332",
+        # "rand_MLP_max_iter_n_layer_iris_20230221_114330",
+        # "rand_MLP_max_iter_n_neurons_digits_20230221_114332",
+        # "rand_MLP_max_iter_n_neurons_iris_20230221_114330",
+        # "rand_MLP_n_layer_n_neurons_digits_20230221_114330",
+        # "rand_MLP_n_layer_n_neurons_iris_20230221_114330",
+        # "rand_Polynom_function_2D_X0_X1_20230221_120528",
+        # "rand_Rosenbrock_2D_X0_X1_20230221_120527",
+        # "rand_SVM_C_coef0_digits_20230221_114754",
+        # "rand_SVM_C_coef0_iris_20230221_114755",
+        # "rand_SVM_C_degree_digits_20230221_114756",
+        # "rand_SVM_C_degree_iris_20230221_114756",
+        # "rand_SVM_C_gamma_digits_20230221_114754",
+        # "rand_SVM_C_gamma_iris_20230221_114755",
+        # "rand_SVM_coef0_degree_digits_20230221_114754",
+        # "rand_SVM_coef0_degree_iris_20230221_114756",
+        # "rand_SVM_coef0_gamma_digits_20230221_114755",
+        # "rand_SVM_coef0_gamma_iris_20230221_114755",
+        # "rand_SVM_degree_gamma_digits_20230221_114754",
+        # "rand_SVM_degree_gamma_iris_20230221_114754",
         "smac_BDT_learning_rate_n_estimators_digits_20230223_162320",
-        "smac_BDT_learning_rate_n_estimators_iris_20230223_162320",
-        "smac_Branin_2D_X0_X1_20230223_162155",
-        "smac_Camelback_2D_X0_X1_20230223_162155",
-        #"smac_DT_max_depth_min_samples_leaf_digits_20230224_090309",
-        #"smac_DT_max_depth_min_samples_leaf_iris_20230224_090310",
-        "smac_Exponential_function_2D_X0_X1_20230223_162156",
-        "smac_Linear_2D_X0_X1_20230223_162155",
-        "smac_MLP_learning_rate_init_max_iter_digits_20230223_162437",
-        "smac_MLP_learning_rate_init_max_iter_iris_20230223_162436",
-        "smac_MLP_learning_rate_init_n_layer_digits_20230223_162436",
-        "smac_MLP_learning_rate_init_n_layer_iris_20230223_162436",
-        "smac_MLP_learning_rate_init_n_neurons_digits_20230223_162436",
-        "smac_MLP_learning_rate_init_n_neurons_iris_20230223_162436",
-        "smac_MLP_max_iter_n_layer_digits_20230223_162436",
-        "smac_MLP_max_iter_n_layer_iris_20230223_162436",
-        "smac_MLP_max_iter_n_neurons_digits_20230223_162436",
-        "smac_MLP_max_iter_n_neurons_iris_20230223_162436",
-        "smac_MLP_n_layer_n_neurons_digits_20230223_162436",
-        "smac_MLP_n_layer_n_neurons_iris_20230223_162437",
-        "smac_Polynom_function_2D_X0_X1_20230223_162156",
-        "smac_Rosenbrock_2D_X0_X1_20230223_162155",
-        "smac_SVM_C_coef0_digits_20230223_164415",
-        "smac_SVM_C_coef0_iris_20230223_162859",
-        "smac_SVM_C_degree_digits_20230223_162900",
-        "smac_SVM_C_degree_iris_20230223_164415",
-        "smac_SVM_C_gamma_digits_20230223_162900",
-        "smac_SVM_C_gamma_iris_20230223_162859",
-        "smac_SVM_coef0_degree_digits_20230223_162859",
-        "smac_SVM_coef0_degree_iris_20230223_162859",
-        "smac_SVM_coef0_gamma_digits_20230223_162859",
-        "smac_SVM_coef0_gamma_iris_20230223_162859",
-        "smac_SVM_degree_gamma_digits_20230223_162900",
-        "smac_SVM_degree_gamma_iris_20230223_162859"
+        # "smac_BDT_learning_rate_n_estimators_iris_20230223_162320",
+        # "smac_Branin_2D_X0_X1_20230223_162155",
+        # "smac_Camelback_2D_X0_X1_20230223_162155",
+        # #"smac_DT_max_depth_min_samples_leaf_digits_20230224_090309",
+        # #"smac_DT_max_depth_min_samples_leaf_iris_20230224_090310",
+        # "smac_Exponential_function_2D_X0_X1_20230223_162156",
+        # "smac_Linear_2D_X0_X1_20230223_162155",
+        # "smac_MLP_learning_rate_init_max_iter_digits_20230223_162437",
+        # "smac_MLP_learning_rate_init_max_iter_iris_20230223_162436",
+        # "smac_MLP_learning_rate_init_n_layer_digits_20230223_162436",
+        # "smac_MLP_learning_rate_init_n_layer_iris_20230223_162436",
+        # "smac_MLP_learning_rate_init_n_neurons_digits_20230223_162436",
+        # "smac_MLP_learning_rate_init_n_neurons_iris_20230223_162436",
+        # "smac_MLP_max_iter_n_layer_digits_20230223_162436",
+        # "smac_MLP_max_iter_n_layer_iris_20230223_162436",
+        # "smac_MLP_max_iter_n_neurons_digits_20230223_162436",
+        # "smac_MLP_max_iter_n_neurons_iris_20230223_162436",
+        # "smac_MLP_n_layer_n_neurons_digits_20230223_162436",
+        # "smac_MLP_n_layer_n_neurons_iris_20230223_162437",
+        # "smac_Polynom_function_2D_X0_X1_20230223_162156",
+        # "smac_Rosenbrock_2D_X0_X1_20230223_162155",
+        # "smac_SVM_C_coef0_digits_20230223_164415",
+        # "smac_SVM_C_coef0_iris_20230223_162859",
+        # "smac_SVM_C_degree_digits_20230223_162900",
+        # "smac_SVM_C_degree_iris_20230223_164415",
+        # "smac_SVM_C_gamma_digits_20230223_162900",
+        # "smac_SVM_C_gamma_iris_20230223_162859",
+        # "smac_SVM_coef0_degree_digits_20230223_162859",
+        # "smac_SVM_coef0_degree_iris_20230223_162859",
+        # "smac_SVM_coef0_gamma_digits_20230223_162859",
+        # "smac_SVM_coef0_gamma_iris_20230223_162859",
+        # "smac_SVM_degree_gamma_digits_20230223_162900",
+        # "smac_SVM_degree_gamma_iris_20230223_162859"
     ]
 
     # set up directories
@@ -172,32 +172,32 @@ if __name__ == "__main__":
 
         # Plot RMSE (Boxplot)
         plt.figure()
-        _, ax = plt.subplots(figsize=(10, 8))
+        _, ax = plt.subplots(figsize=(8, 5))
         sns.boxplot(data=df_error_metrics_all, x="n_samples", y="rmse_test_smac", hue="Experiment", showfliers=False)
         plt.suptitle(f"Model: {classifier_name}, Hyperparameters: {', '.join(parameter_names)}")
-        plt.title(f"Test Mean: {avg_cost:.3f}, Test Standard deviation: {std_cost:.3f}", fontsize=10),
+        plt.title(f"Test Mean: {avg_cost:.3f}, Test Std.: {std_cost:.3f}", fontsize=10),
         plt.ylabel("Test RMSE")
         plt.xlabel("Number of Samples")
         plt.axhline(y=std_cost, color='darkred', linestyle='--', linewidth=0.5)
+        plt.tight_layout()
         sns.move_legend(
             ax, "lower center",
-            bbox_to_anchor=(0.5, -.3),
+            bbox_to_anchor=(0.5, -.05),
             ncol=3,
             title=None, frameon=False,
         )
-        plt.tight_layout()
         plt.savefig(f"{rmse_plot_dir}/{sampling_run_name}_boxplot.png", dpi=200)
 
         # Plot Complexity (Boxplot)
         plt.figure()
-        _, ax = plt.subplots(figsize=(10, 8))
+        _, ax = plt.subplots(figsize=(8, 5))
         sns.boxplot(data=df_complexity_all, x="n_samples", y="complexity", hue="Experiment", showfliers=False)
         plt.suptitle(f"{classifier_name}: {', '.join(parameter_names)}")
-        plt.title("Complexity")
+        plt.title("Symbolic Regression Program Length")
         plt.ylabel("Program Length")
         sns.move_legend(
             ax, "lower center",
-            bbox_to_anchor=(0.5, -.3),
+            bbox_to_anchor=(0.5, -.05),
             ncol=3,
             title=None, frameon=False,
         )
