@@ -192,11 +192,11 @@ if __name__ == "__main__":
         plt.figure()
         _, ax = plt.subplots(figsize=(8, 5))
         sns.pointplot(data=df_error_metrics_all, x="n_samples", y="rmse_test_smac", hue="Experiment", errorbar="sd", 
-                      linestyles="", capsize=0.2, errwidth=0.5, scale=0.5)#, showfliers=False)
+                      linestyles="", capsize=0.2, errwidth=0.5, scale=0.7, dodge=0.5)#, showfliers=False)
         if data_set:
-            plt.suptitle(f"{classifier_title}, Dataset: {data_set}\n {', '.join(parameter_names)}")
+            plt.suptitle(f"{classifier_title}: {', '.join(parameter_names)}\n Dataset: {data_set}")
         else:
-            plt.suptitle(f"{classifier_title}\n {', '.join(parameter_names)}")
+            plt.suptitle(f"{classifier_title}: {', '.join(parameter_names)}")
         #plt.title(f"Test Mean: {avg_cost:.3f}, Test Std.: {std_cost:.3f}", fontsize=10),
         plt.ylabel("Test RMSE")
         plt.xlabel("Number of Samples")
@@ -204,7 +204,7 @@ if __name__ == "__main__":
         plt.tight_layout(rect=(0, 0.05, 1, 1))
         sns.move_legend(
             ax, "lower center",
-            bbox_to_anchor=(0.45, -0.23),
+            bbox_to_anchor=(0.45, -0.24),
             ncol=3,
             title=None, frameon=False,
         )
@@ -214,17 +214,17 @@ if __name__ == "__main__":
         plt.figure()
         _, ax = plt.subplots(figsize=(8, 5))
         sns.pointplot(data=df_complexity_all, x="n_samples", y="complexity", hue="Experiment", errorbar="sd",
-                      linestyles="", capsize=0.2, errwidth=0.5)#, showfliers=False)
+                      linestyles="", capsize=0.2, errwidth=0.7, scale=0.7, dodge=0.3)#, showfliers=False)
         if data_set:
-            plt.suptitle(f"{classifier_title}, Dataset: {data_set}\n {', '.join(parameter_names)}")
+            plt.suptitle(f"{classifier_title}: {', '.join(parameter_names)}\n Dataset: {data_set}")
         else:
-            plt.suptitle(f"{classifier_title}\n {', '.join(parameter_names)}")
+            plt.suptitle(f"{classifier_title}: {', '.join(parameter_names)}")
        # plt.title("Symbolic Regression Program Length")
         plt.ylabel("Program Length")
         plt.tight_layout(rect=(0, 0.05, 1, 1))
         sns.move_legend(
             ax, "lower center",
-            bbox_to_anchor=(0.45, -0.23),
+            bbox_to_anchor=(0.45, -0.24),
             ncol=2,
             title=None, frameon=False,
         )
