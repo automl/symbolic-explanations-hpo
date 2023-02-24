@@ -26,9 +26,9 @@ if __name__ == "__main__":
         "rand_MLP_n_layer_n_neurons_iris_20230221_114330",
         "rand_Camelback_2D_X0_X1_20230221_120527",
         "rand_Polynom_function_2D_X0_X1_20230221_120528",
-        "rand_DT_max_depth_min_samples_leaf_digits_20230221_114653",
+        #"rand_DT_max_depth_min_samples_leaf_digits_20230221_114653",
         "rand_Rosenbrock_2D_X0_X1_20230221_120527",
-        "rand_DT_max_depth_min_samples_leaf_iris_20230221_114651",
+        #"rand_DT_max_depth_min_samples_leaf_iris_20230221_114651",
         "rand_SVM_C_coef0_digits_20230221_114754",
         "rand_Exponential_function_2D_X0_X1_20230221_120528",
         "rand_SVM_C_coef0_iris_20230221_114755",
@@ -146,16 +146,16 @@ if __name__ == "__main__":
         df_error_metrics_all = pd.DataFrame()
         df_complexity_all = pd.DataFrame()
 
-        for sampling_type in ["rand", "smac", "surrogate"]:
+        for sampling_type in ["SR (Random)", "SR (SMAC)", "GP (SMAC)"]:
 
-            if sampling_type == "smac" or sampling_type == "surrogate":
+            if sampling_type == "SR (SMAC)" or sampling_type == "GP (SMAC)":
                 run_dir = f"learning_curves/runs/{smac_run_name}"
             else:
                 run_dir = f"learning_curves/runs/{rand_run_name}"
 
             model_dir = f"{run_dir}/{model_name}"
 
-            if sampling_type == "surrogate":
+            if sampling_type == "GP (SMAC)":
                 df_error_metrics = pd.read_csv(f"{run_dir}/surrogate_error_metrics.csv")
             else:
                 df_error_metrics = pd.read_csv(f"{model_dir}/error_metrics.csv")
@@ -168,47 +168,37 @@ if __name__ == "__main__":
             df_error_metrics.insert(0, "Experiment", f"{sampling_type}")
             df_error_metrics_all = pd.concat((df_error_metrics_all, df_error_metrics))
 
-            # if not sampling_type == "surrogate":
-            #     for n_samples in df_error_metrics.n_samples.unique():
-            #         for sampling_seed in df_error_metrics.sampling_seed.unique():
-            #             for symb_seed in df_error_metrics.symb_seed.unique():
-            #                 try:
-            #                     with open(
-            #                             f"{model_dir}/symb_models/n_samples{n_samples}_sampling_seed{sampling_seed}_symb_seed{symb_seed}.pkl",
-            #                             "rb") as symb_model_file:
-            #                         symb_model = pickle.load(symb_model_file)
-            #                         complexity = symb_model._program.length_
-            #                         df_complexity = pd.DataFrame({
-            #                             "complexity": [complexity],
-            #                             "n_samples": [n_samples],
-            #                             "sampling_seed": [sampling_seed],
-            #                             "symb_seed": [symb_seed]
-            #                         })
-            #                         df_complexity.insert(0, "Experiment", f"{sampling_type}")
-            #                         df_all_complexity = pd.concat((df_all_complexity, df_complexity))
-            #                 except:
-            #                     continue
-
         logger.info(f"Create boxplot.")
 
         # Plot RMSE (Boxplot)
         plt.figure()
+        _, ax = plt.subplots(figsize=(15, 10))
         sns.boxplot(data=df_error_metrics_all, x="n_samples", y="rmse_test_smac", hue="Experiment", showfliers=False)
+        sns.move_legend(
+            ax, "lower center",
+            bbox_to_anchor=(0.5, -.3),
+            ncol=3,
+            title=None, frameon=False,
+        )
         plt.suptitle(f"{classifier_name}: {', '.join(parameter_names)}")
-        plt.title(f"Function Value Avg: {avg_cost:.2f} / Std: {std_cost:.2f}", fontsize=10),
+        plt.title(f"Test Mean: {avg_cost:.3f} / Standard deviation: {std_cost:.3f}", fontsize=10),
         plt.ylabel("Test RMSE")
         plt.xlabel("Number of Samples")
         plt.axhline(y=std_cost, color='darkred', linestyle='--', linewidth=0.5)
-        #plt.gca().set_ylim(top=2*std_cost)
+        handles, labels = ax.get_legend_handles_labels()
+        ax.legend(handles=handles[1:], labels=labels[1:])
         plt.tight_layout()
         plt.savefig(f"{rmse_plot_dir}/{sampling_run_name}_boxplot.png", dpi=200)
 
         # Plot Complexity (Boxplot)
         plt.figure()
+        _, ax = plt.subplots(figsize=(15, 10))
         sns.boxplot(data=df_complexity_all, x="n_samples", y="complexity", hue="Experiment", showfliers=False)
         plt.suptitle(f"{classifier_name}: {', '.join(parameter_names)}")
         plt.title("Complexity")
         plt.ylabel("Program Length")
+        handles, labels = ax.get_legend_handles_labels()
+        ax.legend(handles=handles[1:], labels=labels[1:])
         plt.tight_layout()
         plt.savefig(f"{complexity_plot_dir}/{sampling_run_name}_complexity_boxplot.png", dpi=200)
 
