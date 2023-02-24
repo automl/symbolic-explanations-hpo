@@ -187,8 +187,8 @@ if __name__ == "__main__":
         else:
             classifier_title = classifier_name
 
-        param0 = f"log({optimized_parameters[0].name}" if optimized_parameters[0].log else optimized_parameters[0].name
-        param1 = f"log({optimized_parameters[1].name}" if optimized_parameters[1].log else optimized_parameters[1].name
+        param0 = f"log({optimized_parameters[0].name})" if optimized_parameters[0].log else optimized_parameters[0].name
+        param1 = f"log({optimized_parameters[1].name})" if optimized_parameters[1].log else optimized_parameters[1].name
 
         # Plot RMSE
         plt.figure()
