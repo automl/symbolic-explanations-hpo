@@ -178,5 +178,5 @@ if __name__ == "__main__":
                                 symbolic_models=symbolic_models,
                                 parameters=optimized_parameters,
                                 plot_dir=viz_plot_dir,
-                                filename=f"{model_name}_{'_'.join(parameter_names)}_{data_set}_n_samples{n_samples}_sampling_seed{sampling_seed}_symb_seed{symb_seed}"
+                                filename=f"{classifier_name}_{'_'.join(parameter_names)}_{data_set}_n_samples{n_samples}_sampling_seed{sampling_seed}_symb_seed{symb_seed}"
                             )
