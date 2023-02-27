@@ -81,7 +81,7 @@ if __name__ == "__main__":
         X_test, y_test = get_hpo_test_data(classifier, optimized_parameters, 100)
 
         symbolic_models = {}
-        for sampling_seed in df_samples_smac.sampling_seed.unique():
+        for sampling_seed in df_samples_smac.seed.unique():
             df_n_samples_smac = df_samples_smac[df_samples_smac["n_samples"] == n_samples]
             df_n_samples_rand = df_samples_rand[df_samples_rand["n_samples"] == n_samples]
 
