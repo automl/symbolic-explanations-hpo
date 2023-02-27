@@ -169,8 +169,10 @@ def get_scores(
         "mse_test_smac": [mean_squared_error(y_test, pred_test)],
         "r2_train_smac": [r2_score(y_train, pred_train)],
         "r2_test_smac": [r2_score(y_test, pred_test)],
-        "kt_train_smac": [kendalltau(y_train, pred_train)],
-        "kt_test_smac": [kendalltau(y_test, pred_test)],
+        "kt_train_smac": [kendalltau(y_train, pred_train)[0]],
+        "kt_test_smac": [kendalltau(y_test, pred_test)[0]],
+        "kt_p_train_smac": [kendalltau(y_train, pred_train)[1]],
+        "kt_p_test_smac": [kendalltau(y_test, pred_test)[1]],
     })
     return df_scores
 
