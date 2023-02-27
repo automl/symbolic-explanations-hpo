@@ -4,6 +4,7 @@ import time
 import pandas as pd
 import sympy
 import numpy as np
+from scipy.stats import kendalltau
 import matplotlib.pyplot as plt
 from functools import partial
 from gplearn.genetic import SymbolicRegressor
@@ -168,6 +169,8 @@ def get_scores(
         "mse_test_smac": [mean_squared_error(y_test, pred_test)],
         "r2_train_smac": [r2_score(y_train, pred_train)],
         "r2_test_smac": [r2_score(y_test, pred_test)],
+        "kt_train_smac": [kendalltau(y_train, pred_train)],
+        "kt_test_smac": [kendalltau(y_test, pred_test)],
     })
     return df_scores
 
