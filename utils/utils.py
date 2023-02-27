@@ -390,6 +390,7 @@ def plot_symb2d(
     metric_name=None,
     function_expression=None,
     plot_dir=None,
+    filename=None,
 ):
     """
     In the 2D setting, create a plot showing the training points from SMAC and another sampling, as well as the true
@@ -535,7 +536,10 @@ def plot_symb2d(
         cbar.set_label("f(X0, X1)", fontsize=LABEL_SIZE, rotation=270, labelpad=10)
     cbar.ax.tick_params(labelsize=LABEL_SIZE)
     if plot_dir:
-        plt.savefig(f"{plot_dir}/{function_name}", dpi=800)
+        if filename:
+            plt.savefig(f"{plot_dir}/{filename}", dpi=800)
+        else:
+            plt.savefig(f"{plot_dir}/{function_name}", dpi=800)
     else:
         plt.show()
     plt.close()
