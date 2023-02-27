@@ -22,11 +22,10 @@ if __name__ == "__main__":
     ]
 
     # set up directories
-    plot_dir = f"learning_curves/plots/combined_plots_smac_rand_best"
-    complexity_plot_dir = f"{plot_dir}/complexity"
+    plot_dir = f"learning_curves/plots"
     viz_plot_dir = f"{plot_dir}/visualization"
     if not os.path.exists(viz_plot_dir):
-        os.makedirs(complexity_plot_dir)
+        os.makedirs(viz_plot_dir)
 
     # setup logging
     logger = logging.getLogger(__name__)
