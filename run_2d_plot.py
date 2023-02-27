@@ -16,7 +16,7 @@ sys.modules['functions'] = functions
 if __name__ == "__main__":
     model_name = "symb_best"
     n_samples = 100
-    symb_seeds = [0, 3, 6]
+    symb_seeds = [0] #, 3, 6]
     run_names = [
         # "rand_BDT_learning_rate_n_estimators_digits_20230221_114624",
         # "rand_BDT_learning_rate_n_estimators_iris_20230221_114624",
@@ -149,7 +149,7 @@ if __name__ == "__main__":
 
         symbolic_models = {}
 
-        for sampling_seed in df_samples_smac.seed.unique():
+        for sampling_seed in [0]: #df_samples_smac.seed.unique():
             logger.info(f"Considering sampling seed {sampling_seed}.")
             df_sampling_seed_smac = df_samples_smac.copy()[df_samples_smac["seed"] == sampling_seed]
             df_sampling_seed_rand = df_samples_rand.copy()[df_samples_rand["seed"] == sampling_seed]
