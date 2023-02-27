@@ -76,17 +76,18 @@ if __name__ == "__main__":
 
         df_samples_smac = pd.read_csv(f"{classifier_dir}/sampling/samples.csv")
         df_samples_rand = pd.read_csv(f"learning_curves/runs/{rand_run_name}/sampling/samples.csv")
+        df_samples_smac = df_samples_smac[:n_samples]
+        df_samples_rand = df_samples_rand[:n_samples]
 
         logger.info(f"Get test data for {classifier_name}.")
         X_test, y_test = get_hpo_test_data(classifier, optimized_parameters, 100)
 
         symbolic_models = {}
         for sampling_seed in df_samples_smac.seed.unique():
-            df_n_samples_smac = df_samples_smac[df_samples_smac["n_samples"] == n_samples]
-            df_n_samples_rand = df_samples_rand[df_samples_rand["n_samples"] == n_samples]
 
-            df_sampling_seed_smac = df_n_samples_smac[df_n_samples_smac["seed"] == sampling_seed]
-            df_sampling_seed_rand = df_n_samples_rand[df_n_samples_rand["seed"] == sampling_seed]
+
+            df_sampling_seed_smac = df_samples_smac[df_samples_smac["seed"] == sampling_seed]
+            df_sampling_seed_rand = df_samples_rand[df_samples_rand["seed"] == sampling_seed]
 
             X_train_smac = df_sampling_seed_smac[[parameter_names[0], parameter_names[1]]]
             X_train_rand = df_sampling_seed_rand[[parameter_names[0], parameter_names[1]]]
