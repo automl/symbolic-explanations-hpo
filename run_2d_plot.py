@@ -85,8 +85,8 @@ if __name__ == "__main__":
 
         for sampling_seed in df_samples_smac.seed.unique():
             logger.info(f"Considering sampling seed {sampling_seed}.")
-            df_sampling_seed_smac = df_samples_smac[df_samples_smac["seed"] == sampling_seed]
-            df_sampling_seed_rand = df_samples_rand[df_samples_rand["seed"] == sampling_seed]
+            df_sampling_seed_smac = df_samples_smac.copy()[df_samples_smac["seed"] == sampling_seed]
+            df_sampling_seed_rand = df_samples_rand.copy()[df_samples_rand["seed"] == sampling_seed]
 
             X_train_smac = np.array(df_sampling_seed_smac[[parameter_names[0], parameter_names[1]]])[:n_samples]
             X_train_rand = np.array(df_sampling_seed_rand[[parameter_names[0], parameter_names[1]]])[:n_samples]
@@ -103,8 +103,8 @@ if __name__ == "__main__":
                 symbolic_models["Symb-rand"] = symb_rand
 
                 plot = plot_symb2d(
-                                X_train_smac=X_train_smac,
-                                X_train_compare=X_train_rand,
+                                X_train_smac=X_train_smac.T,
+                                X_train_compare=X_train_rand.T,
                                 X_test=X_test,
                                 y_test=y_test,
                                 function_name=classifier.name,
