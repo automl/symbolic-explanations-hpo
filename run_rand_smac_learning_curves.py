@@ -195,7 +195,7 @@ if __name__ == "__main__":
         _, ax = plt.subplots(figsize=(8, 5))
         line = plt.axhline(y=std_cost, color='darkred', linestyle='--', linewidth=0.5, label="Test Std.")
         sns.pointplot(data=df_error_metrics_all, x="n_samples", y="rmse_test_smac", hue="Experiment", errorbar="sd", 
-                      linestyles="", capsize=0.2, errwidth=0.7, scale=0.7, dodge=0.5)#, showfliers=False)
+                      linestyles="", capsize=0.2, errwidth=0.7, scale=0.7, dodge=0.4)#, showfliers=False)
         if data_set:
             plt.title(f"{classifier_title}, Dataset: {data_set}\nX0: {param0}, X1: {param1}")
         else:
@@ -216,8 +216,7 @@ if __name__ == "__main__":
         plt.figure()
         _, ax = plt.subplots(figsize=(8, 5))
         sns.pointplot(data=df_complexity_all, x="n_samples", y="complexity", hue="Experiment", errorbar="sd",
-                      linestyles="", capsize=0.2, errwidth=0.7, scale=0.7, dodge=0.5)#, showfliers=False)
-        plt.suptitle(f"{classifier_title}, Dataset: {data_set}")
+                      linestyles="", capsize=0.2, errwidth=0.7, scale=0.7, dodge=0.2)#, showfliers=False)
         if data_set:
             plt.title(f"{classifier_title}, Dataset: {data_set}\nX0: {param0}, X1: {param1}")
         else:
