@@ -15,7 +15,7 @@ sys.modules['functions'] = functions
 
 if __name__ == "__main__":
     model_name = "symb_best"
-    n_samples = 30
+    n_samples = 20
     symb_seeds = [0, 3, 6]
     run_names = [
         "rand_DT_max_depth_min_samples_leaf_digits_20230221_114653",
