@@ -103,8 +103,8 @@ if __name__ == "__main__":
                 symbolic_models["Symb-rand"] = symb_rand
 
                 plot = plot_symb2d(
-                                X_train_smac=X_train_smac.reshape(2, n_samples),
-                                X_train_compare=X_train_rand.reshape(2, n_samples),
+                                X_train_smac=X_train_smac,
+                                X_train_compare=X_train_rand,
                                 X_test=X_test,
                                 y_test=y_test,
                                 function_name=classifier.name,
