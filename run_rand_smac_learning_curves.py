@@ -195,22 +195,22 @@ if __name__ == "__main__":
 
         # Plot RMSE
         plt.figure()
-        _, ax = plt.subplots(figsize=(20, 5))
+        _, ax = plt.subplots(figsize=(8, 5))
         line = plt.axhline(y=std_cost, color='darkred', linestyle='--', linewidth=0.5, label="Test Standard Deviation")
         sns.pointplot(data=df_error_metrics_all, x="n_samples", y="rmse_test_smac", hue="Experiment", errorbar="sd",
                       linestyles="", capsize=0.2, errwidth=0.7, scale=0.7, dodge=0.4)#, showfliers=False)
         if data_set:
-            plt.title(f"{classifier_title}, Dataset: {data_set}\nOptimize: {param0}, {param1}", fontsize=14)
+            plt.title(f"{classifier_title}, Dataset: {data_set}\nOptimize: {param0}, {param1}", fontsize=16)
         else:
-            plt.title(f"{classifier_title}\nOptimize: {param0}, {param1}", fontsize=14)
+            plt.title(f"{classifier_title}\nOptimize: {param0}, {param1}", fontsize=16)
         #plt.title(f"Test Mean: {avg_cost:.3f}, Test Std.: {std_cost:.3f}", fontsize=10),
-        plt.ylabel("Test RMSE", fontsize=14)
+        plt.ylabel("Test RMSE", fontsize=16)
         plt.yticks(fontsize=14)
-        plt.xlabel("Number of Samples", fontsize=14)
+        plt.xlabel("Number of Samples", fontsize=16)
         plt.xticks(fontsize=14)
         plt.ylim(0., 0.32)
-        plt.tight_layout(rect=(0, 0.1, 1, 1))
-        #plt.legend([], [], frameon=False)
+        plt.tight_layout(rect=(0, 0, 1, 1))
+        plt.legend([], [], frameon=False)
         sns.move_legend(
             ax, "lower center",
             bbox_to_anchor=(0.45, -0.3),
@@ -227,12 +227,12 @@ if __name__ == "__main__":
         # sns.pointplot(data=df_error_metrics_all, x="n_samples", y="kt_test_smac", hue="Experiment", errorbar="sd",
         #               linestyles="", capsize=0.2, errwidth=0.7, scale=0.7, dodge=0.4)#, showfliers=False)
         # if data_set:
-        #     plt.title(f"{classifier_title}, Dataset: {data_set}\nOptimize: {param0}, {param1}", fontsize=14)
+        #     plt.title(f"{classifier_title}, Dataset: {data_set}\nOptimize: {param0}, {param1}", fontsize=16)
         # else:
-        #     plt.title(f"{classifier_title}\nOptimize: {param0}, {param1}", fontsize=14)
-        # plt.ylabel("Test Kendall Tau", fontsize=14)
+        #     plt.title(f"{classifier_title}\nOptimize: {param0}, {param1}", fontsize=16)
+        # plt.ylabel("Test Kendall Tau", fontsize=16)
         #plt.yticks(fontsize=14)
-        # plt.xlabel("Number of Samples", fontsize=14)
+        # plt.xlabel("Number of Samples", fontsize=16)
         #plt.xticks(fontsize=14)
         # plt.tight_layout(rect=(0, 0.05, 1, 1))
         # sns.move_legend(
@@ -249,13 +249,13 @@ if __name__ == "__main__":
         sns.pointplot(data=df_complexity_all, x="n_samples", y="complexity", hue="Experiment", errorbar="sd",
                       linestyles="", capsize=0.2, errwidth=0.7, scale=0.7, dodge=0.2)#, showfliers=False)
         if data_set:
-            plt.title(f"{classifier_title}, Dataset: {data_set}\nOptimize: {param0}, {param1}", fontsize=14)
+            plt.title(f"{classifier_title}, Dataset: {data_set}\nOptimize: {param0}, {param1}", fontsize=16)
         else:
-            plt.title(f"{classifier_title}\nOptimize: {param0}, {param1}", fontsize=14)
+            plt.title(f"{classifier_title}\nOptimize: {param0}, {param1}", fontsize=16)
        # plt.title("Symbolic Regression Program Length")
-        plt.ylabel("Number of Operations in Program", fontsize=14)
+        plt.ylabel("Number of Operations in Program", fontsize=16)
         #plt.yticks(np.arange(0, 18.5 + 1, 2.0), fontsize=14)
-        plt.xlabel("Number of Samples", fontsize=14)
+        plt.xlabel("Number of Samples", fontsize=16)
         plt.xticks(fontsize=14)
         #plt.ylim(0, 18.5)
         plt.tight_layout()#rect=(0, 0.05, 1, 1))
@@ -266,6 +266,5 @@ if __name__ == "__main__":
         #     ncol=2,
         #     title=None, frameon=False,
         # )
-        plt.tight_layout()
         plt.savefig(f"{complexity_plot_dir}/{sampling_run_name}_complexity_pointplot.png", dpi=400)
 
