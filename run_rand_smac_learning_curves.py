@@ -253,11 +253,11 @@ if __name__ == "__main__":
         else:
             plt.title(f"{classifier_title}\nOptimize: {param0}, {param1}", fontsize=16)
        # plt.title("Symbolic Regression Program Length")
-        plt.ylabel("Number of Operations in Program", fontsize=16)
-        #plt.yticks(np.arange(0, 18.5 + 1, 2.0), fontsize=14)
+        plt.ylabel("Number of Operations in Formula", fontsize=16)
+        plt.yticks(np.arange(0, 20, 2.0), fontsize=14)
         plt.xlabel("Number of Samples", fontsize=16)
         plt.xticks(fontsize=14)
-        #plt.ylim(0, 18.5)
+        plt.ylim(0, 18.5)
         plt.tight_layout()#rect=(0, 0.05, 1, 1))
         plt.legend([], [], frameon=False)
         # sns.move_legend(
