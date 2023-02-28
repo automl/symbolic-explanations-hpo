@@ -200,12 +200,14 @@ if __name__ == "__main__":
         sns.pointplot(data=df_error_metrics_all, x="n_samples", y="rmse_test_smac", hue="Experiment", errorbar="sd", 
                       linestyles="", capsize=0.2, errwidth=0.7, scale=0.7, dodge=0.4)#, showfliers=False)
         if data_set:
-            plt.title(f"{classifier_title}, Dataset: {data_set}\n{param0}, {param1}", fontsize=18)
+            plt.title(f"{classifier_title}, Dataset: {data_set}\nOptimize: {param0}, {param1}", fontsize=16)
         else:
-            plt.title(f"{classifier_title}\n{param0}, {param1}", fontsize=18)
+            plt.title(f"{classifier_title}\nOptimize: {param0}, {param1}", fontsize=16)
         #plt.title(f"Test Mean: {avg_cost:.3f}, Test Std.: {std_cost:.3f}", fontsize=10),
-        plt.ylabel("Test RMSE", fontsize=16)
-        plt.xlabel("Number of Samples", fontsize=16)
+        plt.ylabel("Test RMSE", fontsize=14)
+        plt.yticks(fontsize=14)
+        plt.xlabel("Number of Samples", fontsize=14)
+        plt.xticks(fontsize=14)
         plt.ylim(0., 0.32)
         plt.tight_layout()#rect=(0, 0.05, 1, 1))
         plt.legend([], [], frameon=False)
@@ -224,11 +226,13 @@ if __name__ == "__main__":
         # sns.pointplot(data=df_error_metrics_all, x="n_samples", y="kt_test_smac", hue="Experiment", errorbar="sd",
         #               linestyles="", capsize=0.2, errwidth=0.7, scale=0.7, dodge=0.4)#, showfliers=False)
         # if data_set:
-        #     plt.title(f"{classifier_title}, Dataset: {data_set}\n{param0}, {param1}", fontsize=18)
+        #     plt.title(f"{classifier_title}, Dataset: {data_set}\nOptimize: {param0}, {param1}", fontsize=16)
         # else:
-        #     plt.title(f"{classifier_title}\n{param0}, {param1}", fontsize=18)
-        # plt.ylabel("Test Kendall Tau", fontsize=16)
-        # plt.xlabel("Number of Samples", fontsize=16)
+        #     plt.title(f"{classifier_title}\nOptimize: {param0}, {param1}", fontsize=16)
+        # plt.ylabel("Test Kendall Tau", fontsize=14)
+        #plt.yticks(fontsize=14)
+        # plt.xlabel("Number of Samples", fontsize=14)
+        #plt.xticks(fontsize=14)
         # plt.tight_layout(rect=(0, 0.05, 1, 1))
         # sns.move_legend(
         #     ax, "lower center",
@@ -244,12 +248,14 @@ if __name__ == "__main__":
         sns.pointplot(data=df_complexity_all, x="n_samples", y="complexity", hue="Experiment", errorbar="sd",
                       linestyles="", capsize=0.2, errwidth=0.7, scale=0.7, dodge=0.2)#, showfliers=False)
         if data_set:
-            plt.title(f"{classifier_title}, Dataset: {data_set}\n{param0}, {param1}", fontsize=18)
+            plt.title(f"{classifier_title}, Dataset: {data_set}\nOptimize: {param0}, {param1}", fontsize=16)
         else:
-            plt.title(f"{classifier_title}\n{param0}, {param1}", fontsize=18)
+            plt.title(f"{classifier_title}\nOptimize: {param0}, {param1}", fontsize=16)
        # plt.title("Symbolic Regression Program Length")
-        plt.ylabel("Program Length", fontsize=16)
-        plt.xlabel("Number of Samples", fontsize=16)
+        plt.ylabel("Program Length", fontsize=14)
+        plt.yticks(fontsize=14)
+        plt.xlabel("Number of Samples", fontsize=14)
+        plt.xticks(fontsize=14)
         plt.ylim(0, 19)
         plt.tight_layout()#rect=(0, 0.05, 1, 1))
         plt.legend([], [], frameon=False)
