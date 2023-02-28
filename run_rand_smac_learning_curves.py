@@ -257,7 +257,7 @@ if __name__ == "__main__":
         plt.yticks(fontsize=14)
         plt.xlabel("Number of Samples", fontsize=14)
         plt.xticks(fontsize=14)
-        plt.ylim(0, 19)
+        plt.ylim(0, 18.5)
         plt.tight_layout()#rect=(0, 0.05, 1, 1))
         plt.legend([], [], frameon=False)
         # sns.move_legend(
