@@ -195,7 +195,7 @@ if __name__ == "__main__":
 
         # Plot RMSE
         plt.figure()
-        _, ax = plt.subplots(figsize=(10, 5))
+        _, ax = plt.subplots(figsize=(20, 5))
         line = plt.axhline(y=std_cost, color='darkred', linestyle='--', linewidth=0.5, label="Test Standard Deviation")
         sns.pointplot(data=df_error_metrics_all, x="n_samples", y="rmse_test_smac", hue="Experiment", errorbar="sd",
                       linestyles="", capsize=0.2, errwidth=0.7, scale=0.7, dodge=0.4)#, showfliers=False)
@@ -213,9 +213,10 @@ if __name__ == "__main__":
         #plt.legend([], [], frameon=False)
         sns.move_legend(
             ax, "lower center",
-            bbox_to_anchor=(0.45, -0.24),
+            bbox_to_anchor=(0.45, -0.26),
             ncol=4,
             title=None, frameon=False,
+            fontsize=14
         )
         plt.savefig(f"{rmse_plot_dir}/{sampling_run_name}_pointplot.png", dpi=400)
 
