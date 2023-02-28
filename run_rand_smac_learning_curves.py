@@ -219,24 +219,24 @@ if __name__ == "__main__":
 
 
         # Plot Kendall
-        plt.figure()
-        _, ax = plt.subplots(figsize=(8, 5))
-        sns.pointplot(data=df_error_metrics_all, x="n_samples", y="kt_test_smac", hue="Experiment", errorbar="sd",
-                      linestyles="", capsize=0.2, errwidth=0.7, scale=0.7, dodge=0.4)#, showfliers=False)
-        if data_set:
-            plt.title(f"{classifier_title}, Dataset: {data_set}\n{param0}, {param1}", fontsize=18)
-        else:
-            plt.title(f"{classifier_title}\n{param0}, {param1}", fontsize=18)
-        plt.ylabel("Test Kendall Tau", fontsize=16)
-        plt.xlabel("Number of Samples", fontsize=16)
-        plt.tight_layout(rect=(0, 0.05, 1, 1))
-        sns.move_legend(
-            ax, "lower center",
-            bbox_to_anchor=(0.45, -0.24),
-            ncol=4,
-            title=None, frameon=False,
-        )
-        plt.savefig(f"{kt_plot_dir}/{sampling_run_name}_pointplot.png", dpi=400)
+        # plt.figure()
+        # _, ax = plt.subplots(figsize=(8, 5))
+        # sns.pointplot(data=df_error_metrics_all, x="n_samples", y="kt_test_smac", hue="Experiment", errorbar="sd",
+        #               linestyles="", capsize=0.2, errwidth=0.7, scale=0.7, dodge=0.4)#, showfliers=False)
+        # if data_set:
+        #     plt.title(f"{classifier_title}, Dataset: {data_set}\n{param0}, {param1}", fontsize=18)
+        # else:
+        #     plt.title(f"{classifier_title}\n{param0}, {param1}", fontsize=18)
+        # plt.ylabel("Test Kendall Tau", fontsize=16)
+        # plt.xlabel("Number of Samples", fontsize=16)
+        # plt.tight_layout(rect=(0, 0.05, 1, 1))
+        # sns.move_legend(
+        #     ax, "lower center",
+        #     bbox_to_anchor=(0.45, -0.24),
+        #     ncol=4,
+        #     title=None, frameon=False,
+        # )
+        # plt.savefig(f"{kt_plot_dir}/{sampling_run_name}_pointplot.png", dpi=400)
 
         # Plot Complexity
         plt.figure()
