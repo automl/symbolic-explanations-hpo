@@ -16,76 +16,76 @@ sys.modules['functions'] = functions
 
 
 if __name__ == "__main__":
-    model_name = "symb_wkendall"
+    model_name = "symb_best"
     run_names = [
-        "rand_BDT_learning_rate_n_estimators_digits_20230221_114624",
-        "rand_BDT_learning_rate_n_estimators_iris_20230221_114624",
-        "rand_Branin_2D_X0_X1_20230221_120527",
-        "rand_Camelback_2D_X0_X1_20230221_120527",
+        # "rand_BDT_learning_rate_n_estimators_digits_20230221_114624",
+        # "rand_BDT_learning_rate_n_estimators_iris_20230221_114624",
+        # "rand_Branin_2D_X0_X1_20230221_120527",
+        # "rand_Camelback_2D_X0_X1_20230221_120527",
         "rand_DT_max_depth_min_samples_leaf_digits_20230221_114653",
         "rand_DT_max_depth_min_samples_leaf_iris_20230221_114651",
-        "rand_Exponential_function_2D_X0_X1_20230221_120528",
-        "rand_Linear_2D_X0_X1_20230221_120527",
-        "rand_MLP_learning_rate_init_max_iter_digits_20230221_114330",
-        "rand_MLP_learning_rate_init_max_iter_iris_20230221_114330",
-        "rand_MLP_learning_rate_init_n_layer_digits_20230221_114329",
-        "rand_MLP_learning_rate_init_n_layer_iris_20230221_114329",
+        # "rand_Exponential_function_2D_X0_X1_20230221_120528",
+        # "rand_Linear_2D_X0_X1_20230221_120527",
+        # "rand_MLP_learning_rate_init_max_iter_digits_20230221_114330",
+        # "rand_MLP_learning_rate_init_max_iter_iris_20230221_114330",
+        # "rand_MLP_learning_rate_init_n_layer_digits_20230221_114329",
+        # "rand_MLP_learning_rate_init_n_layer_iris_20230221_114329",
         "rand_MLP_learning_rate_init_n_neurons_digits_20230221_114330",
         "rand_MLP_learning_rate_init_n_neurons_iris_20230221_114330",
-        "rand_MLP_max_iter_n_layer_digits_20230221_114332",
-        "rand_MLP_max_iter_n_layer_iris_20230221_114330",
-        "rand_MLP_max_iter_n_neurons_digits_20230221_114332",
-        "rand_MLP_max_iter_n_neurons_iris_20230221_114330",
-        "rand_MLP_n_layer_n_neurons_digits_20230221_114330",
-        "rand_MLP_n_layer_n_neurons_iris_20230221_114330",
-        "rand_Polynom_function_2D_X0_X1_20230221_120528",
-        "rand_Rosenbrock_2D_X0_X1_20230221_120527",
-        "rand_SVM_C_coef0_digits_20230221_114754",
-        "rand_SVM_C_coef0_iris_20230221_114755",
-        "rand_SVM_C_degree_digits_20230221_114756",
-        "rand_SVM_C_degree_iris_20230221_114756",
-        "rand_SVM_C_gamma_digits_20230221_114754",
-        "rand_SVM_C_gamma_iris_20230221_114755",
-        "rand_SVM_coef0_degree_digits_20230221_114754",
-        "rand_SVM_coef0_degree_iris_20230221_114756",
-        "rand_SVM_coef0_gamma_digits_20230221_114755",
-        "rand_SVM_coef0_gamma_iris_20230221_114755",
-        "rand_SVM_degree_gamma_digits_20230221_114754",
-        "rand_SVM_degree_gamma_iris_20230221_114754",
-        "smac_BDT_learning_rate_n_estimators_digits_20230223_162320",
-        "smac_BDT_learning_rate_n_estimators_iris_20230223_162320",
-        "smac_Branin_2D_X0_X1_20230223_162155",
-        "smac_Camelback_2D_X0_X1_20230223_162155",
-         "smac_DT_max_depth_min_samples_leaf_digits_20230224_090309",
-         "smac_DT_max_depth_min_samples_leaf_iris_20230224_090310",
-        "smac_Exponential_function_2D_X0_X1_20230223_162156",
-        "smac_Linear_2D_X0_X1_20230223_162155",
-        "smac_MLP_learning_rate_init_max_iter_digits_20230223_162437",
-        "smac_MLP_learning_rate_init_max_iter_iris_20230223_162436",
-        "smac_MLP_learning_rate_init_n_layer_digits_20230223_162436",
-        "smac_MLP_learning_rate_init_n_layer_iris_20230223_162436",
+        # "rand_MLP_max_iter_n_layer_digits_20230221_114332",
+        # "rand_MLP_max_iter_n_layer_iris_20230221_114330",
+        # "rand_MLP_max_iter_n_neurons_digits_20230221_114332",
+        # "rand_MLP_max_iter_n_neurons_iris_20230221_114330",
+        # "rand_MLP_n_layer_n_neurons_digits_20230221_114330",
+        # "rand_MLP_n_layer_n_neurons_iris_20230221_114330",
+        # "rand_Polynom_function_2D_X0_X1_20230221_120528",
+        # "rand_Rosenbrock_2D_X0_X1_20230221_120527",
+        # "rand_SVM_C_coef0_digits_20230221_114754",
+        # "rand_SVM_C_coef0_iris_20230221_114755",
+        # "rand_SVM_C_degree_digits_20230221_114756",
+        # "rand_SVM_C_degree_iris_20230221_114756",
+        # "rand_SVM_C_gamma_digits_20230221_114754",
+        # "rand_SVM_C_gamma_iris_20230221_114755",
+        # "rand_SVM_coef0_degree_digits_20230221_114754",
+        # "rand_SVM_coef0_degree_iris_20230221_114756",
+        # "rand_SVM_coef0_gamma_digits_20230221_114755",
+        # "rand_SVM_coef0_gamma_iris_20230221_114755",
+        # "rand_SVM_degree_gamma_digits_20230221_114754",
+        # "rand_SVM_degree_gamma_iris_20230221_114754",
+        # "smac_BDT_learning_rate_n_estimators_digits_20230223_162320",
+        # "smac_BDT_learning_rate_n_estimators_iris_20230223_162320",
+        # "smac_Branin_2D_X0_X1_20230223_162155",
+        # "smac_Camelback_2D_X0_X1_20230223_162155",
+        "smac_DT_max_depth_min_samples_leaf_digits_20230224_090309",
+        "smac_DT_max_depth_min_samples_leaf_iris_20230224_090310",
+        # "smac_Exponential_function_2D_X0_X1_20230223_162156",
+        # "smac_Linear_2D_X0_X1_20230223_162155",
+        # "smac_MLP_learning_rate_init_max_iter_digits_20230223_162437",
+        # "smac_MLP_learning_rate_init_max_iter_iris_20230223_162436",
+        # "smac_MLP_learning_rate_init_n_layer_digits_20230223_162436",
+        # "smac_MLP_learning_rate_init_n_layer_iris_20230223_162436",
         "smac_MLP_learning_rate_init_n_neurons_digits_20230223_162436",
         "smac_MLP_learning_rate_init_n_neurons_iris_20230223_162436",
-        "smac_MLP_max_iter_n_layer_digits_20230223_162436",
-        "smac_MLP_max_iter_n_layer_iris_20230223_162436",
-        "smac_MLP_max_iter_n_neurons_digits_20230223_162436",
-        "smac_MLP_max_iter_n_neurons_iris_20230223_162436",
-        "smac_MLP_n_layer_n_neurons_digits_20230223_162436",
-        "smac_MLP_n_layer_n_neurons_iris_20230223_162437",
-        "smac_Polynom_function_2D_X0_X1_20230223_162156",
-        "smac_Rosenbrock_2D_X0_X1_20230223_162155",
-        "smac_SVM_C_coef0_digits_20230223_164415",
-        "smac_SVM_C_coef0_iris_20230223_162859",
-        "smac_SVM_C_degree_digits_20230223_162900",
-        "smac_SVM_C_degree_iris_20230223_164415",
-        "smac_SVM_C_gamma_digits_20230223_162900",
-        "smac_SVM_C_gamma_iris_20230223_162859",
-        "smac_SVM_coef0_degree_digits_20230223_162859",
-        "smac_SVM_coef0_degree_iris_20230223_162859",
-        "smac_SVM_coef0_gamma_digits_20230223_162859",
-        "smac_SVM_coef0_gamma_iris_20230223_162859",
-        "smac_SVM_degree_gamma_digits_20230223_162900",
-        "smac_SVM_degree_gamma_iris_20230223_162859"
+        # "smac_MLP_max_iter_n_layer_digits_20230223_162436",
+        # "smac_MLP_max_iter_n_layer_iris_20230223_162436",
+        # "smac_MLP_max_iter_n_neurons_digits_20230223_162436",
+        # "smac_MLP_max_iter_n_neurons_iris_20230223_162436",
+        # "smac_MLP_n_layer_n_neurons_digits_20230223_162436",
+        # "smac_MLP_n_layer_n_neurons_iris_20230223_162437",
+        # "smac_Polynom_function_2D_X0_X1_20230223_162156",
+        # "smac_Rosenbrock_2D_X0_X1_20230223_162155",
+        # "smac_SVM_C_coef0_digits_20230223_164415",
+        # "smac_SVM_C_coef0_iris_20230223_162859",
+        # "smac_SVM_C_degree_digits_20230223_162900",
+        # "smac_SVM_C_degree_iris_20230223_164415",
+        # "smac_SVM_C_gamma_digits_20230223_162900",
+        # "smac_SVM_C_gamma_iris_20230223_162859",
+        # "smac_SVM_coef0_degree_digits_20230223_162859",
+        # "smac_SVM_coef0_degree_iris_20230223_162859",
+        # "smac_SVM_coef0_gamma_digits_20230223_162859",
+        # "smac_SVM_coef0_gamma_iris_20230223_162859",
+        # "smac_SVM_degree_gamma_digits_20230223_162900",
+        # "smac_SVM_degree_gamma_iris_20230223_162859"
     ]
 
     # set up directories
@@ -200,20 +200,22 @@ if __name__ == "__main__":
         sns.pointplot(data=df_error_metrics_all, x="n_samples", y="rmse_test_smac", hue="Experiment", errorbar="sd", 
                       linestyles="", capsize=0.2, errwidth=0.7, scale=0.7, dodge=0.4)#, showfliers=False)
         if data_set:
-            plt.title(f"{classifier_title}, Dataset: {data_set}\nX0: {param0}, X1: {param1}")
+            plt.title(f"{classifier_title}, Dataset: {data_set}\n{param0}, {param1}", fontsize=18)
         else:
-            plt.title(f"{classifier_title}\nX0: {param0}, X1: {param1}")
+            plt.title(f"{classifier_title}\n{param0}, {param1}", fontsize=18)
         #plt.title(f"Test Mean: {avg_cost:.3f}, Test Std.: {std_cost:.3f}", fontsize=10),
-        plt.ylabel("Test RMSE")
-        plt.xlabel("Number of Samples")
-        plt.tight_layout(rect=(0, 0.05, 1, 1))
-        sns.move_legend(
-            ax, "lower center",
-            bbox_to_anchor=(0.45, -0.24),
-            ncol=4,
-            title=None, frameon=False,
-        )
-        plt.savefig(f"{rmse_plot_dir}/{sampling_run_name}_pointplot.png", dpi=200)
+        plt.ylabel("Test RMSE", fontsize=16)
+        plt.xlabel("Number of Samples", fontsize=16)
+        plt.ylim(0., 0.32)
+        plt.tight_layout()#rect=(0, 0.05, 1, 1))
+        plt.legend([], [], frameon=False)
+        # sns.move_legend(
+        #     ax, "lower center",
+        #     bbox_to_anchor=(0.45, -0.24),
+        #     ncol=4,
+        #     title=None, frameon=False,
+        # )
+        plt.savefig(f"{rmse_plot_dir}/{sampling_run_name}_pointplot.png", dpi=400)
 
 
         # Plot Kendall
@@ -222,11 +224,11 @@ if __name__ == "__main__":
         sns.pointplot(data=df_error_metrics_all, x="n_samples", y="kt_test_smac", hue="Experiment", errorbar="sd",
                       linestyles="", capsize=0.2, errwidth=0.7, scale=0.7, dodge=0.4)#, showfliers=False)
         if data_set:
-            plt.title(f"{classifier_title}, Dataset: {data_set}\nX0: {param0}, X1: {param1}")
+            plt.title(f"{classifier_title}, Dataset: {data_set}\n{param0}, {param1}", fontsize=18)
         else:
-            plt.title(f"{classifier_title}\nX0: {param0}, X1: {param1}")
-        plt.ylabel("Test Kendall Tau")
-        plt.xlabel("Number of Samples")
+            plt.title(f"{classifier_title}\n{param0}, {param1}", fontsize=18)
+        plt.ylabel("Test Kendall Tau", fontsize=16)
+        plt.xlabel("Number of Samples", fontsize=16)
         plt.tight_layout(rect=(0, 0.05, 1, 1))
         sns.move_legend(
             ax, "lower center",
@@ -234,7 +236,7 @@ if __name__ == "__main__":
             ncol=4,
             title=None, frameon=False,
         )
-        plt.savefig(f"{kt_plot_dir}/{sampling_run_name}_pointplot.png", dpi=200)
+        plt.savefig(f"{kt_plot_dir}/{sampling_run_name}_pointplot.png", dpi=400)
 
         # Plot Complexity
         plt.figure()
@@ -242,18 +244,21 @@ if __name__ == "__main__":
         sns.pointplot(data=df_complexity_all, x="n_samples", y="complexity", hue="Experiment", errorbar="sd",
                       linestyles="", capsize=0.2, errwidth=0.7, scale=0.7, dodge=0.2)#, showfliers=False)
         if data_set:
-            plt.title(f"{classifier_title}, Dataset: {data_set}\nX0: {param0}, X1: {param1}")
+            plt.title(f"{classifier_title}, Dataset: {data_set}\n{param0}, {param1}", fontsize=18)
         else:
-            plt.title(f"{classifier_title}\nX0: {param0}, X1: {param1}")
+            plt.title(f"{classifier_title}\n{param0}, {param1}", fontsize=18)
        # plt.title("Symbolic Regression Program Length")
-        plt.ylabel("Program Length")
-        plt.tight_layout(rect=(0, 0.05, 1, 1))
-        sns.move_legend(
-            ax, "lower center",
-            bbox_to_anchor=(0.45, -0.24),
-            ncol=2,
-            title=None, frameon=False,
-        )
+        plt.ylabel("Program Length", fontsize=16)
+        plt.xlabel("Number of Samples", fontsize=16)
+        plt.ylim(0, 19)
+        plt.tight_layout()#rect=(0, 0.05, 1, 1))
+        plt.legend([], [], frameon=False)
+        # sns.move_legend(
+        #     ax, "lower center",
+        #     bbox_to_anchor=(0.45, -0.24),
+        #     ncol=2,
+        #     title=None, frameon=False,
+        # )
         plt.tight_layout()
-        plt.savefig(f"{complexity_plot_dir}/{sampling_run_name}_complexity_pointplot.png", dpi=200)
+        plt.savefig(f"{complexity_plot_dir}/{sampling_run_name}_complexity_pointplot.png", dpi=400)
 
