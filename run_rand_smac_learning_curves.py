@@ -209,14 +209,14 @@ if __name__ == "__main__":
         plt.xlabel("Number of Samples", fontsize=14)
         plt.xticks(fontsize=14)
         plt.ylim(0., 0.32)
-        plt.tight_layout(rect=(0, 0.05, 1, 1))
+        plt.tight_layout(rect=(0, 0.1, 1, 1))
         #plt.legend([], [], frameon=False)
         sns.move_legend(
             ax, "lower center",
-            bbox_to_anchor=(0.45, -0.26),
+            bbox_to_anchor=(0.45, -0.3),
             ncol=4,
             title=None, frameon=False,
-            fontsize=14
+            fontsize=16
         )
         plt.savefig(f"{rmse_plot_dir}/{sampling_run_name}_pointplot.png", dpi=400)
 
