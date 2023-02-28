@@ -155,16 +155,16 @@ if __name__ == "__main__":
         df_error_metrics_all = pd.DataFrame()
         df_complexity_all = pd.DataFrame()
 
-        for sampling_type in ["Symbolic Regr. (Random)", "Symbolic Regr. (BO)", "Gaussian Process (BO)"]:
+        for sampling_type in ["Symbolic Regression (Random Sampling)", "Symbolic Regression (BO Sampling)", "Gaussian Process (BO Sampling)"]:
 
-            if sampling_type == "Symbolic Regr. (BO)" or sampling_type == "Gaussian Process (BO)":
+            if sampling_type == "Symbolic Regression (BO Sampling)" or sampling_type == "Gaussian Process (BO Sampling)":
                 run_dir = f"learning_curves/runs/{smac_run_name}"
             else:
                 run_dir = f"learning_curves/runs/{rand_run_name}"
 
             model_dir = f"{run_dir}/{model_name}"
 
-            if sampling_type == "Gaussian Process (BO)":
+            if sampling_type == "Gaussian Process (BO Sampling)":
                 df_error_metrics = pd.read_csv(f"{run_dir}/surrogate_error_metrics.csv")
             else:
                 df_error_metrics = pd.read_csv(f"{model_dir}/error_metrics.csv")
@@ -195,9 +195,9 @@ if __name__ == "__main__":
 
         # Plot RMSE
         plt.figure()
-        _, ax = plt.subplots(figsize=(8, 5))
-        line = plt.axhline(y=std_cost, color='darkred', linestyle='--', linewidth=0.5, label="Test Std.")
-        sns.pointplot(data=df_error_metrics_all, x="n_samples", y="rmse_test_smac", hue="Experiment", errorbar="sd", 
+        _, ax = plt.subplots(figsize=(10, 5))
+        line = plt.axhline(y=std_cost, color='darkred', linestyle='--', linewidth=0.5, label="Test Standard Deviation")
+        sns.pointplot(data=df_error_metrics_all, x="n_samples", y="rmse_test_smac", hue="Experiment", errorbar="sd",
                       linestyles="", capsize=0.2, errwidth=0.7, scale=0.7, dodge=0.4)#, showfliers=False)
         if data_set:
             plt.title(f"{classifier_title}, Dataset: {data_set}\nOptimize: {param0}, {param1}", fontsize=14)
@@ -209,15 +209,14 @@ if __name__ == "__main__":
         plt.xlabel("Number of Samples", fontsize=14)
         plt.xticks(fontsize=14)
         plt.ylim(0., 0.32)
-        plt.tight_layout()#(rect=(0, 0.05, 1, 1))
+        plt.tight_layout(rect=(0, 0.05, 1, 1))
         plt.legend([], [], frameon=False)
-        # sns.move_legend(
-        #     ax, "lower center",
-        #     bbox_to_anchor=(0.45, -0.24),
-        #     ncol=4,
-        #     title=None, frameon=False,
-        #     fontsize=14
-        # )
+        sns.move_legend(
+            ax, "lower center",
+            bbox_to_anchor=(0.45, -0.24),
+            ncol=4,
+            title=None, frameon=False,
+        )
         plt.savefig(f"{rmse_plot_dir}/{sampling_run_name}_pointplot.png", dpi=400)
 
 
@@ -253,11 +252,11 @@ if __name__ == "__main__":
         else:
             plt.title(f"{classifier_title}\nOptimize: {param0}, {param1}", fontsize=14)
        # plt.title("Symbolic Regression Program Length")
-        plt.ylabel("Program Length", fontsize=14)
-        plt.yticks(fontsize=14)
+        plt.ylabel("Number of Operations in Program", fontsize=14)
+        #plt.yticks(np.arange(0, 18.5 + 1, 2.0), fontsize=14)
         plt.xlabel("Number of Samples", fontsize=14)
         plt.xticks(fontsize=14)
-        plt.ylim(0, 18.5)
+        #plt.ylim(0, 18.5)
         plt.tight_layout()#rect=(0, 0.05, 1, 1))
         plt.legend([], [], frameon=False)
         # sns.move_legend(
