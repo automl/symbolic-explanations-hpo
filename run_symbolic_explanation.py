@@ -205,8 +205,20 @@ if __name__ == "__main__":
                     df_metrics.insert(0, "symb_seed", symb_seed)
                     df_all_metrics = pd.concat((df_all_metrics, df_metrics))
 
+                    try:
+                        conv_expr = convert_symb(symb_model, n_dim=len(optimized_parameters), n_decimals=3)
+                    except:
+                        conv_expr = ""
+                        print(f"Could not convert expression for n_samples: {n_samples}, sampling_seed: {sampling_seed}"
+                              f", symb_seed: {symb_seed}.")
+                    df_expr = pd.DataFrame({"expr": [conv_expr]})
+                    df_expr.insert(0, "n_samples", n_samples)
+                    df_expr.insert(0, "sampling_seed", sampling_seed)
+                    df_expr.insert(0, "symb_seed", symb_seed)
+                    df_all_expr = pd.concat((df_all_expr, df_expr))
+
                     program_length_before_simplification = symb_model._program.length_
-                    program_operations = sympy.count_ops(sympy.simplify(str(symb_model._program)))
+                    program_operations = sympy.count_ops(conv_expr)
                     df_complexity = pd.DataFrame({
                         "program_length_before_simplification": [program_length_before_simplification],
                         "program_operations": [program_operations],
@@ -215,19 +227,7 @@ if __name__ == "__main__":
                         "symb_seed": [symb_seed]
                     })
                     df_all_complexity = pd.concat((df_all_complexity, df_complexity))
-
-                    try:
-                        df_expr = pd.DataFrame(
-                            {"expr": [convert_symb(symb_model, n_dim=len(optimized_parameters), n_decimals=3)]})
-                    except:
-                        df_expr = pd.DataFrame({"expr": [""]})
-                        print(f"Could not convert expression for n_samples: {n_samples}, sampling_seed: {sampling_seed}"
-                              f", symb_seed: {symb_seed}.")
-                    df_expr.insert(0, "n_samples", n_samples)
-                    df_expr.insert(0, "sampling_seed", sampling_seed)
-                    df_expr.insert(0, "symb_seed", symb_seed)
-                    df_all_expr = pd.concat((df_all_expr, df_expr))
-
+                    
                     df_all_metrics.to_csv(f"{symb_dir}/error_metrics.csv", index=False)
                     df_all_complexity.to_csv(f"{symb_dir}/complexity.csv", index=False)
                     df_all_expr.to_csv(f"{symb_dir}/expressions.csv", index=False)
