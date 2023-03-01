@@ -15,6 +15,8 @@ def run_smac_optimization(
     n_eval: int,
     run_dir: str,
     seed: int,
+    n_configs_per_hyperparamter: int = 8,
+    max_ratio: float = 0.25,
     callback: Callback | None = None
 ) -> [np.ndarray, np.ndarray]:
     """Runs SMAC Hyperparameter Optimization on the given function within the hyperparameter space.
@@ -28,6 +30,8 @@ def run_smac_optimization(
     n_eval : Desired number of function evaluations.
     run_dir : Run directory to save SMAC output to.
     seed : Seed to be used in SMAC scenario.
+    n_configs_per_hyperparamter: Number of initial configurations per hyperparameter.
+    max_ratio: Use at most scenario.n_trials * max_ratio number of configurations in the initial design.
     callback : Custom callback to be passed to smac.
 
     Returns
@@ -45,12 +49,15 @@ def run_smac_optimization(
     )
 
     config_selector = facade.get_config_selector(scenario, retrain_after=1)
+    initial_design = facade.get_initial_design(scenario, n_configs_per_hyperparamter=n_configs_per_hyperparamter,
+                                               max_ratio=max_ratio)
 
     smac = facade(
         scenario=scenario,
         target_function=target_function,
         logging_level=Path("logging_smac.yml"),
         config_selector=config_selector,
+        initial_design=initial_design,
         callbacks=[callback] if callback else []
     )
 

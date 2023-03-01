@@ -2,7 +2,7 @@ import logging
 import os
 import numpy as np
 import pandas as pd
-import time
+import shutil
 import argparse
 import dill as pickle
 from smac import BlackBoxFacade, Callback
@@ -22,6 +22,9 @@ class SurrogateModelCallback(Callback):
                 pickle.dump(surrogate_model, surrogate_file)
 
 
+N_SAMPLES_SPACING = np.linspace(20, 200, 10)
+
+
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
@@ -31,17 +34,14 @@ if __name__ == "__main__":
 
     functions = get_functions2d()
     n_seeds = 5
-    n_samples = 200
-    #model = "DT"
-    model = functions[int(args.job_id)]
+    model = "DT"
+    #model = functions[int(args.job_id)]
     data_sets = ["digits", "iris"]
     use_random_samples = False
-    symb_reg = True
 
-    if use_random_samples:
-        run_type = "rand"
-    else:
-        run_type = "smac"
+    init_design_max_ratio = 0.25
+    init_design_n_configs_per_hyperparamter = 8
+    sampling_dir_name = "runs_sampling"
 
     if model == "MLP":
         hyperparams = [
@@ -69,7 +69,7 @@ if __name__ == "__main__":
         hyperparams = None
 
     if isinstance(model, NamedFunction):
-        data_set_prefix = ""
+        data_set_postfix = ""
         classifier = model
     else:
         hp_comb = combinations(hyperparams, 2)
@@ -78,7 +78,7 @@ if __name__ == "__main__":
             for ds in data_sets:
                 run_configs.append({hp_conf[0]: True, hp_conf[1]: True, "data_set_name": ds})
         run_conf = run_configs[int(job_id)]
-        data_set_prefix = f"_{run_conf['data_set_name']}"
+        data_set_postfix = f"_{run_conf['data_set_name']}"
         if model == "MLP":
             classifier = MLP(**run_conf)
         elif model == "SVM":  # set lower tolerance, iris (stopping_criteria=0.00001)
@@ -93,67 +93,83 @@ if __name__ == "__main__":
 
     function_name = classifier.name if isinstance(classifier, NamedFunction) else model
 
-    # setup logging
-    logger = logging.getLogger(__name__)
-
     optimized_parameters = classifier.configspace.get_hyperparameters()
     parameter_names = [param.name for param in optimized_parameters]
 
-    sampling_run_name = f"{run_type}_{function_name.replace(' ', '_')}_{'_'.join(parameter_names)}" \
-                        f"{data_set_prefix}_{time.strftime('%Y%m%d_%H%M%S')}"
+    if use_random_samples:
+        run_type = "rand"
+        n_samples_to_eval = [max(N_SAMPLES_SPACING)]
+    else:
+        run_type = "smac"
+        # SMAC uses at most scenario.n_trials * max_ratio number of configurations in the initial design
+        # If we run SMAC only once with n_trials = max(N_SAMPLES_SPACING), we would always use the maximum number of
+        # initial designs, e.g. a run with 20 samples would have the same number of initial designs as a run with 200
+        # Thus, we do separate runs for each sample size as long as the number of initial designs would differ
+        n_samples_to_eval = [n for n in N_SAMPLES_SPACING if init_design_max_ratio * n < len(
+            optimized_parameters) * init_design_n_configs_per_hyperparamter]
+        if max(N_SAMPLES_SPACING) not in n_samples_to_eval:
+            n_samples_to_eval = n_samples_to_eval.append(max(N_SAMPLES_SPACING))
 
-    logger.info(f"Start sampling for {sampling_run_name}.")
+    run_name = f"{run_type}_{function_name.replace(' ', '_')}_{'_'.join(parameter_names)}{data_set_postfix}"
 
-    if not os.path.exists("learning_curves/runs"):
-        os.makedirs("learning_curves/runs")
-    run_dir = f"learning_curves/runs/{sampling_run_name}"
-    sampling_dir = f"{run_dir}/sampling"
-    if not os.path.exists(sampling_dir):
-        os.makedirs(sampling_dir)
-    if not use_random_samples and not os.path.exists(f"{sampling_dir}/surrogates"):
-        os.makedirs(f"{sampling_dir}/surrogates")
+    sampling_dir = f"learning_curves/{sampling_dir_name}/{run_type}"
+    sampling_run_dir = f"{sampling_dir}/{run_name}"
+    if os.path.exists(sampling_run_dir):
+        shutil.rmtree(sampling_run_dir)
+    os.makedirs(sampling_run_dir)
+    if not use_random_samples:
+        os.makedirs(f"{sampling_run_dir}/surrogates")
 
-    with open(f"{sampling_dir}/classifier.pkl", "wb") as classifier_file:
+    with open(f"{sampling_run_dir}/classifier.pkl", "wb") as classifier_file:
         pickle.dump(classifier, classifier_file)
 
-    df_samples = pd.DataFrame()
+    # setup logging
+    logger = logging.getLogger(__name__)
 
-    for i in range(n_seeds):
-        seed = i * 3
+    logger.info(f"Start sampling for {run_name}.")
 
-        np.random.seed(seed)
+    for n_samples in n_samples_to_eval:
 
-        if not isinstance(classifier, NamedFunction):
-            classifier.set_seed(seed)
+        df_samples = pd.DataFrame()
 
-        logger.info(f"Sample configs and train {function_name} with seed {seed}.")
+        for i in range(n_seeds):
+            seed = i * 3
 
-        if use_random_samples:
-            configurations = classifier.configspace.sample_configuration(size=n_samples)
-            performances = np.array(
-                [classifier.train(config=x, seed=seed) for x in configurations]
-            )
-            configurations = np.array(
-                [list(i.get_dictionary().values()) for i in configurations]
-            ).T
-        else:
-            configurations, performances, _ = run_smac_optimization(
-                configspace=classifier.configspace,
-                facade=BlackBoxFacade,  # HyperparameterOptimizationFacade,
-                target_function=classifier.train,
-                function_name=function_name,
-                n_eval=n_samples,
-                run_dir=run_dir,
-                seed=seed,
-                callback=SurrogateModelCallback()
-            )
+            np.random.seed(seed)
 
-        df = pd.DataFrame(
-            data=np.concatenate((configurations.T,
-                                 performances.reshape(-1, 1)), axis=1),
-            columns=parameter_names + ["cost"])
-        df.insert(0, "seed", seed)
-        df_samples = pd.concat((df_samples, df))
+            if not isinstance(classifier, NamedFunction):
+                classifier.set_seed(seed)
 
-    df_samples.to_csv(f"{sampling_dir}/samples.csv", index=False)
+            logger.info(f"Sample configs and train {function_name} with seed {seed}.")
+
+            if use_random_samples:
+                configurations = classifier.configspace.sample_configuration(size=n_samples)
+                performances = np.array(
+                    [classifier.train(config=x, seed=seed) for x in configurations]
+                )
+                configurations = np.array(
+                    [list(i.get_dictionary().values()) for i in configurations]
+                ).T
+            else:
+                configurations, performances, _ = run_smac_optimization(
+                    configspace=classifier.configspace,
+                    facade=BlackBoxFacade,  # HyperparameterOptimizationFacade,
+                    target_function=classifier.train,
+                    function_name=function_name,
+                    n_eval=n_samples,
+                    run_dir=sampling_run_dir,
+                    seed=seed,
+                    n_configs_per_hyperparamter=init_design_n_configs_per_hyperparamter,
+                    max_ratio=init_design_max_ratio,
+                    callback=SurrogateModelCallback()
+                )
+
+            df = pd.DataFrame(
+                data=np.concatenate((configurations.T,
+                                     performances.reshape(-1, 1)), axis=1),
+                columns=parameter_names + ["cost"])
+            df.insert(0, "seed", seed)
+            df_samples = pd.concat((df_samples, df))
+
+            df_samples.to_csv(f"{sampling_dir}/samples_{n_samples}.csv", index=False)
 
