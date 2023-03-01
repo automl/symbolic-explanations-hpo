@@ -111,7 +111,7 @@ class MLP:
             warnings.filterwarnings("ignore")
 
             classifier = MLPClassifier(
-                hidden_layer_sizes=n_neurons * n_layer,
+                hidden_layer_sizes=[n_neurons] * n_layer,
                 solver=solver,
                 batch_size=batch_size,
                 activation=activation,
