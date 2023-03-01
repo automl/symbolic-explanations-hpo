@@ -16,7 +16,7 @@ sys.modules['functions'] = functions
 
 
 if __name__ == "__main__":
-    model_name = "symb_best"
+    model_name = "symb_wkendall"
     run_names = [
         # "rand_BDT_learning_rate_n_estimators_digits_20230221_114624",
         # "rand_BDT_learning_rate_n_estimators_iris_20230221_114624",
@@ -246,7 +246,7 @@ if __name__ == "__main__":
         # Plot Complexity
         plt.figure()
         _, ax = plt.subplots(figsize=(8, 5))
-        sns.pointplot(data=df_complexity_all, x="n_samples", y="complexity", hue="Experiment", errorbar="sd",
+        sns.pointplot(data=df_complexity_all, x="n_samples", y="program_operations", hue="Experiment", errorbar="sd",
                       linestyles="", capsize=0.2, errwidth=0.7, scale=0.7, dodge=0.2)#, showfliers=False)
         if data_set:
             plt.title(f"{classifier_title}, Dataset: {data_set}\nOptimize: {param0}, {param1}", fontsize=16)
