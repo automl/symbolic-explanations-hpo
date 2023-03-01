@@ -14,6 +14,7 @@ from utils import functions
 
 sys.modules['functions'] = functions
 
+N_SAMPLES_SPACING = np.linspace(20, 200, 10)
 
 if __name__ == "__main__":
 
@@ -39,8 +40,8 @@ if __name__ == "__main__":
         # "rand_MLP_learning_rate_init_max_iter_iris_20230221_114330",
         # "rand_MLP_learning_rate_init_n_layer_digits_20230221_114329",
         # "rand_MLP_learning_rate_init_n_layer_iris_20230221_114329",
-        # "rand_MLP_learning_rate_init_n_neurons_digits_20230221_114330",
-        # "rand_MLP_learning_rate_init_n_neurons_iris_20230221_114330",
+        "rand_MLP_learning_rate_init_n_neurons_digits_20230221_114330",
+        "rand_MLP_learning_rate_init_n_neurons_iris_20230221_114330",
         # "rand_MLP_max_iter_n_layer_digits_20230221_114332",
         # "rand_MLP_max_iter_n_layer_iris_20230221_114330",
         # "rand_MLP_max_iter_n_neurons_digits_20230221_114332",
@@ -65,8 +66,8 @@ if __name__ == "__main__":
         # "smac_BDT_learning_rate_n_estimators_iris_20230223_162320",
         # "smac_Branin_2D_X0_X1_20230223_162155",
         # "smac_Camelback_2D_X0_X1_20230223_162155",
-        "smac_DT_max_depth_min_samples_leaf_digits_20230224_090309",
-        "smac_DT_max_depth_min_samples_leaf_iris_20230224_090310",
+        # "smac_DT_max_depth_min_samples_leaf_digits_20230224_090309",
+        # "smac_DT_max_depth_min_samples_leaf_iris_20230224_090310",
         # "smac_Exponential_function_2D_X0_X1_20230224_144857",
         # "smac_Linear_2D_X0_X1_20230223_162155",
         # "smac_MLP_learning_rate_init_max_iter_digits_20230223_162437",
@@ -135,8 +136,6 @@ if __name__ == "__main__":
     df_train_samples = pd.read_csv(f"{sampling_dir}/samples.csv")
     sampling_seeds = df_train_samples.seed.unique()
 
-    n_samples_spacing = np.linspace(20, 200, 10)
-
     df_all_metrics = pd.DataFrame()
     df_all_complexity = pd.DataFrame()
     df_all_expr = pd.DataFrame()
@@ -169,7 +168,7 @@ if __name__ == "__main__":
         X_train_all_samples = df_train_samples.query(f"seed == {sampling_seed}")[param_names]
         y_train_all_samples = df_train_samples.query(f"seed == {sampling_seed}")["cost"]
 
-        for n_samples in n_samples_spacing.astype(int):
+        for n_samples in N_SAMPLES_SPACING.astype(int):
 
             X_train = X_train_all_samples[:n_samples]
             y_train = y_train_all_samples[:n_samples]
