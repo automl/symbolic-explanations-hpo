@@ -98,7 +98,7 @@ if __name__ == "__main__":
     # setup logging
     logger = logging.getLogger(__name__)
 
-    logger.info(f"Start sampling for {run_name}.")
+    logger.info(f"Start {run_type} sampling for {run_name}.")
 
     for n_samples in n_samples_to_eval:
 
