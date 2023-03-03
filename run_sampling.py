@@ -22,7 +22,7 @@ class SurrogateModelCallback(Callback):
                 pickle.dump(surrogate_model, surrogate_file)
 
 
-N_SAMPLES_SPACING = np.linspace(20, 200, 10).astype(int)
+N_SAMPLES_SPACING = np.linspace(20, 200, 10, dtype=int).tolist()
 
 
 if __name__ == "__main__":
