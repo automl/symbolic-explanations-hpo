@@ -1,153 +1,77 @@
 import pandas as pd
 import os
-import sys
-import logging
-import dill as pickle
+import shutil
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
+from itertools import combinations
 
-from utils.utils import get_hpo_test_data
-from utils.functions import NamedFunction
-from utils import functions
-
-
-sys.modules['functions'] = functions
+from utils.functions_utils import get_functions2d, NamedFunction
+from utils.model_utils import get_hyperparams, get_classifier_from_run_conf
+from utils.logging_utils import get_logger
 
 
 if __name__ == "__main__":
-    model_name = "symb_wkendall"
-    run_names = [
-        # "rand_BDT_learning_rate_n_estimators_digits_20230221_114624",
-        # "rand_BDT_learning_rate_n_estimators_iris_20230221_114624",
-        # "rand_Branin_2D_X0_X1_20230221_120527",
-        # "rand_Camelback_2D_X0_X1_20230221_120527",
-        "rand_DT_max_depth_min_samples_leaf_digits_20230221_114653",
-        "rand_DT_max_depth_min_samples_leaf_iris_20230221_114651",
-        # "rand_Exponential_function_2D_X0_X1_20230221_120528",
-        # "rand_Linear_2D_X0_X1_20230221_120527",
-        # "rand_MLP_learning_rate_init_max_iter_digits_20230221_114330",
-        # "rand_MLP_learning_rate_init_max_iter_iris_20230221_114330",
-        # "rand_MLP_learning_rate_init_n_layer_digits_20230221_114329",
-        # "rand_MLP_learning_rate_init_n_layer_iris_20230221_114329",
-        "rand_MLP_learning_rate_init_n_neurons_digits_20230221_114330",
-        "rand_MLP_learning_rate_init_n_neurons_iris_20230221_114330",
-        # "rand_MLP_max_iter_n_layer_digits_20230221_114332",
-        # "rand_MLP_max_iter_n_layer_iris_20230221_114330",
-        # "rand_MLP_max_iter_n_neurons_digits_20230221_114332",
-        # "rand_MLP_max_iter_n_neurons_iris_20230221_114330",
-        # "rand_MLP_n_layer_n_neurons_digits_20230221_114330",
-        # "rand_MLP_n_layer_n_neurons_iris_20230221_114330",
-        # "rand_Polynom_function_2D_X0_X1_20230221_120528",
-        # "rand_Rosenbrock_2D_X0_X1_20230221_120527",
-        # "rand_SVM_C_coef0_digits_20230221_114754",
-        # "rand_SVM_C_coef0_iris_20230221_114755",
-        # "rand_SVM_C_degree_digits_20230221_114756",
-        # "rand_SVM_C_degree_iris_20230221_114756",
-        # "rand_SVM_C_gamma_digits_20230221_114754",
-        # "rand_SVM_C_gamma_iris_20230221_114755",
-        # "rand_SVM_coef0_degree_digits_20230221_114754",
-        # "rand_SVM_coef0_degree_iris_20230221_114756",
-        # "rand_SVM_coef0_gamma_digits_20230221_114755",
-        # "rand_SVM_coef0_gamma_iris_20230221_114755",
-        # "rand_SVM_degree_gamma_digits_20230221_114754",
-        # "rand_SVM_degree_gamma_iris_20230221_114754",
-        # "smac_BDT_learning_rate_n_estimators_digits_20230223_162320",
-        # "smac_BDT_learning_rate_n_estimators_iris_20230223_162320",
-        # "smac_Branin_2D_X0_X1_20230223_162155",
-        # "smac_Camelback_2D_X0_X1_20230223_162155",
-        "smac_DT_max_depth_min_samples_leaf_digits_20230224_090309",
-        "smac_DT_max_depth_min_samples_leaf_iris_20230224_090310",
-        # "smac_Exponential_function_2D_X0_X1_20230223_162156",
-        # "smac_Linear_2D_X0_X1_20230223_162155",
-        # "smac_MLP_learning_rate_init_max_iter_digits_20230223_162437",
-        # "smac_MLP_learning_rate_init_max_iter_iris_20230223_162436",
-        # "smac_MLP_learning_rate_init_n_layer_digits_20230223_162436",
-        # "smac_MLP_learning_rate_init_n_layer_iris_20230223_162436",
-        "smac_MLP_learning_rate_init_n_neurons_digits_20230223_162436",
-        "smac_MLP_learning_rate_init_n_neurons_iris_20230223_162436",
-        # "smac_MLP_max_iter_n_layer_digits_20230223_162436",
-        # "smac_MLP_max_iter_n_layer_iris_20230223_162436",
-        # "smac_MLP_max_iter_n_neurons_digits_20230223_162436",
-        # "smac_MLP_max_iter_n_neurons_iris_20230223_162436",
-        # "smac_MLP_n_layer_n_neurons_digits_20230223_162436",
-        # "smac_MLP_n_layer_n_neurons_iris_20230223_162437",
-        # "smac_Polynom_function_2D_X0_X1_20230223_162156",
-        # "smac_Rosenbrock_2D_X0_X1_20230223_162155",
-        # "smac_SVM_C_coef0_digits_20230223_164415",
-        # "smac_SVM_C_coef0_iris_20230223_162859",
-        # "smac_SVM_C_degree_digits_20230223_162900",
-        # "smac_SVM_C_degree_iris_20230223_164415",
-        # "smac_SVM_C_gamma_digits_20230223_162900",
-        # "smac_SVM_C_gamma_iris_20230223_162859",
-        # "smac_SVM_coef0_degree_digits_20230223_162859",
-        # "smac_SVM_coef0_degree_iris_20230223_162859",
-        # "smac_SVM_coef0_gamma_digits_20230223_162859",
-        # "smac_SVM_coef0_gamma_iris_20230223_162859",
-        # "smac_SVM_degree_gamma_digits_20230223_162900",
-        # "smac_SVM_degree_gamma_iris_20230223_162859"
-    ]
+    symb_dir_name = "default"
+    functions = get_functions2d()
+    #models = ["MLP", "SVM", "BDT", "DT"]
+    models = functions
+    data_sets = ["digits", "iris"]
 
-    # set up directories
-    plot_dir = f"learning_curves/plots/combined_plots_smac_rand_best"
+    run_configs = []
+    for model in models:
+        if isinstance(model, NamedFunction):
+            run_configs.append({"model": model, "data_set_name": None})
+        else:
+            hyperparams = get_hyperparams(model_name=model)
+            hp_comb = combinations(hyperparams, 2)
+            for hp_conf in hp_comb:
+                for ds in data_sets:
+                    run_configs.append({"model": model, hp_conf[0]: True, hp_conf[1]: True, "data_set_name": ds})
+
+    # Set up plot directories
+    plot_dir = f"learning_curves/plots/combined_plots"
     complexity_plot_dir = f"{plot_dir}/complexity"
     mse_plot_dir = f"{plot_dir}/mse"
     rmse_plot_dir = f"{plot_dir}/rmse"
     kt_plot_dir = f"{plot_dir}/kt"
-    if not os.path.exists(complexity_plot_dir):
-        os.makedirs(complexity_plot_dir)
-    if not os.path.exists(mse_plot_dir):
-        os.makedirs(mse_plot_dir)
-    if not os.path.exists(rmse_plot_dir):
-        os.makedirs(rmse_plot_dir)
-    if not os.path.exists(kt_plot_dir):
-        os.makedirs(kt_plot_dir)
+    if os.path.exists(plot_dir):
+        shutil.rmtree(plot_dir)
+    os.makedirs(complexity_plot_dir)
+    os.makedirs(mse_plot_dir)
+    os.makedirs(rmse_plot_dir)
+    os.makedirs(kt_plot_dir)
 
-    # setup logging
-    logger = logging.getLogger(__name__)
-    handler2 = logging.StreamHandler()
-    handler2.setLevel("INFO")
-    handler2.setFormatter(
-        logging.Formatter("[%(levelname)s][%(filename)s:%(lineno)d] %(message)s")
-    )
-    handler2.setStream(sys.stdout)
-    logger.root.addHandler(handler2)
-    logger.root.setLevel("INFO")
+    logger = get_logger(filename=f"{plot_dir}/plot_log.log")
 
     logger.info(f"Save plots to {plot_dir}.")
 
-    run_names_cut = ["_".join(run.split("_")[1:-2]) for run in run_names]
-    run_names_cut = set(run_names_cut)
+    for run_conf in run_configs:
 
-    for sampling_run_name in run_names_cut:
-
-        logger.info(f"Create plot for {sampling_run_name}.")
-
-        if "iris" in sampling_run_name:
-            data_set = "Iris"
-        elif "digits" in sampling_run_name:
-            data_set = "Digits"
+        if run_conf['data_set_name']:
+            data_set = run_conf['data_set_name']
+            data_set_postfix = f"_{run_conf['data_set_name']}"
         else:
             data_set = None
-
-        smac_run_name = [filename for filename in
-                         os.listdir(f"learning_curves/runs/") if
-                         filename.startswith(f"smac_{sampling_run_name}")][0]
-        rand_run_name = [filename for filename in
-                         os.listdir(f"learning_curves/runs/") if
-                         filename.startswith(f"rand_{sampling_run_name}")][0]
-        classifier_dir = f"learning_curves/runs/{smac_run_name}"
-
-        with open(f"{classifier_dir}/sampling/classifier.pkl", "rb") as classifier_file:
-            classifier = pickle.load(classifier_file)
-        if isinstance(classifier, NamedFunction):
-            classifier_name = classifier.name
+            data_set_postfix = ""
+        model = run_conf.pop("model")
+        if isinstance(model, NamedFunction):
+            classifier = model
         else:
-            classifier_name = classifier.name
-        optimized_parameters = classifier.configspace.get_hyperparameters()
+            classifier = get_classifier_from_run_conf(model_name=model, run_conf=run_conf)
 
-        logger.info(f"Get test data for {classifier_name}.")
-        X_test, y_test = get_hpo_test_data(classifier, optimized_parameters, 100)
+        function_name = classifier.name if isinstance(classifier, NamedFunction) else model
+        optimized_parameters = classifier.configspace.get_hyperparameters()
+        parameter_names = [param.name for param in optimized_parameters]
+
+        run_name = f"{function_name.replace(' ', '_')}_{'_'.join(parameter_names)}{data_set_postfix}"
+
+        logger.info(f"Create plot for {run_name}.")
+
+        # Load test data
+        logger.info(f"Get test data.")
+        X_test = np.array(pd.read_csv(f"learning_curves/runs_symb/{symb_dir_name}/smac/{run_name}/x_test.csv", header=False))
+        y_test = np.array(pd.read_csv(f"learning_curves/runs_symb/{symb_dir_name}/smac/{run_name}/y_test.csv"))
 
         avg_cost = y_test.mean()
         std_cost = y_test.std()
@@ -158,17 +82,15 @@ if __name__ == "__main__":
         for sampling_type in ["Symbolic Regression (Random Sampling)", "Symbolic Regression (BO Sampling)", "Gaussian Process (BO Sampling)"]:
 
             if sampling_type == "Symbolic Regression (BO Sampling)" or sampling_type == "Gaussian Process (BO Sampling)":
-                run_dir = f"learning_curves/runs/{smac_run_name}"
+                symb_dir = f"learning_curves/runs_symb/{symb_dir_name}/smac/{run_name}"
             else:
-                run_dir = f"learning_curves/runs/{rand_run_name}"
-
-            model_dir = f"{run_dir}/{model_name}"
+                symb_dir = f"learning_curves/runs_symb/{symb_dir_name}/rand/{run_name}"
 
             if sampling_type == "Gaussian Process (BO Sampling)":
-                df_error_metrics = pd.read_csv(f"{run_dir}/surrogate_error_metrics.csv")
+                df_error_metrics = pd.read_csv(f"{symb_dir}/surrogate_error_metrics.csv")
             else:
-                df_error_metrics = pd.read_csv(f"{model_dir}/error_metrics.csv")
-                df_complexity = pd.read_csv(f"{model_dir}/complexity.csv")
+                df_error_metrics = pd.read_csv(f"{symb_dir}/error_metrics.csv")
+                df_complexity = pd.read_csv(f"{symb_dir}/complexity.csv")
                 df_complexity.insert(0, "Experiment", f"{sampling_type}")
                 df_complexity_all = pd.concat((df_complexity_all, df_complexity))
 
@@ -185,10 +107,10 @@ if __name__ == "__main__":
             "SVM": "Support Vector Machine",
             "MLP": "Neural Network",
         }
-        if classifier_name in classifier_titles.keys():
-            classifier_title = classifier_titles[classifier_name]
+        if classifier.name in classifier_titles.keys():
+            classifier_title = classifier_titles[classifier.name]
         else:
-            classifier_title = classifier_name
+            classifier_title = classifier.name
 
         param0 = f"log({optimized_parameters[0].name})" if optimized_parameters[0].log else optimized_parameters[0].name
         param1 = f"log({optimized_parameters[1].name})" if optimized_parameters[1].log else optimized_parameters[1].name
@@ -218,30 +140,30 @@ if __name__ == "__main__":
             title=None, frameon=False,
             fontsize=16
         )
-        plt.savefig(f"{rmse_plot_dir}/{sampling_run_name}_pointplot.png", dpi=400)
+        plt.savefig(f"{rmse_plot_dir}/{run_name}_pointplot.png", dpi=400)
 
 
         # Plot Kendall
-        # plt.figure()
-        # _, ax = plt.subplots(figsize=(8, 5))
-        # sns.pointplot(data=df_error_metrics_all, x="n_samples", y="kt_test_smac", hue="Experiment", errorbar="sd",
-        #               linestyles="", capsize=0.2, errwidth=0.7, scale=0.7, dodge=0.4)#, showfliers=False)
-        # if data_set:
-        #     plt.title(f"{classifier_title}, Dataset: {data_set}\nOptimize: {param0}, {param1}", fontsize=16)
-        # else:
-        #     plt.title(f"{classifier_title}\nOptimize: {param0}, {param1}", fontsize=16)
-        # plt.ylabel("Test Kendall Tau", fontsize=16)
-        #plt.yticks(fontsize=14)
-        # plt.xlabel("Number of Samples", fontsize=16)
-        #plt.xticks(fontsize=14)
-        # plt.tight_layout(rect=(0, 0.05, 1, 1))
-        # sns.move_legend(
-        #     ax, "lower center",
-        #     bbox_to_anchor=(0.45, -0.24),
-        #     ncol=4,
-        #     title=None, frameon=False,
-        # )
-        # plt.savefig(f"{kt_plot_dir}/{sampling_run_name}_pointplot.png", dpi=400)
+        plt.figure()
+        _, ax = plt.subplots(figsize=(8, 5))
+        sns.pointplot(data=df_error_metrics_all, x="n_samples", y="kt_test_smac", hue="Experiment", errorbar="sd",
+                      linestyles="", capsize=0.2, errwidth=0.7, scale=0.7, dodge=0.4)#, showfliers=False)
+        if data_set:
+            plt.title(f"{classifier_title}, Dataset: {data_set}\nOptimize: {param0}, {param1}", fontsize=16)
+        else:
+            plt.title(f"{classifier_title}\nOptimize: {param0}, {param1}", fontsize=16)
+        plt.ylabel("Test Kendall Tau", fontsize=16)
+        plt.yticks(fontsize=14)
+        plt.xlabel("Number of Samples", fontsize=16)
+        plt.xticks(fontsize=14)
+        plt.tight_layout(rect=(0, 0.05, 1, 1))
+        sns.move_legend(
+            ax, "lower center",
+            bbox_to_anchor=(0.45, -0.24),
+            ncol=4,
+            title=None, frameon=False,
+        )
+        plt.savefig(f"{kt_plot_dir}/{run_name}_pointplot.png", dpi=400)
 
         # Plot Complexity
         plt.figure()
@@ -266,5 +188,5 @@ if __name__ == "__main__":
         #     ncol=2,
         #     title=None, frameon=False,
         # )
-        plt.savefig(f"{complexity_plot_dir}/{sampling_run_name}_complexity_pointplot.png", dpi=400)
+        plt.savefig(f"{complexity_plot_dir}/{run_name}_complexity_pointplot.png", dpi=400)
 

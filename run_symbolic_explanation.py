@@ -82,7 +82,7 @@ if __name__ == "__main__":
 
     logger = get_logger(filename=f"{symb_dir}/symb_log.log")
 
-    logger.info(f"Fit Symbolic Model for {run_name}.")
+    logger.info(f"Fit Symbolic Model for {run_name} ({run_type}).")
 
     logger.info(f"Get and save test data.")
     X_test, y_test = get_hpo_test_data(classifier, optimized_parameters, n_test_samples)

@@ -163,16 +163,16 @@ def get_scores(
     Get scores.
     """
     df_scores = pd.DataFrame.from_dict({
-        "mae_train_smac": [mean_absolute_error(y_train, pred_train)],
-        "mae_test_smac": [mean_absolute_error(y_test, pred_test)],
-        "mse_train_smac": [mean_squared_error(y_train, pred_train)],
-        "mse_test_smac": [mean_squared_error(y_test, pred_test)],
-        "r2_train_smac": [r2_score(y_train, pred_train)],
-        "r2_test_smac": [r2_score(y_test, pred_test)],
-        "kt_train_smac": [kendalltau(y_train, pred_train)[0]],
-        "kt_test_smac": [kendalltau(y_test, pred_test)[0]],
-        "kt_p_train_smac": [kendalltau(y_train, pred_train)[1]],
-        "kt_p_test_smac": [kendalltau(y_test, pred_test)[1]],
+        "mae_train": [mean_absolute_error(y_train, pred_train)],
+        "mae_test": [mean_absolute_error(y_test, pred_test)],
+        "mse_train": [mean_squared_error(y_train, pred_train)],
+        "mse_test": [mean_squared_error(y_test, pred_test)],
+        "r2_train": [r2_score(y_train, pred_train)],
+        "r2_test": [r2_score(y_test, pred_test)],
+        "kt_train": [kendalltau(y_train, pred_train)[0]],
+        "kt_test": [kendalltau(y_test, pred_test)[0]],
+        "kt_p_train": [kendalltau(y_train, pred_train)[1]],
+        "kt_p_test": [kendalltau(y_test, pred_test)[1]],
     })
     return df_scores
 
