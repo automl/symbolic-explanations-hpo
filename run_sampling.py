@@ -22,7 +22,7 @@ class SurrogateModelCallback(Callback):
                 pickle.dump(surrogate_model, surrogate_file)
 
 
-N_SAMPLES_SPACING = np.linspace(20, 200, 10)
+N_SAMPLES_SPACING = np.linspace(20, 200, 10).astype(int)
 
 
 if __name__ == "__main__":
@@ -74,7 +74,7 @@ if __name__ == "__main__":
         n_samples_to_eval = [n for n in N_SAMPLES_SPACING if init_design_max_ratio * n < len(
             optimized_parameters) * init_design_n_configs_per_hyperparamter]
         if max(N_SAMPLES_SPACING) not in n_samples_to_eval:
-            n_samples_to_eval = n_samples_to_eval.append(max(N_SAMPLES_SPACING))
+            n_samples_to_eval.append(max(N_SAMPLES_SPACING))
 
     run_name = f"{function_name.replace(' ', '_')}_{'_'.join(parameter_names)}{data_set_postfix}"
 
@@ -137,5 +137,5 @@ if __name__ == "__main__":
             df.insert(0, "seed", seed)
             df_samples = pd.concat((df_samples, df))
 
-            df_samples.to_csv(f"{sampling_run_dir}/samples_{int(n_samples)}.csv", index=False)
+            df_samples.to_csv(f"{sampling_run_dir}/samples_{n_samples}.csv", index=False)
 
