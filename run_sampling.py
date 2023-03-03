@@ -9,8 +9,8 @@ from smac import BlackBoxFacade, Callback
 from itertools import combinations
 
 from utils.smac_utils import run_smac_optimization
-from utils.model_wrapper import SVM, MLP, BDT, DT
-from utils.functions import get_functions2d, NamedFunction
+from utils.functions_utils import get_functions2d, NamedFunction
+from utils.model_utils import get_hyperparams, get_classifier_from_run_conf
 
 
 class SurrogateModelCallback(Callback):
@@ -18,7 +18,7 @@ class SurrogateModelCallback(Callback):
         if config._acquisition_function._eta:
             surrogate_model = config._model
             processed_configs = len(config._processed_configs)
-            with open(f"{sampling_dir}/surrogates/seed{seed}_samples{processed_configs}.pkl", "wb") as surrogate_file:
+            with open(f"{sampling_run_dir}/surrogates/seed{seed}_samples{processed_configs}.pkl", "wb") as surrogate_file:
                 pickle.dump(surrogate_model, surrogate_file)
 
 
@@ -43,30 +43,7 @@ if __name__ == "__main__":
     init_design_n_configs_per_hyperparamter = 8
     sampling_dir_name = "runs_sampling"
 
-    if model == "MLP":
-        hyperparams = [
-            "optimize_n_neurons",
-            "optimize_n_layer",
-            "optimize_learning_rate_init",
-            "optimize_max_iter"
-        ]
-    elif model == "SVM":
-        hyperparams = [
-            "optimize_C",
-            "optimize_degree",
-            "optimize_coef",
-            "optimize_gamma"
-        ]
-    elif model == "BDT":
-        hyperparams = [
-            "optimize_learning_rate", "optimize_n_estimators"
-        ]
-    elif model == "DT":
-        hyperparams = [
-            "optimize_max_depth", "optimize_min_samples_leaf"
-        ]
-    else:
-        hyperparams = None
+    hyperparams = get_hyperparams(model_name=model)
 
     if isinstance(model, NamedFunction):
         data_set_postfix = ""
@@ -79,20 +56,9 @@ if __name__ == "__main__":
                 run_configs.append({hp_conf[0]: True, hp_conf[1]: True, "data_set_name": ds})
         run_conf = run_configs[int(job_id)]
         data_set_postfix = f"_{run_conf['data_set_name']}"
-        if model == "MLP":
-            classifier = MLP(**run_conf)
-        elif model == "SVM":  # set lower tolerance, iris (stopping_criteria=0.00001)
-            classifier = SVM(**run_conf)
-        elif model == "BDT":
-            classifier = BDT(**run_conf)
-        elif model == "DT":
-            classifier = DT(**run_conf)
-        else:
-            print(f"Unknown model: {model}")
-            classifier = None
+        classifier = get_classifier_from_run_conf(model_name=model, run_conf=run_conf)
 
     function_name = classifier.name if isinstance(classifier, NamedFunction) else model
-
     optimized_parameters = classifier.configspace.get_hyperparameters()
     parameter_names = [param.name for param in optimized_parameters]
 
@@ -110,7 +76,7 @@ if __name__ == "__main__":
         if max(N_SAMPLES_SPACING) not in n_samples_to_eval:
             n_samples_to_eval = n_samples_to_eval.append(max(N_SAMPLES_SPACING))
 
-    run_name = f"{run_type}_{function_name.replace(' ', '_')}_{'_'.join(parameter_names)}{data_set_postfix}"
+    run_name = f"{function_name.replace(' ', '_')}_{'_'.join(parameter_names)}{data_set_postfix}"
 
     sampling_dir = f"learning_curves/{sampling_dir_name}/{run_type}"
     sampling_run_dir = f"{sampling_dir}/{run_name}"
@@ -171,5 +137,5 @@ if __name__ == "__main__":
             df.insert(0, "seed", seed)
             df_samples = pd.concat((df_samples, df))
 
-            df_samples.to_csv(f"{sampling_dir}/samples_{n_samples}.csv", index=False)
+            df_samples.to_csv(f"{sampling_run_dir}/samples_{int(n_samples)}.csv", index=False)
 

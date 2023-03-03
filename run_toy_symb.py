@@ -22,7 +22,7 @@ from utils.utils import (
     write_dict_to_cfg_file,
 )
 from utils.smac_utils import run_smac_optimization
-from utils.functions import get_functions1d, get_functions2d
+from utils.functions_utils import get_functions1d, get_functions2d
 
 
 if __name__ == "__main__":
