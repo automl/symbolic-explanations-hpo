@@ -30,10 +30,8 @@ if __name__ == "__main__":
     symb_dir_name = "default"
 
     functions = get_functions2d()
-    # Choose from "MLP", "SVM", "BDT", "DT"
-    model = "DT"
-    # Or choose synthetic function instead
-    #model = functions[int(args.job_id)]
+    #models = ["MLP", "SVM", "BDT", "DT"]
+    models = functions
     data_sets = ["digits", "iris"]
     use_random_samples = False
 
@@ -41,19 +39,25 @@ if __name__ == "__main__":
     init_design_n_configs_per_hyperparamter = 8
     sampling_dir_name = "runs_sampling"
 
-    hyperparams = get_hyperparams(model_name=model)
-
-    if isinstance(model, NamedFunction):
+    run_configs = []
+    for model in models:
+        if isinstance(model, NamedFunction):
+            run_configs.append({"model": model, "data_set_name": None})
+        else:
+            hyperparams = get_hyperparams(model_name=model)
+            hp_comb = combinations(hyperparams, 2)
+            for hp_conf in hp_comb:
+                for ds in data_sets:
+                    run_configs.append({"model": model, hp_conf[0]: True, hp_conf[1]: True, "data_set_name": ds})
+    run_conf = run_configs[int(job_id)]
+    if run_conf['data_set_name']:
+        data_set_postfix = f"_{run_conf['data_set_name']}"
+    else:
         data_set_postfix = ""
+    model = run_conf.pop("model")
+    if isinstance(model, NamedFunction):
         classifier = model
     else:
-        hp_comb = combinations(hyperparams, 2)
-        run_configs = []
-        for hp_conf in hp_comb:
-            for ds in data_sets:
-                run_configs.append({hp_conf[0]: True, hp_conf[1]: True, "data_set_name": ds})
-        run_conf = run_configs[int(job_id)]
-        data_set_postfix = f"_{run_conf['data_set_name']}"
         classifier = get_classifier_from_run_conf(model_name=model, run_conf=run_conf)
 
     function_name = classifier.name if isinstance(classifier, NamedFunction) else model
