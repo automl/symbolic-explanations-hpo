@@ -1,15 +1,16 @@
-import os
-import logging
 import dill as pickle
 import argparse
-import sys
 import numpy as np
 import pandas as pd
+from itertools import combinations
 
 from utils.utils import get_hpo_test_data, get_scores, get_surrogate_predictions
-from utils import functions
+from utils.functions_utils import get_functions2d, NamedFunction
+from utils.model_utils import get_hyperparams, get_classifier_from_run_conf
+from utils.logging_utils import get_logger
 
-sys.modules['functions'] = functions
+
+N_SAMPLES_SPACING = np.linspace(20, 200, 10)
 
 
 if __name__ == "__main__":
@@ -19,78 +20,52 @@ if __name__ == "__main__":
     args = parser.parse_args()
     job_id = args.job_id
 
+    functions = get_functions2d()
+    #models = ["MLP", "SVM", "BDT", "DT"]
+    models = functions
+    data_sets = ["digits", "iris"]
+    
+    init_design_max_ratio = 0.25
+    init_design_n_configs_per_hyperparamter = 8
+    sampling_dir_name = "runs_sampling"
+
     n_test_samples = 100
 
-    sampling_run_names = [
-        # "smac_BDT_learning_rate_n_estimators_digits_20230223_162320",
-        # "smac_BDT_learning_rate_n_estimators_iris_20230223_162320",
-        # "smac_Branin_2D_X0_X1_20230223_162155",
-        # "smac_Camelback_2D_X0_X1_20230223_162155",
-        "smac_DT_max_depth_min_samples_leaf_digits_20230224_090309",
-        "smac_DT_max_depth_min_samples_leaf_iris_20230224_090310",
-        # "smac_Exponential_function_2D_X0_X1_20230223_162156",
-        # "smac_Linear_2D_X0_X1_20230223_162155",
-        # "smac_MLP_learning_rate_init_max_iter_digits_20230223_162437",
-        # "smac_MLP_learning_rate_init_max_iter_iris_20230223_162436",
-        # "smac_MLP_learning_rate_init_n_layer_digits_20230223_162436",
-        # "smac_MLP_learning_rate_init_n_layer_iris_20230223_162436",
-        # "smac_MLP_learning_rate_init_n_neurons_digits_20230223_162436",
-        # "smac_MLP_learning_rate_init_n_neurons_iris_20230223_162436",
-        # "smac_MLP_max_iter_n_layer_digits_20230223_162436",
-        # "smac_MLP_max_iter_n_layer_iris_20230223_162436",
-        # "smac_MLP_max_iter_n_neurons_digits_20230223_162436",
-        # "smac_MLP_max_iter_n_neurons_iris_20230223_162436",
-        # "smac_MLP_n_layer_n_neurons_digits_20230223_162436",
-        # "smac_MLP_n_layer_n_neurons_iris_20230223_162437",
-        # "smac_Polynom_function_2D_X0_X1_20230223_162156",
-        # "smac_Rosenbrock_2D_X0_X1_20230223_162155",
-        # "smac_SVM_C_coef0_digits_20230223_162857",
-        # "smac_SVM_C_coef0_digits_20230223_164415",
-        # "smac_SVM_C_coef0_iris_20230223_162859",
-        # "smac_SVM_C_degree_digits_20230223_162900",
-        # "smac_SVM_C_degree_iris_20230223_162900",
-        # "smac_SVM_C_degree_iris_20230223_164415",
-        # "smac_SVM_C_gamma_digits_20230223_162900",
-        # "smac_SVM_C_gamma_iris_20230223_162859",
-        # "smac_SVM_coef0_degree_digits_20230223_162859",
-        # "smac_SVM_coef0_degree_iris_20230223_162859",
-        # "smac_SVM_coef0_gamma_digits_20230223_162859",
-        # "smac_SVM_coef0_gamma_iris_20230223_162859",
-        # "smac_SVM_degree_gamma_digits_20230223_162900",
-        # "smac_SVM_degree_gamma_iris_20230223_162859"
-    ]
-    sampling_run_name = sampling_run_names[int(job_id)]
+    run_configs = []
+    for model in models:
+        if isinstance(model, NamedFunction):
+            run_configs.append({"model": model, "data_set_name": None})
+        else:
+            hyperparams = get_hyperparams(model_name=model)
+            hp_comb = combinations(hyperparams, 2)
+            for hp_conf in hp_comb:
+                for ds in data_sets:
+                    run_configs.append({"model": model, hp_conf[0]: True, hp_conf[1]: True, "data_set_name": ds})
+    run_conf = run_configs[int(job_id)]
+    if run_conf['data_set_name']:
+        data_set_postfix = f"_{run_conf['data_set_name']}"
+    else:
+        data_set_postfix = ""
+    model = run_conf.pop("model")
+    if isinstance(model, NamedFunction):
+        classifier = model
+    else:
+        classifier = get_classifier_from_run_conf(model_name=model, run_conf=run_conf)
 
-    run_dir = f"learning_curves/runs/{sampling_run_name}"
-    sampling_dir = f"{run_dir}/sampling"
-    if not os.path.exists(f"{run_dir}/symb_models"):
-        os.makedirs(f"{run_dir}/symb_models")
-    model = sampling_run_name.split("_")[1]
+    function_name = classifier.name if isinstance(classifier, NamedFunction) else model
+    optimized_parameters = classifier.configspace.get_hyperparameters()
+    parameter_names = [param.name for param in optimized_parameters]
+
+    run_name = f"{function_name.replace(' ', '_')}_{'_'.join(parameter_names)}{data_set_postfix}"
+
+    sampling_dir = f"learning_curves/{sampling_dir_name}/smac"
+    sampling_run_dir = f"{sampling_dir}/{run_name}"
+    surr_dir = f"learning_curves/runs_surr/{run_name}"
 
     # setup logging
-    logger = logging.getLogger(__name__)
-    handler = logging.FileHandler(filename=f"{run_dir}/surrogate_log.log", encoding="utf8")
-    handler.setLevel("INFO")
-    handler.setFormatter(
-        logging.Formatter("[%(levelname)s][%(filename)s:%(lineno)d] %(message)s")
-    )
-    logger.root.addHandler(handler)
-    handler2 = logging.StreamHandler()
-    handler2.setLevel("INFO")
-    handler2.setFormatter(
-        logging.Formatter("[%(levelname)s][%(filename)s:%(lineno)d] %(message)s")
-    )
-    handler2.setStream(sys.stdout)
-    logger.root.addHandler(handler2)
-    logger.root.setLevel("INFO")
+    logger = get_logger(filename=f"{surr_dir}/surrogate_log.log")
 
-    with open(f"{sampling_dir}/classifier.pkl", "rb") as classifier_file:
-        classifier = pickle.load(classifier_file)
-
-    optimized_parameters = classifier.configspace.get_hyperparameters()
-    param_names = [param.name for param in optimized_parameters]
-
-    logger.info(f"Fit Symbolic Model for {sampling_run_name}.")
+    logger.info(f"Evaluate surrogate model for {run_name}.")
 
     X_test, y_test = get_hpo_test_data(classifier, optimized_parameters, n_test_samples)
 
@@ -102,7 +77,7 @@ if __name__ == "__main__":
     df_all_metrics = pd.DataFrame()
 
     for sampling_seed in sampling_seeds:
-        X_train_all_samples = df_train_samples.query(f"seed == {sampling_seed}")[param_names]
+        X_train_all_samples = df_train_samples.query(f"seed == {sampling_seed}")[parameter_names]
         y_train_all_samples = df_train_samples.query(f"seed == {sampling_seed}")["cost"]
 
         for n_samples in n_samples_spacing.astype(int):
@@ -112,9 +87,16 @@ if __name__ == "__main__":
 
             logger.info(f"Evaluate Surrogate Model for {n_samples} samples and sampling seed {sampling_seed}.")
 
+            # Load surrogate model
+            # Get specific surrogate file for each sample size for which the number of initial designs differs from
+            # the maximum number of initial designs (number of hyperparameters * init_design_n_configs_per_hyperparamter)
+            if init_design_max_ratio * n_samples < len(
+                    optimized_parameters) * init_design_n_configs_per_hyperparamter:
+                n_eval = n_samples
+            else:
+                n_eval = max(N_SAMPLES_SPACING)
             try:
-                # load surrogate model
-                with open(f"{run_dir}/sampling/surrogates/seed{sampling_seed}_samples{n_samples}.pkl",
+                with open(f"{sampling_dir}/surrogates/n_eval{n_eval}_samples{n_samples}_seed{sampling_seed}.pkl",
                           "rb") as surrogate_file:
                     surrogate_model = pickle.load(surrogate_file)
 
@@ -129,6 +111,7 @@ if __name__ == "__main__":
                 df_metrics.insert(0, "sampling_seed", sampling_seed)
                 df_all_metrics = pd.concat((df_all_metrics, df_metrics))
             except:
-                logger.warning(f"File seed{sampling_seed}_samples{n_samples}.pkl could not be loaded, skip.")
+                logger.warning(f"File n_eval{n_eval}_samples{n_samples}_seed{sampling_seed}.pkl could not be loaded, "
+                               f"skip.")
 
-            df_all_metrics.to_csv(f"{run_dir}/surrogate_error_metrics.csv", index=False)
+            df_all_metrics.to_csv(f"{surr_dir}/error_metrics.csv", index=False)

@@ -18,8 +18,11 @@ class SurrogateModelCallback(Callback):
         if config._acquisition_function._eta:
             surrogate_model = config._model
             processed_configs = len(config._processed_configs)
-            with open(f"{sampling_run_dir}/surrogates/seed{seed}_samples{processed_configs}.pkl", "wb") as surrogate_file:
-                pickle.dump(surrogate_model, surrogate_file)
+            if processed_configs in N_SAMPLES_SPACING:
+                with open(
+                        f"{sampling_run_dir}/surrogates/n_eval{n_samples}_samples{processed_configs}_seed{seed}.pkl",
+                        "wb") as surrogate_file:
+                    pickle.dump(surrogate_model, surrogate_file)
 
 
 N_SAMPLES_SPACING = np.linspace(20, 200, 10, dtype=int).tolist()
@@ -34,8 +37,8 @@ if __name__ == "__main__":
 
     functions = get_functions2d()
     n_seeds = 5
-    #models = ["MLP", "SVM", "BDT", "DT"]
-    models = functions
+    models = ["MLP", "SVM", "BDT", "DT"]
+    #models = functions
     data_sets = ["digits", "iris"]
     use_random_samples = False
 
