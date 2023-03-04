@@ -139,6 +139,7 @@ if __name__ == "__main__":
             fontsize=14
         )
         plt.savefig(f"{rmse_plot_dir}/{run_name}_pointplot.png", dpi=400)
+        plt.close()
 
 
         # Plot Kendall
@@ -163,6 +164,7 @@ if __name__ == "__main__":
             fontsize=14
         )
         plt.savefig(f"{kt_plot_dir}/{run_name}_pointplot.png", dpi=400)
+        plt.close()
 
         # Plot Complexity
         plt.figure()
@@ -187,4 +189,5 @@ if __name__ == "__main__":
             fontsize=14
         )
         plt.savefig(f"{complexity_plot_dir}/{run_name}_complexity_pointplot.png", dpi=400)
+        plt.close()
 
