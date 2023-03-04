@@ -82,6 +82,8 @@ if __name__ == "__main__":
         logger.info(f"No test data found, create test data for {run_name}.")
         X_test, y_test = get_hpo_test_data(classifier, optimized_parameters, n_test_samples)
 
+    df_all_metrics = []
+
     for n_samples in N_SAMPLES_SPACING:
         # Get specific surrogate file for each sample size for which the number of initial designs differs from
         # the maximum number of initial designs (number of hyperparameters * init_design_n_configs_per_hyperparamter)
