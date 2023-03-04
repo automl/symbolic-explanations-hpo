@@ -117,7 +117,7 @@ if __name__ == "__main__":
         # Plot RMSE
         plt.figure()
         _, ax = plt.subplots(figsize=(8, 5))
-        line = plt.axhline(y=std_cost, color='darkred', linestyle='--', linewidth=0.5, label="Test Standard Deviation")
+        line = plt.axhline(y=std_cost, color='darkred', linestyle='--', linewidth=0.5, label="Test Std.")
         sns.pointplot(data=df_error_metrics_all, x="n_samples", y="rmse_test", hue="Experiment", errorbar="sd",
                       linestyles="", capsize=0.2, errwidth=0.7, scale=0.7, dodge=0.4)#, showfliers=False)
         if data_set:
@@ -129,7 +129,7 @@ if __name__ == "__main__":
         plt.yticks(fontsize=14)
         plt.xlabel("Number of Samples", fontsize=16)
         plt.xticks(fontsize=14)
-        plt.ylim(0., 0.32)
+        plt.ylim(0., 0.4)
         plt.tight_layout(rect=(0, 0.05, 1, 1))
         sns.move_legend(
             ax, "lower center",
@@ -155,6 +155,7 @@ if __name__ == "__main__":
         plt.yticks(fontsize=14)
         plt.xlabel("Number of Samples", fontsize=16)
         plt.xticks(fontsize=14)
+        plt.ylim(-0.6, 1.)
         plt.tight_layout(rect=(0, 0.05, 1, 1))
         sns.move_legend(
             ax, "lower center",
