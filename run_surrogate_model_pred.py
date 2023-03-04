@@ -12,7 +12,7 @@ from utils.model_utils import get_hyperparams, get_classifier_from_run_conf
 from utils.logging_utils import get_logger
 
 
-N_SAMPLES_SPACING = np.linspace(20, 200, 10)
+N_SAMPLES_SPACING = np.linspace(20, 200, 10, dtype=int).tolist()
 
 
 if __name__ == "__main__":

@@ -15,7 +15,7 @@ from utils.model_utils import get_hyperparams, get_classifier_from_run_conf
 from utils.logging_utils import get_logger
 
 
-N_SAMPLES_SPACING = np.linspace(20, 200, 10)
+N_SAMPLES_SPACING = np.linspace(20, 200, 10, dtype=int).tolist()
 
 
 if __name__ == "__main__":
@@ -30,8 +30,8 @@ if __name__ == "__main__":
     symb_dir_name = "default"
 
     functions = get_functions2d()
-    #models = ["MLP", "SVM", "BDT", "DT"]
-    models = functions
+    models = ["MLP", "SVM", "BDT", "DT"]
+    #models = functions
     data_sets = ["digits", "iris"]
     use_random_samples = False
 
@@ -78,7 +78,6 @@ if __name__ == "__main__":
     if os.path.exists(symb_dir):
         shutil.rmtree(symb_dir)
     os.makedirs(f"{symb_dir}/symb_models")
-    model = run_name.split("_")[1]
 
     logger = get_logger(filename=f"{symb_dir}/symb_log.log")
 
@@ -108,7 +107,7 @@ if __name__ == "__main__":
         target_file_path=f"{symb_dir}/symbolic_regression_params.cfg",
     )
 
-    for n_samples in N_SAMPLES_SPACING.astype(int):
+    for n_samples in N_SAMPLES_SPACING:
         # Get specific sampling file for each sample size for which the number of initial designs differs from
         # the maximum number of initial designs (number of hyperparameters * init_design_n_configs_per_hyperparamter)
         if init_design_max_ratio * n_samples < len(
