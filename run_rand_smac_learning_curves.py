@@ -79,12 +79,12 @@ if __name__ == "__main__":
         df_error_metrics_all = pd.DataFrame()
         df_complexity_all = pd.DataFrame()
 
-        for sampling_type in ["SR (Random Sampling)", "SR (BO Sampling)", "GP (BO Sampling)"]:
+        for sampling_type in ["SR (Random)", "SR (BO)", "GP (BO)"]:
 
-            if sampling_type == "GP (BO Sampling)":
+            if sampling_type == "GP (BO)":
                 symb_dir = f"learning_curves/runs_surr/{run_name}"
             else:
-                if sampling_type == "SR (BO Sampling)":
+                if sampling_type == "SR (BO)":
                     symb_dir = f"learning_curves/runs_symb/{symb_dir_name}/smac/{run_name}"
                 else:
                     symb_dir = f"learning_curves/runs_symb/{symb_dir_name}/rand/{run_name}"
@@ -133,7 +133,7 @@ if __name__ == "__main__":
         plt.tight_layout(rect=(0, 0.05, 1, 1))
         sns.move_legend(
             ax, "lower center",
-            bbox_to_anchor=(0.45, -0.3),
+            bbox_to_anchor=(0.45, -0.32),
             ncol=4,
             title=None, frameon=False,
             fontsize=14
@@ -158,7 +158,7 @@ if __name__ == "__main__":
         plt.tight_layout(rect=(0, 0.05, 1, 1))
         sns.move_legend(
             ax, "lower center",
-            bbox_to_anchor=(0.45, -0.3),
+            bbox_to_anchor=(0.45, -0.32),
             ncol=4,
             title=None, frameon=False,
             fontsize=14
@@ -183,7 +183,7 @@ if __name__ == "__main__":
         plt.tight_layout(rect=(0, 0.05, 1, 1))
         sns.move_legend(
             ax, "lower center",
-            bbox_to_anchor=(0.45, -0.3),
+            bbox_to_anchor=(0.45, -0.32),
             ncol=2,
             title=None, frameon=False,
             fontsize=14
