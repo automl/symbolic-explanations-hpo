@@ -81,18 +81,18 @@ if __name__ == "__main__":
 
         for sampling_type in ["Symbolic Regression (Random Sampling)", "Symbolic Regression (BO Sampling)", "Gaussian Process (BO Sampling)"]:
 
-            if sampling_type == "Symbolic Regression (BO Sampling)":
-                symb_dir = f"learning_curves/runs_symb/{symb_dir_name}/smac/{run_name}"
-            elif sampling_type == "Gaussian Process (BO Sampling)":
+            if sampling_type == "Gaussian Process (BO Sampling)":
                 symb_dir = f"learning_curves/runs_surr/{run_name}"
             else:
-                symb_dir = f"learning_curves/runs_symb/{symb_dir_name}/rand/{run_name}"
+                if sampling_type == "Symbolic Regression (BO Sampling)":
+                    symb_dir = f"learning_curves/runs_symb/{symb_dir_name}/smac/{run_name}"
+                else:
+                    symb_dir = f"learning_curves/runs_symb/{symb_dir_name}/rand/{run_name}"
+                df_complexity = pd.read_csv(f"{symb_dir}/complexity.csv")
+                df_complexity.insert(0, "Experiment", f"{sampling_type}")
+                df_complexity_all = pd.concat((df_complexity_all, df_complexity))
 
             df_error_metrics = pd.read_csv(f"{symb_dir}/error_metrics.csv")
-            df_complexity = pd.read_csv(f"{symb_dir}/complexity.csv")
-            df_complexity.insert(0, "Experiment", f"{sampling_type}")
-            df_complexity_all = pd.concat((df_complexity_all, df_complexity))
-
             df_error_metrics["rmse_test"] = np.sqrt(df_error_metrics["mse_test"])
             df_error_metrics["rmse_train"] = np.sqrt(df_error_metrics["mse_train"])
             df_error_metrics.insert(0, "Experiment", f"{sampling_type}")
