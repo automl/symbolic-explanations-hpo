@@ -70,7 +70,7 @@ if __name__ == "__main__":
 
         # Load test data
         logger.info(f"Get test data.")
-        X_test = np.array(pd.read_csv(f"learning_curves/runs_symb/{symb_dir_name}/smac/{run_name}/x_test.csv", header=False))
+        X_test = np.array(pd.read_csv(f"learning_curves/runs_symb/{symb_dir_name}/smac/{run_name}/x_test.csv"))
         y_test = np.array(pd.read_csv(f"learning_curves/runs_symb/{symb_dir_name}/smac/{run_name}/y_test.csv"))
 
         avg_cost = y_test.mean()
@@ -96,8 +96,8 @@ if __name__ == "__main__":
                 df_complexity.insert(0, "Experiment", f"{sampling_type}")
                 df_complexity_all = pd.concat((df_complexity_all, df_complexity))
 
-            df_error_metrics["rmse_test_smac"] = np.sqrt(df_error_metrics["mse_test_smac"])
-            df_error_metrics["rmse_train_smac"] = np.sqrt(df_error_metrics["mse_train_smac"])
+            df_error_metrics["rmse_test"] = np.sqrt(df_error_metrics["mse_test"])
+            df_error_metrics["rmse_train"] = np.sqrt(df_error_metrics["mse_train"])
             df_error_metrics.insert(0, "Experiment", f"{sampling_type}")
             df_error_metrics_all = pd.concat((df_error_metrics_all, df_error_metrics))
 
@@ -121,7 +121,7 @@ if __name__ == "__main__":
         plt.figure()
         _, ax = plt.subplots(figsize=(8, 5))
         line = plt.axhline(y=std_cost, color='darkred', linestyle='--', linewidth=0.5, label="Test Standard Deviation")
-        sns.pointplot(data=df_error_metrics_all, x="n_samples", y="rmse_test_smac", hue="Experiment", errorbar="sd",
+        sns.pointplot(data=df_error_metrics_all, x="n_samples", y="rmse_test", hue="Experiment", errorbar="sd",
                       linestyles="", capsize=0.2, errwidth=0.7, scale=0.7, dodge=0.4)#, showfliers=False)
         if data_set:
             plt.title(f"{classifier_title}, Dataset: {data_set}\nOptimize: {param0}, {param1}", fontsize=16)
@@ -147,7 +147,7 @@ if __name__ == "__main__":
         # Plot Kendall
         plt.figure()
         _, ax = plt.subplots(figsize=(8, 5))
-        sns.pointplot(data=df_error_metrics_all, x="n_samples", y="kt_test_smac", hue="Experiment", errorbar="sd",
+        sns.pointplot(data=df_error_metrics_all, x="n_samples", y="kt_test", hue="Experiment", errorbar="sd",
                       linestyles="", capsize=0.2, errwidth=0.7, scale=0.7, dodge=0.4)#, showfliers=False)
         if data_set:
             plt.title(f"{classifier_title}, Dataset: {data_set}\nOptimize: {param0}, {param1}", fontsize=16)
