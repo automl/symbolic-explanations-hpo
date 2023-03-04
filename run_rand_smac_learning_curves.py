@@ -79,12 +79,12 @@ if __name__ == "__main__":
         df_error_metrics_all = pd.DataFrame()
         df_complexity_all = pd.DataFrame()
 
-        for sampling_type in ["Symbolic Regression (Random Sampling)", "Symbolic Regression (BO Sampling)", "Gaussian Process (BO Sampling)"]:
+        for sampling_type in ["SR (Random Sampling)", "SR (BO Sampling)", "GP (BO Sampling)"]:
 
-            if sampling_type == "Gaussian Process (BO Sampling)":
+            if sampling_type == "GP (BO Sampling)":
                 symb_dir = f"learning_curves/runs_surr/{run_name}"
             else:
-                if sampling_type == "Symbolic Regression (BO Sampling)":
+                if sampling_type == "SR (BO Sampling)":
                     symb_dir = f"learning_curves/runs_symb/{symb_dir_name}/smac/{run_name}"
                 else:
                     symb_dir = f"learning_curves/runs_symb/{symb_dir_name}/rand/{run_name}"
@@ -136,7 +136,7 @@ if __name__ == "__main__":
             bbox_to_anchor=(0.45, -0.3),
             ncol=4,
             title=None, frameon=False,
-            fontsize=16
+            fontsize=14
         )
         plt.savefig(f"{rmse_plot_dir}/{run_name}_pointplot.png", dpi=400)
 
@@ -157,9 +157,10 @@ if __name__ == "__main__":
         plt.tight_layout(rect=(0, 0.05, 1, 1))
         sns.move_legend(
             ax, "lower center",
-            bbox_to_anchor=(0.45, -0.24),
+            bbox_to_anchor=(0.45, -0.3),
             ncol=4,
             title=None, frameon=False,
+            fontsize=14
         )
         plt.savefig(f"{kt_plot_dir}/{run_name}_pointplot.png", dpi=400)
 
@@ -180,9 +181,10 @@ if __name__ == "__main__":
         plt.tight_layout(rect=(0, 0.05, 1, 1))
         sns.move_legend(
             ax, "lower center",
-            bbox_to_anchor=(0.45, -0.24),
+            bbox_to_anchor=(0.45, -0.3),
             ncol=2,
             title=None, frameon=False,
+            fontsize=14
         )
         plt.savefig(f"{complexity_plot_dir}/{run_name}_complexity_pointplot.png", dpi=400)
 
