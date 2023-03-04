@@ -81,8 +81,10 @@ if __name__ == "__main__":
 
         for sampling_type in ["Symbolic Regression (Random Sampling)", "Symbolic Regression (BO Sampling)", "Gaussian Process (BO Sampling)"]:
 
-            if sampling_type == "Symbolic Regression (BO Sampling)" or sampling_type == "Gaussian Process (BO Sampling)":
+            if sampling_type == "Symbolic Regression (BO Sampling)":
                 symb_dir = f"learning_curves/runs_symb/{symb_dir_name}/smac/{run_name}"
+            elif sampling_type == "Gaussian Process (BO Sampling)":
+                symb_dir = f"learning_curves/runs_surr/{run_name}"
             else:
                 symb_dir = f"learning_curves/runs_symb/{symb_dir_name}/rand/{run_name}"
 
@@ -131,8 +133,7 @@ if __name__ == "__main__":
         plt.xlabel("Number of Samples", fontsize=16)
         plt.xticks(fontsize=14)
         plt.ylim(0., 0.32)
-        plt.tight_layout(rect=(0, 0, 1, 1))
-        plt.legend([], [], frameon=False)
+        plt.tight_layout(rect=(0, 0.05, 1, 1))
         sns.move_legend(
             ax, "lower center",
             bbox_to_anchor=(0.45, -0.3),
@@ -174,19 +175,17 @@ if __name__ == "__main__":
             plt.title(f"{classifier_title}, Dataset: {data_set}\nOptimize: {param0}, {param1}", fontsize=16)
         else:
             plt.title(f"{classifier_title}\nOptimize: {param0}, {param1}", fontsize=16)
-       # plt.title("Symbolic Regression Program Length")
         plt.ylabel("Number of Operations in Formula", fontsize=16)
         plt.yticks(np.arange(0, 20, 2.0), fontsize=14)
         plt.xlabel("Number of Samples", fontsize=16)
         plt.xticks(fontsize=14)
         plt.ylim(0, 18.5)
-        plt.tight_layout()#rect=(0, 0.05, 1, 1))
-        plt.legend([], [], frameon=False)
-        # sns.move_legend(
-        #     ax, "lower center",
-        #     bbox_to_anchor=(0.45, -0.24),
-        #     ncol=2,
-        #     title=None, frameon=False,
-        # )
+        plt.tight_layout(rect=(0, 0.05, 1, 1))
+        sns.move_legend(
+            ax, "lower center",
+            bbox_to_anchor=(0.45, -0.24),
+            ncol=2,
+            title=None, frameon=False,
+        )
         plt.savefig(f"{complexity_plot_dir}/{run_name}_complexity_pointplot.png", dpi=400)
 
