@@ -114,7 +114,7 @@ if __name__ == "__main__":
 
             # Load surrogate model
             try:
-                with open(f"{sampling_dir}/surrogates/n_eval{n_eval}_samples{n_samples}_seed{sampling_seed}.pkl",
+                with open(f"{sampling_run_dir}/surrogates/n_eval{n_eval}_samples{n_samples}_seed{sampling_seed}.pkl",
                           "rb") as surrogate_file:
                     surrogate_model = pickle.load(surrogate_file)
 
