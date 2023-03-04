@@ -1,3 +1,5 @@
+import os
+import shutil
 import dill as pickle
 import argparse
 import numpy as np
@@ -24,7 +26,7 @@ if __name__ == "__main__":
     #models = ["MLP", "SVM", "BDT", "DT"]
     models = functions
     data_sets = ["digits", "iris"]
-    
+
     init_design_max_ratio = 0.25
     init_design_n_configs_per_hyperparamter = 8
     sampling_dir_name = "runs_sampling"
@@ -61,6 +63,9 @@ if __name__ == "__main__":
     sampling_dir = f"learning_curves/{sampling_dir_name}/smac"
     sampling_run_dir = f"{sampling_dir}/{run_name}"
     surr_dir = f"learning_curves/runs_surr/{run_name}"
+    if os.path.exists(surr_dir):
+        shutil.rmtree(surr_dir)
+    os.makedirs(surr_dir)
 
     # setup logging
     logger = get_logger(filename=f"{surr_dir}/surrogate_log.log")
