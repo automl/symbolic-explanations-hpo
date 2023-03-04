@@ -23,8 +23,8 @@ if __name__ == "__main__":
     job_id = args.job_id
 
     functions = get_functions2d()
-    #models = ["MLP", "SVM", "BDT", "DT"]
-    models = functions
+    models = ["MLP", "SVM", "BDT", "DT"]
+    #models = functions
     data_sets = ["digits", "iris"]
 
     init_design_max_ratio = 0.25
@@ -72,34 +72,45 @@ if __name__ == "__main__":
 
     logger.info(f"Evaluate surrogate model for {run_name}.")
 
-    X_test, y_test = get_hpo_test_data(classifier, optimized_parameters, n_test_samples)
+    # Load test data
+    logger.info(f"Get test data.")
+    try:
+        X_test = np.array(
+            pd.read_csv(f"learning_curves/runs_symb/default/smac/{run_name}/x_test.csv", header=False))
+        y_test = np.array(pd.read_csv(f"learning_curves/runs_symb/default/smac/{run_name}/y_test.csv"))
+    except:
+        logger.info(f"No test data found, create test data for {run_name}.")
+        X_test, y_test = get_hpo_test_data(classifier, optimized_parameters, n_test_samples)
 
-    df_train_samples = pd.read_csv(f"{sampling_dir}/samples.csv")
-    sampling_seeds = df_train_samples.seed.unique()
+    for n_samples in N_SAMPLES_SPACING:
+        # Get specific surrogate file for each sample size for which the number of initial designs differs from
+        # the maximum number of initial designs (number of hyperparameters * init_design_n_configs_per_hyperparamter)
+        if init_design_max_ratio * n_samples < len(
+                optimized_parameters) * init_design_n_configs_per_hyperparamter:
+            n_eval = n_samples
+        else:
+            n_eval = max(N_SAMPLES_SPACING)
 
-    n_samples_spacing = np.linspace(20, 200, 10)
+        df_train_samples = pd.read_csv(f"{sampling_run_dir}/samples_{n_eval}.csv")
 
-    df_all_metrics = pd.DataFrame()
+        sampling_seeds = df_train_samples.seed.unique()
 
-    for sampling_seed in sampling_seeds:
-        X_train_all_samples = df_train_samples.query(f"seed == {sampling_seed}")[parameter_names]
-        y_train_all_samples = df_train_samples.query(f"seed == {sampling_seed}")["cost"]
-
-        for n_samples in n_samples_spacing.astype(int):
+        for sampling_seed in sampling_seeds:
+            X_train_all_samples = df_train_samples.query(f"seed == {sampling_seed}")[parameter_names]
+            y_train_all_samples = df_train_samples.query(f"seed == {sampling_seed}")["cost"]
 
             X_train = X_train_all_samples[:n_samples]
             y_train = y_train_all_samples[:n_samples]
 
+            if len(X_train) < n_samples:
+                logger.warning(
+                    f"Found less than {n_samples} when trying to evaluate {n_samples} samples for sampling seed "
+                    f"{sampling_seed}, skip.")
+                break
+
             logger.info(f"Evaluate Surrogate Model for {n_samples} samples and sampling seed {sampling_seed}.")
 
             # Load surrogate model
-            # Get specific surrogate file for each sample size for which the number of initial designs differs from
-            # the maximum number of initial designs (number of hyperparameters * init_design_n_configs_per_hyperparamter)
-            if init_design_max_ratio * n_samples < len(
-                    optimized_parameters) * init_design_n_configs_per_hyperparamter:
-                n_eval = n_samples
-            else:
-                n_eval = max(N_SAMPLES_SPACING)
             try:
                 with open(f"{sampling_dir}/surrogates/n_eval{n_eval}_samples{n_samples}_seed{sampling_seed}.pkl",
                           "rb") as surrogate_file:
