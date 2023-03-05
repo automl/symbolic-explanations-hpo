@@ -8,6 +8,7 @@ import dill as pickle
 from smac import BlackBoxFacade, Callback
 from itertools import combinations
 
+from utils.utils import get_surrogate_predictions
 from utils.smac_utils import run_smac_optimization
 from utils.functions_utils import get_functions2d, NamedFunction
 from utils.model_utils import get_hyperparams, get_classifier_from_run_conf
@@ -41,6 +42,8 @@ if __name__ == "__main__":
     #models = functions
     data_sets = ["digits", "iris"]
     use_random_samples = False
+    evaluate_on_surrogate = True
+    surrogate_n_samples = 400
 
     init_design_max_ratio = 0.25
     init_design_n_configs_per_hyperparamter = 8
@@ -75,7 +78,6 @@ if __name__ == "__main__":
         run_type = "rand"
         n_samples_to_eval = [max(N_SAMPLES_SPACING)]
     else:
-        run_type = "smac"
         # SMAC uses at most scenario.n_trials * max_ratio number of configurations in the initial design
         # If we run SMAC only once with n_trials = max(N_SAMPLES_SPACING), we would always use the maximum number of
         # initial designs, e.g. a run with 20 samples would have the same number of initial designs as a run with 200
@@ -84,6 +86,10 @@ if __name__ == "__main__":
             optimized_parameters) * init_design_n_configs_per_hyperparamter]
         if max(N_SAMPLES_SPACING) not in n_samples_to_eval:
             n_samples_to_eval.append(max(N_SAMPLES_SPACING))
+        if evaluate_on_surrogate:
+            run_type = "surr"
+        else:
+            run_type = "smac"
 
     run_name = f"{function_name.replace(' ', '_')}_{'_'.join(parameter_names)}{data_set_postfix}"
 
@@ -105,6 +111,13 @@ if __name__ == "__main__":
 
     for n_samples in n_samples_to_eval:
 
+        # required for surrogate evaluation
+        if init_design_max_ratio * n_samples < len(
+                optimized_parameters) * init_design_n_configs_per_hyperparamter:
+            n_eval = n_samples
+        else:
+            n_eval = max(N_SAMPLES_SPACING)
+
         df_samples = pd.DataFrame()
 
         for i in range(n_seeds):
@@ -125,6 +138,15 @@ if __name__ == "__main__":
                 configurations = np.array(
                     [list(i.get_dictionary().values()) for i in configurations]
                 ).T
+            elif evaluate_on_surrogate:
+                configurations = classifier.configspace.sample_configuration(size=surrogate_n_samples)
+                configurations = np.array(
+                    [list(i.get_dictionary().values()) for i in configurations]
+                ).T
+                with open(f"learning_curves/{sampling_dir_name}/smac/{run_name}/surrogates/n_eval{n_eval}"
+                          f"_samples{n_samples}_seed{seed}.pkl", "rb") as surrogate_file:
+                    surrogate_model = pickle.load(surrogate_file)
+                performances = np.array(get_surrogate_predictions(configurations.T, classifier, surrogate_model))
             else:
                 configurations, performances, _ = run_smac_optimization(
                     configspace=classifier.configspace,
