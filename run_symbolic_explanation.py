@@ -30,10 +30,10 @@ if __name__ == "__main__":
     symb_dir_name = "default"
 
     functions = get_functions2d()
-    models = ["MLP", "SVM", "BDT", "DT"]
-    #models = functions
+    #models = ["MLP", "SVM", "BDT", "DT"]
+    models = functions
     data_sets = ["digits", "iris"]
-    use_random_samples = False
+    use_random_samples = True
 
     init_design_max_ratio = 0.25
     init_design_n_configs_per_hyperparamter = 8
@@ -161,20 +161,27 @@ if __name__ == "__main__":
                 df_metrics.insert(2, "symb_seed", symb_seed)
                 df_all_metrics = pd.concat((df_all_metrics, df_metrics))
 
+
+                program_length_before_simplification = symb_model._program.length_
                 try:
                     conv_expr = convert_symb(symb_model, n_dim=len(optimized_parameters), n_decimals=3)
                 except:
                     conv_expr = ""
-                    print(f"Could not convert expression for n_samples: {n_samples}, sampling_seed: {sampling_seed}"
-                          f", symb_seed: {symb_seed}.")
+                    logger.warning(f"Could not convert expression for n_samples: {n_samples}, "
+                                   f"sampling_seed: {sampling_seed}, symb_seed: {symb_seed}.")
+                try:
+                    program_operations = sympy.count_ops(conv_expr)
+                except:
+                    program_operations = np.nan
+                    logger.warning(f"Could not count operations for n_samples: {n_samples}, "
+                                   f"sampling_seed: {sampling_seed}, symb_seed: {symb_seed}.")
+
                 df_expr = pd.DataFrame({"expr": [conv_expr]})
                 df_expr.insert(0, "n_samples", n_samples)
                 df_expr.insert(1, "sampling_seed", sampling_seed)
                 df_expr.insert(2, "symb_seed", symb_seed)
                 df_all_expr = pd.concat((df_all_expr, df_expr))
 
-                program_length_before_simplification = symb_model._program.length_
-                program_operations = sympy.count_ops(conv_expr)
                 df_complexity = pd.DataFrame({
                     "n_samples": [n_samples],
                     "sampling_seed": [sampling_seed],
