@@ -33,7 +33,7 @@ if __name__ == "__main__":
     #models = ["MLP", "SVM", "BDT", "DT"]
     models = functions
     data_sets = ["digits", "iris"]
-    use_random_samples = True
+    use_random_samples = False
 
     init_design_max_ratio = 0.25
     init_design_n_configs_per_hyperparamter = 8
@@ -96,7 +96,7 @@ if __name__ == "__main__":
 
     symb_params = dict(
         population_size=5000,
-        generations=50,
+        generations=2,
         function_set=get_function_set(),
         metric="mse",
         verbose=1,
@@ -172,9 +172,7 @@ if __name__ == "__main__":
                 try:
                     program_operations = sympy.count_ops(conv_expr)
                 except:
-                    program_operations = np.nan
-                    logger.warning(f"Could not count operations for n_samples: {n_samples}, "
-                                   f"sampling_seed: {sampling_seed}, symb_seed: {symb_seed}.")
+                    program_operations = sympy.count_ops(symb_model)
 
                 df_expr = pd.DataFrame({"expr": [conv_expr]})
                 df_expr.insert(0, "n_samples", n_samples)
