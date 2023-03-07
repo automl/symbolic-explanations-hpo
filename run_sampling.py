@@ -168,6 +168,7 @@ if __name__ == "__main__":
             df.insert(0, "seed", seed)
             df = df.reset_index()
             df = df.rename(columns={"index": "n_samples"})
+            df["n_samples"] = df["n_samples"] + 1
             df_samples = pd.concat((df_samples, df))
 
             df_samples.to_csv(f"{sampling_run_dir}/samples_{n_samples}.csv", index=False)
