@@ -42,7 +42,7 @@ if __name__ == "__main__":
     #models = functions
     data_sets = ["digits", "iris"]
     use_random_samples = False
-    evaluate_on_surrogate = True
+    evaluate_on_surrogate = False
     surrogate_n_samples = 400
 
     init_design_max_ratio = 0.25
@@ -98,7 +98,7 @@ if __name__ == "__main__":
     if os.path.exists(sampling_run_dir):
         shutil.rmtree(sampling_run_dir)
     os.makedirs(sampling_run_dir)
-    if not use_random_samples:
+    if run_type == "smac":
         os.makedirs(f"{sampling_run_dir}/surrogates")
 
     with open(f"{sampling_run_dir}/classifier.pkl", "wb") as classifier_file:
@@ -166,6 +166,8 @@ if __name__ == "__main__":
                                      performances.reshape(-1, 1)), axis=1),
                 columns=parameter_names + ["cost"])
             df.insert(0, "seed", seed)
+            df = df.reset_index()
+            df = df.rename(columns={"index": "n_samples"})
             df_samples = pd.concat((df_samples, df))
 
             df_samples.to_csv(f"{sampling_run_dir}/samples_{n_samples}.csv", index=False)
