@@ -30,7 +30,7 @@ if __name__ == "__main__":
                     run_configs.append({"model": model, hp_conf[0]: True, hp_conf[1]: True, "data_set_name": ds})
 
     # Set up plot directories
-    plot_dir = f"learning_curves/plots/combined_plots"
+    plot_dir = f"learning_curves/plots/combined_plots_toy"
     complexity_plot_dir = f"{plot_dir}/complexity"
     mse_plot_dir = f"{plot_dir}/mse"
     rmse_plot_dir = f"{plot_dir}/rmse"
@@ -46,7 +46,7 @@ if __name__ == "__main__":
 
     logger.info(f"Save plots to {plot_dir}.")
 
-    for run_conf in run_configs:
+    for run_conf in run_configs[3:]:
 
         if run_conf['data_set_name']:
             data_set = run_conf['data_set_name']
@@ -133,7 +133,7 @@ if __name__ == "__main__":
             plt.ylim(0., 0.4)
         else:
             if classifier.name == "Camelback 2D":
-                plt.ylim(-100., 100)
+                plt.ylim(0., 25)
             if classifier.name == "Rosenbrock 2D":
                 plt.ylim(-500000, 500000)
         plt.tight_layout(rect=(0, 0.05, 1, 1))
