@@ -127,8 +127,8 @@ if __name__ == "__main__":
 
 
             if evaluate_on_surrogate:
-                X_train = X_train_all_samples
-                y_train = y_train_all_samples
+                X_train = X_train_all_samples[:n_samples]
+                y_train = y_train_all_samples[:n_samples]
             else:
                 X_train = X_train_all_samples[:n_samples]
                 y_train = y_train_all_samples[:n_samples]
