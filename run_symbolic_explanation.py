@@ -180,7 +180,10 @@ if __name__ == "__main__":
                 try:
                     program_operations = sympy.count_ops(conv_expr)
                 except:
-                    program_operations = sympy.count_ops(symb_model)
+                    try:
+                        program_operations = sympy.count_ops(symb_model)
+                    except:
+                        program_operations = -1
 
                 df_expr = pd.DataFrame({"expr": [conv_expr]})
                 df_expr.insert(0, "n_samples", n_samples)
