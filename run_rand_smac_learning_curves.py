@@ -14,8 +14,8 @@ from utils.logging_utils import get_logger
 if __name__ == "__main__":
     symb_dir_name = "default"
     functions = get_functions2d()
-    models = ["MLP", "SVM", "BDT", "DT"]
-    #models = functions
+    #models = ["MLP", "SVM", "BDT", "DT"]
+    models = functions
     data_sets = ["digits", "iris"]
 
     run_configs = []
@@ -129,7 +129,13 @@ if __name__ == "__main__":
         plt.yticks(fontsize=14)
         plt.xlabel("Number of Samples", fontsize=16)
         plt.xticks(fontsize=14)
-        plt.ylim(0., 0.4)
+        if not isinstance(model, NamedFunction):
+            plt.ylim(0., 0.4)
+        else:
+            if classifier.name == "Camelback 2D":
+                plt.ylim(-100., 100)
+            if classifier.name == "Rosenbrock 2D":
+                plt.ylim(-500000, 500000)
         plt.tight_layout(rect=(0, 0.05, 1, 1))
         sns.move_legend(
             ax, "lower center",
@@ -180,7 +186,8 @@ if __name__ == "__main__":
         plt.yticks(np.arange(0, 20, 2.0), fontsize=14)
         plt.xlabel("Number of Samples", fontsize=16)
         plt.xticks(fontsize=14)
-        plt.ylim(0, 18.5)
+        if not isinstance(model, NamedFunction):
+            plt.ylim(0, 18.5)
         plt.tight_layout(rect=(0, 0.05, 1, 1))
         sns.move_legend(
             ax, "lower center",
