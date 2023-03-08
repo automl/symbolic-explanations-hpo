@@ -96,6 +96,8 @@ if __name__ == "__main__":
                 df_complexity.insert(0, "Experiment", f"{sampling_type}")
                 df_complexity_all = pd.concat((df_complexity_all, df_complexity))
 
+            df_complexity_all = df_complexity_all[df_complexity_all["program_operations"] != -1]
+
             df_error_metrics = pd.read_csv(f"{symb_dir}/error_metrics.csv")
             df_error_metrics["rmse_test"] = np.sqrt(df_error_metrics["mse_test"])
             df_error_metrics["rmse_train"] = np.sqrt(df_error_metrics["mse_train"])
