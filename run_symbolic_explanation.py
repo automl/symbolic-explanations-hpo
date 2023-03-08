@@ -125,8 +125,13 @@ if __name__ == "__main__":
             X_train_all_samples = df_train_samples.query(f"seed == {sampling_seed}")[parameter_names]
             y_train_all_samples = df_train_samples.query(f"seed == {sampling_seed}")["cost"]
 
-            X_train = X_train_all_samples[:n_samples]
-            y_train = y_train_all_samples[:n_samples]
+
+            if evaluate_on_surrogate:
+                X_train = X_train_all_samples
+                y_train = y_train_all_samples
+            else:
+                X_train = X_train_all_samples[:n_samples]
+                y_train = y_train_all_samples[:n_samples]
 
             if len(X_train) < n_samples:
                 logger.warning(
