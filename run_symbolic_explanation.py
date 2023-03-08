@@ -99,7 +99,7 @@ if __name__ == "__main__":
 
     symb_params = dict(
         population_size=5000,
-        generations=2,
+        generations=50,
         function_set=get_function_set(),
         metric="mse",
         verbose=1,
@@ -127,8 +127,8 @@ if __name__ == "__main__":
 
 
             if evaluate_on_surrogate:
-                X_train = X_train_all_samples[:n_samples]
-                y_train = y_train_all_samples[:n_samples]
+                X_train = X_train_all_samples
+                y_train = y_train_all_samples
             else:
                 X_train = X_train_all_samples[:n_samples]
                 y_train = y_train_all_samples[:n_samples]
