@@ -79,15 +79,17 @@ if __name__ == "__main__":
         df_error_metrics_all = pd.DataFrame()
         df_complexity_all = pd.DataFrame()
 
-        for sampling_type in ["SR (Random)", "SR (BO)", "GP (BO)"]:
+        for sampling_type in ["SR (Random)", "SR (BO)", "SR (BO-GP)", "GP (BO)"]:
 
             if sampling_type == "GP (BO)":
                 symb_dir = f"learning_curves/runs_surr/{run_name}"
             else:
                 if sampling_type == "SR (BO)":
                     symb_dir = f"learning_curves/runs_symb/{symb_dir_name}/smac/{run_name}"
-                else:
+                elif sampling_type == "SR (Random)":
                     symb_dir = f"learning_curves/runs_symb/{symb_dir_name}/rand/{run_name}"
+                else:
+                    symb_dir = f"learning_curves/runs_symb/{symb_dir_name}/surr/{run_name}"
                 df_complexity = pd.read_csv(f"{symb_dir}/complexity.csv")
                 df_complexity.insert(0, "Experiment", f"{sampling_type}")
                 df_complexity_all = pd.concat((df_complexity_all, df_complexity))
