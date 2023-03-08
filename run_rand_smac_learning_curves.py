@@ -142,7 +142,7 @@ if __name__ == "__main__":
         sns.move_legend(
             ax, "lower center",
             bbox_to_anchor=(0.45, -0.32),
-            ncol=4,
+            ncol=5,
             title=None, frameon=False,
             fontsize=14
         )
@@ -168,7 +168,7 @@ if __name__ == "__main__":
         sns.move_legend(
             ax, "lower center",
             bbox_to_anchor=(0.45, -0.32),
-            ncol=4,
+            ncol=5,
             title=None, frameon=False,
             fontsize=14
         )
