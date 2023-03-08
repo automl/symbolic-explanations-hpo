@@ -12,6 +12,8 @@ from utils.logging_utils import get_logger
 
 
 if __name__ == "__main__":
+    labelsize = 12
+    titlesize=14
     symb_dir_name = "default"
     functions = get_functions2d()
     #models = ["MLP", "SVM", "BDT", "DT"]
@@ -123,14 +125,14 @@ if __name__ == "__main__":
         sns.pointplot(data=df_error_metrics_all, x="n_samples", y="rmse_test", hue="Experiment", errorbar="sd",
                       linestyles="", capsize=0.2, errwidth=0.7, scale=0.7, dodge=0.4)#, showfliers=False)
         if data_set:
-            plt.title(f"{classifier_title}, Dataset: {data_set}\nOptimize: {param0}, {param1}", fontsize=16)
+            plt.title(f"{classifier_title}, Dataset: {data_set}\nOptimize: {param0}, {param1}", fontsize=titlesize)
         else:
-            plt.title(f"{classifier_title}\nOptimize: {param0}, {param1}", fontsize=16)
+            plt.title(f"{classifier_title}\nOptimize: {param0}, {param1}", fontsize=titlesize)
         #plt.title(f"Test Mean: {avg_cost:.3f}, Test Std.: {std_cost:.3f}", fontsize=10),
-        plt.ylabel("Test RMSE", fontsize=16)
-        plt.yticks(fontsize=14)
-        plt.xlabel("Number of Samples", fontsize=16)
-        plt.xticks(fontsize=14)
+        plt.ylabel("Test RMSE", fontsize=titlesize)
+        plt.yticks(fontsize=labelsize)
+        plt.xlabel("Number of Samples", fontsize=titlesize)
+        plt.xticks(fontsize=labelsize)
         if not isinstance(model, NamedFunction):
             plt.ylim(0., 0.4)
         else:
@@ -144,7 +146,7 @@ if __name__ == "__main__":
             bbox_to_anchor=(0.45, -0.32),
             ncol=5,
             title=None, frameon=False,
-            fontsize=14
+            fontsize=labelsize
         )
         plt.savefig(f"{rmse_plot_dir}/{run_name}_pointplot.png", dpi=400)
         plt.close()
@@ -156,13 +158,13 @@ if __name__ == "__main__":
         sns.pointplot(data=df_error_metrics_all, x="n_samples", y="kt_test", hue="Experiment", errorbar="sd",
                       linestyles="", capsize=0.2, errwidth=0.7, scale=0.7, dodge=0.4)#, showfliers=False)
         if data_set:
-            plt.title(f"{classifier_title}, Dataset: {data_set}\nOptimize: {param0}, {param1}", fontsize=16)
+            plt.title(f"{classifier_title}, Dataset: {data_set}\nOptimize: {param0}, {param1}", fontsize=titlesize)
         else:
-            plt.title(f"{classifier_title}\nOptimize: {param0}, {param1}", fontsize=16)
-        plt.ylabel("Test Kendall Tau", fontsize=16)
-        plt.yticks(fontsize=14)
-        plt.xlabel("Number of Samples", fontsize=16)
-        plt.xticks(fontsize=14)
+            plt.title(f"{classifier_title}\nOptimize: {param0}, {param1}", fontsize=titlesize)
+        plt.ylabel("Test Kendall Tau", fontsize=titlesize)
+        plt.yticks(fontsize=labelsize)
+        plt.xlabel("Number of Samples", fontsize=titlesize)
+        plt.xticks(fontsize=labelsize)
         plt.ylim(-0.6, 1.)
         plt.tight_layout(rect=(0, 0.05, 1, 1))
         sns.move_legend(
@@ -170,7 +172,7 @@ if __name__ == "__main__":
             bbox_to_anchor=(0.45, -0.32),
             ncol=5,
             title=None, frameon=False,
-            fontsize=14
+            fontsize=labelsize
         )
         plt.savefig(f"{kt_plot_dir}/{run_name}_pointplot.png", dpi=400)
         plt.close()
@@ -181,13 +183,13 @@ if __name__ == "__main__":
         sns.pointplot(data=df_complexity_all, x="n_samples", y="program_operations", hue="Experiment", errorbar="sd",
                       linestyles="", capsize=0.2, errwidth=0.7, scale=0.7, dodge=0.2)#, showfliers=False)
         if data_set:
-            plt.title(f"{classifier_title}, Dataset: {data_set}\nOptimize: {param0}, {param1}", fontsize=16)
+            plt.title(f"{classifier_title}, Dataset: {data_set}\nOptimize: {param0}, {param1}", fontsize=titlesize)
         else:
-            plt.title(f"{classifier_title}\nOptimize: {param0}, {param1}", fontsize=16)
-        plt.ylabel("Number of Operations in Formula", fontsize=16)
-        plt.yticks(np.arange(0, 20, 2.0), fontsize=14)
-        plt.xlabel("Number of Samples", fontsize=16)
-        plt.xticks(fontsize=14)
+            plt.title(f"{classifier_title}\nOptimize: {param0}, {param1}", fontsize=titlesize)
+        plt.ylabel("Number of Operations in Formula", fontsize=titlesize)
+        plt.yticks(np.arange(0, 20, 2.0), fontsize=labelsize)
+        plt.xlabel("Number of Samples", fontsize=titlesize)
+        plt.xticks(fontsize=labelsize)
         if not isinstance(model, NamedFunction):
             plt.ylim(0, 18.5)
         plt.tight_layout(rect=(0, 0.05, 1, 1))
@@ -196,7 +198,7 @@ if __name__ == "__main__":
             bbox_to_anchor=(0.45, -0.32),
             ncol=2,
             title=None, frameon=False,
-            fontsize=14
+            fontsize=labelsize
         )
         plt.savefig(f"{complexity_plot_dir}/{run_name}_complexity_pointplot.png", dpi=400)
         plt.close()
