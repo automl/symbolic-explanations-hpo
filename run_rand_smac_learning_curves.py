@@ -46,7 +46,7 @@ if __name__ == "__main__":
 
     logger.info(f"Save plots to {plot_dir}.")
 
-    for run_conf in run_configs[3:]:
+    for run_conf in run_configs:
 
         if run_conf['data_set_name']:
             data_set = run_conf['data_set_name']
