@@ -38,8 +38,8 @@ if __name__ == "__main__":
 
     functions = get_functions2d()
     n_seeds = 5
-    models = ["MLP", "SVM", "BDT", "DT"]
-    #models = functions
+    #models = ["MLP", "SVM", "BDT", "DT"]
+    models = functions
     data_sets = ["digits", "iris"]
     use_random_samples = False
     evaluate_on_surrogate = False
@@ -82,14 +82,15 @@ if __name__ == "__main__":
         # If we run SMAC only once with n_trials = max(N_SAMPLES_SPACING), we would always use the maximum number of
         # initial designs, e.g. a run with 20 samples would have the same number of initial designs as a run with 200
         # Thus, we do separate runs for each sample size as long as the number of initial designs would differ
-        n_samples_to_eval = [n for n in N_SAMPLES_SPACING if init_design_max_ratio * n < len(
-            optimized_parameters) * init_design_n_configs_per_hyperparamter]
-        if max(N_SAMPLES_SPACING) not in n_samples_to_eval:
-            n_samples_to_eval.append(max(N_SAMPLES_SPACING))
         if evaluate_on_surrogate:
             run_type = "surr"
+            n_samples_to_eval = N_SAMPLES_SPACING
         else:
             run_type = "smac"
+            n_samples_to_eval = [n for n in N_SAMPLES_SPACING if init_design_max_ratio * n < len(
+                optimized_parameters) * init_design_n_configs_per_hyperparamter]
+            if max(N_SAMPLES_SPACING) not in n_samples_to_eval:
+                n_samples_to_eval.append(max(N_SAMPLES_SPACING))
 
     run_name = f"{function_name.replace(' ', '_')}_{'_'.join(parameter_names)}{data_set_postfix}"
 

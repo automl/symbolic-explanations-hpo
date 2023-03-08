@@ -34,6 +34,7 @@ if __name__ == "__main__":
     models = functions
     data_sets = ["digits", "iris"]
     use_random_samples = False
+    evaluate_on_surrogate = True
 
     init_design_max_ratio = 0.25
     init_design_n_configs_per_hyperparamter = 8
@@ -66,6 +67,8 @@ if __name__ == "__main__":
 
     if use_random_samples:
         run_type = "rand"
+    elif evaluate_on_surrogate:
+        run_type = "surr"
     else:
         run_type = "smac"
 
@@ -108,10 +111,10 @@ if __name__ == "__main__":
     )
 
     for n_samples in N_SAMPLES_SPACING:
-        # Get specific sampling file for each sample size for which the number of initial designs differs from
+        # For smac, get specific sampling file for each sample size for which the number of initial designs differs from
         # the maximum number of initial designs (number of hyperparameters * init_design_n_configs_per_hyperparamter)
-        if run_type == "smac" and init_design_max_ratio * n_samples < len(
-                optimized_parameters) * init_design_n_configs_per_hyperparamter:
+        if run_type == "surr" or (run_type == "smac" and init_design_max_ratio * n_samples < len(
+                optimized_parameters) * init_design_n_configs_per_hyperparamter):
             df_train_samples = pd.read_csv(f"{sampling_run_dir}/samples_{n_samples}.csv")
         else:
             df_train_samples = pd.read_csv(f"{sampling_run_dir}/samples_{max(N_SAMPLES_SPACING)}.csv")
