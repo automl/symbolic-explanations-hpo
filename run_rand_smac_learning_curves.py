@@ -143,7 +143,7 @@ if __name__ == "__main__":
         plt.tight_layout(rect=(0, 0.05, 1, 1))
         sns.move_legend(
             ax, "lower center",
-            bbox_to_anchor=(0.45, -0.2),
+            bbox_to_anchor=(0.45, -0.25),
             ncol=5,
             title=None, frameon=False,
             fontsize=labelsize
@@ -169,7 +169,7 @@ if __name__ == "__main__":
         plt.tight_layout(rect=(0, 0.05, 1, 1))
         sns.move_legend(
             ax, "lower center",
-            bbox_to_anchor=(0.45, -0.2),
+            bbox_to_anchor=(0.45, -0.25),
             ncol=5,
             title=None, frameon=False,
             fontsize=labelsize
@@ -195,7 +195,7 @@ if __name__ == "__main__":
         plt.tight_layout(rect=(0, 0.05, 1, 1))
         sns.move_legend(
             ax, "lower center",
-            bbox_to_anchor=(0.45, -0.2),
+            bbox_to_anchor=(0.45, -0.25),
             ncol=2,
             title=None, frameon=False,
             fontsize=labelsize
