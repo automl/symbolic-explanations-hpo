@@ -189,11 +189,11 @@ if __name__ == "__main__":
         else:
             plt.title(f"{classifier_title}\nOptimize: {param0}, {param1}", fontsize=titlesize)
         plt.ylabel("Number of Operations in Formula", fontsize=titlesize)
-        plt.yticks(np.arange(0, 20, 2.0), fontsize=labelsize)
         plt.xlabel("Number of Samples", fontsize=titlesize)
         plt.xticks(fontsize=labelsize)
         if not isinstance(model, NamedFunction):
             plt.ylim(0, 18.5)
+            plt.yticks(np.arange(0, 20, 2.0), fontsize=labelsize)
         plt.tight_layout(rect=(0, 0.05, 1, 1))
         sns.move_legend(
             ax, "lower center",
