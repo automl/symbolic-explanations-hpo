@@ -198,7 +198,7 @@ if __name__ == "__main__":
         sns.move_legend(
             ax, "lower center",
             bbox_to_anchor=(0.45, -0.27),
-            ncol=2,
+            ncol=3,
             title=None, frameon=False,
             fontsize=labelsize
         )
