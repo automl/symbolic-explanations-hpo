@@ -89,11 +89,11 @@ if __name__ == "__main__":
 
         if init_design_max_ratio * n_samples < len(
                 optimized_parameters) * init_design_n_configs_per_hyperparamter:
-            df_samples_smac = pd.read_csv(f"{symb_dir_smac}/sampling/samples_{n_samples}.csv")
+            df_samples_smac = pd.read_csv(f"{symb_dir_smac}/samples_{n_samples}.csv")
         else:
-            df_samples_smac = pd.read_csv(f"{symb_dir_rand}/sampling/{max(N_SAMPLES_SPACING)}.csv")
+            df_samples_smac = pd.read_csv(f"{symb_dir_rand}/{max(N_SAMPLES_SPACING)}.csv")
 
-        df_samples_rand = pd.read_csv(f"{symb_dir_rand}/sampling/{max(N_SAMPLES_SPACING)}.csv")
+        df_samples_rand = pd.read_csv(f"{symb_dir_rand}/{max(N_SAMPLES_SPACING)}.csv")
 
         logger.info(f"Get test data for {classifier_name}.")
         X_test, y_test = get_hpo_test_data(classifier, optimized_parameters, 100)
