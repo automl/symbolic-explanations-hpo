@@ -2,91 +2,44 @@ import pandas as pd
 import os
 import sys
 import numpy as np
-import logging
 import dill as pickle
+from itertools import combinations
 
 from utils.utils import get_hpo_test_data, plot_symb2d
-from utils.functions import NamedFunction
-from utils import functions
+from utils.functions_utils import get_functions2d, NamedFunction
+from utils.model_utils import get_hyperparams, get_classifier_from_run_conf
+from utils import functions_utils
+from utils.logging_utils import get_logger
 
 
-sys.modules['functions'] = functions
+sys.modules['functions'] = functions_utils
+
+
+N_SAMPLES_SPACING = np.linspace(20, 200, 10, dtype=int).tolist()
 
 
 if __name__ == "__main__":
-    model_name = "symb_best"
     n_samples = 100
     symb_seeds = [0] #, 3, 6]
-    run_names = [
-        # "rand_BDT_learning_rate_n_estimators_digits_20230221_114624",
-        # "rand_BDT_learning_rate_n_estimators_iris_20230221_114624",
-        "rand_Branin_2D_X0_X1_20230221_120527",
-        "rand_Camelback_2D_X0_X1_20230221_120527",
-        "rand_DT_max_depth_min_samples_leaf_digits_20230221_114653",
-        "rand_DT_max_depth_min_samples_leaf_iris_20230221_114651",
-        #"rand_Exponential_function_2D_X0_X1_20230221_120528",
-        "rand_Linear_2D_X0_X1_20230221_120527",
-        # "rand_MLP_learning_rate_init_max_iter_digits_20230221_114330",
-        # "rand_MLP_learning_rate_init_max_iter_iris_20230221_114330",
-        # "rand_MLP_learning_rate_init_n_layer_digits_20230221_114329",
-        # "rand_MLP_learning_rate_init_n_layer_iris_20230221_114329",
-        "rand_MLP_learning_rate_init_n_neurons_digits_20230221_114330",
-        "rand_MLP_learning_rate_init_n_neurons_iris_20230221_114330",
-        # "rand_MLP_max_iter_n_layer_digits_20230221_114332",
-        # "rand_MLP_max_iter_n_layer_iris_20230221_114330",
-        # "rand_MLP_max_iter_n_neurons_digits_20230221_114332",
-        # "rand_MLP_max_iter_n_neurons_iris_20230221_114330",
-        "rand_MLP_n_layer_n_neurons_digits_20230221_114330",
-        "rand_MLP_n_layer_n_neurons_iris_20230221_114330",
-        #"rand_Polynom_function_2D_X0_X1_20230221_120528",
-        #"rand_Rosenbrock_2D_X0_X1_20230221_120527",
-        # "rand_SVM_C_coef0_digits_20230221_114754",
-        # "rand_SVM_C_coef0_iris_20230221_114755",
-        # "rand_SVM_C_degree_digits_20230221_114756",
-        # "rand_SVM_C_degree_iris_20230221_114756",
-        # "rand_SVM_C_gamma_digits_20230221_114754",
-        # "rand_SVM_C_gamma_iris_20230221_114755",
-        # "rand_SVM_coef0_degree_digits_20230221_114754",
-        # "rand_SVM_coef0_degree_iris_20230221_114756",
-        # "rand_SVM_coef0_gamma_digits_20230221_114755",
-        # "rand_SVM_coef0_gamma_iris_20230221_114755",
-        # "rand_SVM_degree_gamma_digits_20230221_114754",
-        # "rand_SVM_degree_gamma_iris_20230221_114754",
-        # "smac_BDT_learning_rate_n_estimators_digits_20230223_162320",
-        # "smac_BDT_learning_rate_n_estimators_iris_20230223_162320",
-        "smac_Branin_2D_X0_X1_20230223_162155",
-        "smac_Camelback_2D_X0_X1_20230223_162155",
-        "smac_DT_max_depth_min_samples_leaf_digits_20230224_090309",
-        "smac_DT_max_depth_min_samples_leaf_iris_20230224_090310",
-        #"smac_Exponential_function_2D_X0_X1_20230223_162156",
-        "smac_Linear_2D_X0_X1_20230223_162155",
-        # "smac_MLP_learning_rate_init_max_iter_digits_20230223_162437",
-        # "smac_MLP_learning_rate_init_max_iter_iris_20230223_162436",
-        # "smac_MLP_learning_rate_init_n_layer_digits_20230223_162436",
-        # "smac_MLP_learning_rate_init_n_layer_iris_20230223_162436",
-        "smac_MLP_learning_rate_init_n_neurons_digits_20230223_162436",
-        "smac_MLP_learning_rate_init_n_neurons_iris_20230223_162436",
-        # "smac_MLP_max_iter_n_layer_digits_20230223_162436",
-        # "smac_MLP_max_iter_n_layer_iris_20230223_162436",
-        # "smac_MLP_max_iter_n_neurons_digits_20230223_162436",
-        # "smac_MLP_max_iter_n_neurons_iris_20230223_162436",
-        "smac_MLP_n_layer_n_neurons_digits_20230223_162436",
-        "smac_MLP_n_layer_n_neurons_iris_20230223_162437",
-        #"smac_Polynom_function_2D_X0_X1_20230223_162156",
-        #"smac_Rosenbrock_2D_X0_X1_20230223_162155",
-        # "smac_SVM_C_coef0_digits_20230223_164415",
-        # "smac_SVM_C_coef0_iris_20230223_162859",
-        # "smac_SVM_C_degree_digits_20230223_162900",
-        # "smac_SVM_C_degree_iris_20230223_164415",
-        # "smac_SVM_C_gamma_digits_20230223_162900",
-        # "smac_SVM_C_gamma_iris_20230223_162859",
-        # "smac_SVM_coef0_degree_digits_20230223_162859",
-        # "smac_SVM_coef0_degree_iris_20230223_162859",
-        # "smac_SVM_coef0_gamma_digits_20230223_162859",
-        # "smac_SVM_coef0_gamma_iris_20230223_162859",
-        # "smac_SVM_degree_gamma_digits_20230223_162900",
-        # "smac_SVM_degree_gamma_iris_20230223_162859"
-    ]
+    symb_dir_name = "default"
+    functions = get_functions2d()
+    #models = ["MLP", "SVM", "BDT", "DT"]
+    models = functions
+    data_sets = ["digits", "iris"]
+    
+    init_design_max_ratio = 0.25
+    init_design_n_configs_per_hyperparamter = 8
+
+    run_configs = []
+    for model in models:
+        if isinstance(model, NamedFunction):
+            run_configs.append({"model": model, "data_set_name": None})
+        else:
+            hyperparams = get_hyperparams(model_name=model)
+            hp_comb = combinations(hyperparams, 2)
+            for hp_conf in hp_comb:
+                for ds in data_sets:
+                    run_configs.append({"model": model, hp_conf[0]: True, hp_conf[1]: True, "data_set_name": ds})
 
     # set up directories
     plot_dir = f"learning_curves/plots"
@@ -94,45 +47,38 @@ if __name__ == "__main__":
     if not os.path.exists(viz_plot_dir):
         os.makedirs(viz_plot_dir)
 
-    # setup logging
-    logger = logging.getLogger(__name__)
-    handler2 = logging.StreamHandler()
-    handler2.setLevel("INFO")
-    handler2.setFormatter(
-        logging.Formatter("[%(levelname)s][%(filename)s:%(lineno)d] %(message)s")
-    )
-    handler2.setStream(sys.stdout)
-    logger.root.addHandler(handler2)
-    logger.root.setLevel("INFO")
+    logger = get_logger(filename=f"{plot_dir}/plot_log.log")
 
     logger.info(f"Save plots to {plot_dir}.")
 
-    run_names_cut = ["_".join(run.split("_")[1:-2]) for run in run_names]
-    run_names_cut = set(run_names_cut)
+    for run_conf in run_configs:
 
-    for sampling_run_name in run_names_cut:
-
-        logger.info(f"Create plot for {sampling_run_name}.")
-
-
-        if "iris" in sampling_run_name:
-            data_set = "Iris"
-        elif "digits" in sampling_run_name:
-            data_set = "Digits"
+        if run_conf['data_set_name']:
+            data_set = run_conf['data_set_name']
+            data_set_postfix = f"_{run_conf['data_set_name']}"
         else:
             data_set = None
+            data_set_postfix = ""
+        model = run_conf.pop("model")
+        if isinstance(model, NamedFunction):
+            classifier = model
+        else:
+            classifier = get_classifier_from_run_conf(model_name=model, run_conf=run_conf)
 
-        smac_run_name = [filename for filename in
-                         os.listdir(f"learning_curves/runs/") if
-                         filename.startswith(f"smac_{sampling_run_name}")][0]
-        rand_run_name = [filename for filename in
-                         os.listdir(f"learning_curves/runs/") if
-                         filename.startswith(f"rand_{sampling_run_name}")][0]
-        classifier_dir = f"learning_curves/runs/{smac_run_name}"
-        symb_dir_smac = f"learning_curves/runs/{smac_run_name}/{model_name}/symb_models"
-        symb_dir_rand = f"learning_curves/runs/{rand_run_name}/{model_name}/symb_models"
+        function_name = classifier.name if isinstance(classifier, NamedFunction) else model
+        optimized_parameters = classifier.configspace.get_hyperparameters()
+        parameter_names = [param.name for param in optimized_parameters]
 
-        with open(f"{classifier_dir}/sampling/classifier.pkl", "rb") as classifier_file:
+        run_name = f"{function_name.replace(' ', '_')}_{'_'.join(parameter_names)}{data_set_postfix}"
+
+        logger.info(f"Create plot for {run_name}.")
+
+        sampling_dir_smac = f"learning_curves/runs_sampling/smac/{run_name}"
+        sampling_dir_rand = f"learning_curves/runs_sampling/rand/{run_name}"
+        symb_dir_smac = f"learning_curves/runs/runs_symb/{symb_dir_name}/smac/{run_name}/symb_models"
+        symb_dir_rand = f"learning_curves/runs/runs_symb/{symb_dir_name}/rand/{run_name}/symb_models"
+
+        with open(f"{sampling_dir_smac}/sampling/classifier.pkl", "rb") as classifier_file:
             classifier = pickle.load(classifier_file)
         if isinstance(classifier, NamedFunction):
             classifier_name = classifier.name
@@ -141,8 +87,13 @@ if __name__ == "__main__":
         optimized_parameters = classifier.configspace.get_hyperparameters()
         parameter_names = [param.name for param in optimized_parameters]
 
-        df_samples_smac = pd.read_csv(f"{classifier_dir}/sampling/samples.csv")
-        df_samples_rand = pd.read_csv(f"learning_curves/runs/{rand_run_name}/sampling/samples.csv")
+        if init_design_max_ratio * n_samples < len(
+                optimized_parameters) * init_design_n_configs_per_hyperparamter:
+            df_samples_smac = pd.read_csv(f"{symb_dir_smac}/sampling/samples_{n_samples}.csv")
+        else:
+            df_samples_smac = pd.read_csv(f"{symb_dir_rand}/sampling/{max(N_SAMPLES_SPACING)}.csv")
+
+        df_samples_rand = pd.read_csv(f"{symb_dir_rand}/sampling/{max(N_SAMPLES_SPACING)}.csv")
 
         logger.info(f"Get test data for {classifier_name}.")
         X_test, y_test = get_hpo_test_data(classifier, optimized_parameters, 100)
