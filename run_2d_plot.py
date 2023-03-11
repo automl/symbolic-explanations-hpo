@@ -75,8 +75,8 @@ if __name__ == "__main__":
 
         sampling_dir_smac = f"learning_curves/runs_sampling/smac/{run_name}"
         sampling_dir_rand = f"learning_curves/runs_sampling/rand/{run_name}"
-        symb_dir_smac = f"learning_curves/runs/runs_symb/{symb_dir_name}/smac/{run_name}/symb_models"
-        symb_dir_rand = f"learning_curves/runs/runs_symb/{symb_dir_name}/rand/{run_name}/symb_models"
+        symb_dir_smac = f"learning_curves/runs_symb/{symb_dir_name}/smac/{run_name}/symb_models"
+        symb_dir_rand = f"learning_curves/runs_symb/{symb_dir_name}/rand/{run_name}/symb_models"
 
         with open(f"{sampling_dir_smac}/classifier.pkl", "rb") as classifier_file:
             classifier = pickle.load(classifier_file)
@@ -89,11 +89,11 @@ if __name__ == "__main__":
 
         if init_design_max_ratio * n_samples < len(
                 optimized_parameters) * init_design_n_configs_per_hyperparamter:
-            df_samples_smac = pd.read_csv(f"{symb_dir_smac}/samples_{n_samples}.csv")
+            df_samples_smac = pd.read_csv(f"{sampling_dir_smac}/samples_{n_samples}.csv")
         else:
-            df_samples_smac = pd.read_csv(f"{symb_dir_rand}/{max(N_SAMPLES_SPACING)}.csv")
+            df_samples_smac = pd.read_csv(f"{sampling_dir_smac}/samples_{max(N_SAMPLES_SPACING)}.csv")
 
-        df_samples_rand = pd.read_csv(f"{symb_dir_rand}/{max(N_SAMPLES_SPACING)}.csv")
+        df_samples_rand = pd.read_csv(f"{sampling_dir_rand}/samples_{max(N_SAMPLES_SPACING)}.csv")
 
         logger.info(f"Get test data for {classifier_name}.")
         X_test, y_test = get_hpo_test_data(classifier, optimized_parameters, 100)
