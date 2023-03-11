@@ -78,7 +78,7 @@ if __name__ == "__main__":
         symb_dir_smac = f"learning_curves/runs/runs_symb/{symb_dir_name}/smac/{run_name}/symb_models"
         symb_dir_rand = f"learning_curves/runs/runs_symb/{symb_dir_name}/rand/{run_name}/symb_models"
 
-        with open(f"{sampling_dir_smac}/sampling/classifier.pkl", "rb") as classifier_file:
+        with open(f"{sampling_dir_smac}/classifier.pkl", "rb") as classifier_file:
             classifier = pickle.load(classifier_file)
         if isinstance(classifier, NamedFunction):
             classifier_name = classifier.name
