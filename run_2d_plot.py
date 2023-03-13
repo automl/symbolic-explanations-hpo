@@ -15,7 +15,7 @@ from utils.logging_utils import get_logger
 sys.modules['functions'] = functions_utils
 
 
-N_SAMPLES_SPACING = np.linspace(20, 200, 10, dtype=int).tolist()
+N_SAMPLES_SPACING = np.linspace(10, 20, 3, dtype=int).tolist()
 
 
 if __name__ == "__main__":
@@ -24,7 +24,7 @@ if __name__ == "__main__":
     symb_seeds = [0] #, 3, 6]
     symb_dir_name = "default"
     functions = get_functions2d()
-    models = ["MLP", "SVM", "BDT", "DT"]
+    models = ["DT"]
     #models = functions
     data_sets = ["digits", "iris"]
 
@@ -101,7 +101,9 @@ if __name__ == "__main__":
         # try:
         X_test = np.array(
             pd.read_csv(f"learning_curves/runs_symb/default/smac/{run_name}/x_test.csv", header=0))
-        y_test = np.array(pd.read_csv(f"learning_curves/runs_symb/default/smac/{run_name}/y_test.csv", header=None))
+        X_test = X_test.T.reshape(2, 10, 10)
+        y_test = np.array(
+            pd.read_csv(f"learning_curves/runs_symb/default/smac/{run_name}/y_test.csv", header=None)).reshape(10, 10)
         # except:
         #     logger.info(f"No test data found, create test data for {run_name}.")
         #     X_test, y_test = get_hpo_test_data(classifier, optimized_parameters, n_test_samples)
