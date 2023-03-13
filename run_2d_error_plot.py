@@ -180,7 +180,7 @@ if __name__ == "__main__":
                     y_test=y_test.copy(),
                     function_name=classifier.name,
                     use_same_scale=False,
-                    metric_name="Surrogate Abs. Error",
+                    metric_name="Surrogate MAE",
                     predictions_test=error_test,
                     parameters=optimized_parameters,
                     plot_dir=viz_plot_dir,
