@@ -427,17 +427,25 @@ def plot_symb2d(
         X0_lower = parameters[0].lower
     if isinstance(parameters[0], UniformIntegerHyperparameter):
         dim_x = X_test[0][0].astype(int)
+        if parameters[0].log:
+            dim_x = np.log(dim_x)
     else:
         step_x = (X0_upper - X0_lower) / X_test.shape[2]
-        dim_x = np.arange(np.min(X_test[0]), np.max(X_test[0]) + step_x / 2, step_x)
+        if parameters[0].log:
+            dim_x = np.arange(np.log(np.min(X_test[0])), np.log(np.max(X_test[0])) + step_x / 2, step_x)
+        else:
+            dim_x = np.arange(np.min(X_test[0]), np.max(X_test[0]) + step_x / 2, step_x)
     if parameters[1].log:
         X1_upper = np.log(parameters[1].upper)
         X1_lower = np.log(parameters[1].lower)
+        step_y = 1 / 2 * (np.log(np.max(X_test[1])) - np.log(np.min(X_test[1])))
+        dim_y = np.arange(np.log(np.min(X_test[1])), np.log(np.max(X_test[1])) + step_y / 2, step_y)
     else:
         X1_upper = parameters[1].upper
         X1_lower = parameters[1].lower
-    step_y = 1 / 2 * (np.max(X_test[1]) - np.min(X_test[1]))
-    dim_y = np.arange(np.min(X_test[1]), np.max(X_test[1]) + step_y / 2, step_y)
+        step_y = 1 / 2 * (np.max(X_test[1]) - np.min(X_test[1]))
+        dim_y = np.arange(np.min(X_test[1]), np.max(X_test[1]) + step_y / 2, step_y)
+
 
     fig, axes = plt.subplots(
         ncols=1, nrows=len(symbolic_models) + 1, constrained_layout=True, figsize=(8, 5)
@@ -461,6 +469,11 @@ def plot_symb2d(
         )
     )
     vmin, vmax = min(y_values), max(y_values)
+
+    if parameters[0].log:
+        X_test[0] = np.log(X_test[0])
+    if parameters[1].log:
+        X_test[1] = np.log(X_test[1])
 
     im = axes[0].pcolormesh(
         X_test[0],
@@ -521,6 +534,10 @@ def plot_symb2d(
                 "No training data for model name. Model name should contain 'smac' or 'rand'."
             )
         if X_train is not None:
+            if parameters[0].log:
+                X_train[0] = np.log(X_train[0])
+            if parameters[1].log:
+                X_train[1] = np.log(X_train[1])
             axes[i + 1].scatter(
                 X_train[0],
                 X_train[1],
