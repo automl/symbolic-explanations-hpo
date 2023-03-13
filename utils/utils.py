@@ -205,7 +205,7 @@ def write_dict_to_cfg_file(dictionary: dict, target_file_path: str):
         parser.write(f)
 
 
-def get_hpo_test_data(classifier, optimized_parameters, n_test_samples):
+def get_hpo_test_data(classifier, optimized_parameters, n_test_samples, return_x=False):
     X_test_dimensions = []
     n_test_steps = (
         int(np.sqrt(n_test_samples))
@@ -259,6 +259,8 @@ def get_hpo_test_data(classifier, optimized_parameters, n_test_samples):
                 X_test_dimensions[1],
             )
         ).astype(float)
+        if return_x:
+            return X_test
         y_test = np.zeros((X_test.shape[1], X_test.shape[2]))
         for n in range(X_test.shape[1]):
             for m in range(X_test.shape[2]):

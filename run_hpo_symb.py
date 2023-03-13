@@ -15,6 +15,7 @@ from symbolic_meta_model_wrapper import (
     SymbolicPursuitModelWrapper,
 )
 from utils.symb_reg_utils import get_function_set
+from utils.model_utils import get_classifier
 from utils.utils import (
     get_output_dirs,
     convert_symb,
@@ -26,14 +27,12 @@ from utils.utils import (
     write_dict_to_cfg_file,
 )
 from utils.smac_utils import run_smac_optimization
-from utils.model_wrapper import SVM, MLP, BDT, DT
-
 
 if __name__ == "__main__":
-    seed = 42
-    n_smac_samples = 20
+    seed = 3
+    n_smac_samples = 10
     n_test_samples = 100
-    model = "BDT"
+    model = "MLP"
     symb_reg = True
     symb_meta = False
     symb_purs = False
@@ -41,29 +40,7 @@ if __name__ == "__main__":
     train_on_surrogate = False
     compare_on_test = False
 
-    if model == "MLP":
-        classifier = MLP(
-            optimize_n_neurons=False,
-            optimize_n_layer=False,
-            optimize_batch_size=False,
-            optimize_learning_rate_init=True,
-            optimize_max_iter=False,
-            seed=seed,
-        )
-    elif model == "SVM":  # set lower tolerance, iris (stopping_criteria=0.00001)
-        classifier = SVM(
-            optimize_C=False,
-            optimize_degree=True,
-            optimize_coef=True,
-            optimize_gamma=False,
-        )
-    elif model == "BDT":
-        classifier = BDT(optimize_learning_rate=True, optimize_n_estimators=True)
-    elif model == "DT":
-        classifier = DT(optimize_max_depth=True, optimize_min_samples_leaf=True)
-    else:
-        print(f"Unknown model: {model}")
-        classifier = None
+    classifier = get_classifier(model_name=model, seed=seed)
 
     np.random.seed(seed)
 
@@ -160,22 +137,22 @@ if __name__ == "__main__":
         # TODO: log symb regression logs?
         symb_params = dict(
             population_size=5000,
-            generations=50,
-            stopping_criteria=0.001,
-            p_crossover=0.7,
-            p_subtree_mutation=0.1,
-            p_hoist_mutation=0.05,
-            p_point_mutation=0.1,
-            max_samples=0.9,
-            parsimony_coefficient=0.01,
+            generations=3,
+            # stopping_criteria=0.001,
+            # p_crossover=0.7,
+            # p_subtree_mutation=0.1,
+            # p_hoist_mutation=0.05,
+            # p_point_mutation=0.1,
+            # max_samples=0.9,
+            # parsimony_coefficient=0.01,
             function_set=get_function_set(),
             metric="mse",  # "mean absolute error",
-            random_state=0,
+            random_state=3,
             verbose=1,
-            const_range=(
-                100,
-                100,
-            ),  # Range for constants, rather arbitrary setting here?
+            # const_range=(
+            #     100,
+            #     100,
+            # ),  # Range for constants, rather arbitrary setting here?
         )
 
         write_dict_to_cfg_file(
@@ -193,6 +170,12 @@ if __name__ == "__main__":
         else:
             symb_smac.fit(X_train_smac.T, y_train_smac)
         symbolic_models["Symb-smac"] = symb_smac
+        import dill as pickle
+        with open(
+                f"{res_dir}/symb.pkl", "wb") as symb_model_file:
+            # pickling all programs lead to huge files
+            delattr(symb_smac, "_programs")
+            pickle.dump(symb_smac, symb_model_file)
 
         # run SR on compare samples (either random samples or test grid samples)
         symb_compare = SymbolicRegressor(**symb_params)
@@ -340,7 +323,7 @@ if __name__ == "__main__":
                 X_test=X_test,
                 y_test=y_test,
                 function_name=model,
-                metric_name="Cost",
+                metric_name="1 - Accuracy",
                 symbolic_models=symbolic_models,
                 parameters=optimized_parameters,
                 plot_dir=plot_dir,
