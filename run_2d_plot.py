@@ -100,8 +100,8 @@ if __name__ == "__main__":
         logger.info(f"Get test data for {classifier_name}.")
         # try:
         X_test = np.array(
-            pd.read_csv(f"learning_curves/runs_symb/default/smac/{run_name}/x_test.csv", header=False))
-        y_test = np.array(pd.read_csv(f"learning_curves/runs_symb/default/smac/{run_name}/y_test.csv"))
+            pd.read_csv(f"learning_curves/runs_symb/default/smac/{run_name}/x_test.csv", header=0))
+        y_test = np.array(pd.read_csv(f"learning_curves/runs_symb/default/smac/{run_name}/y_test.csv", header=None))
         # except:
         #     logger.info(f"No test data found, create test data for {run_name}.")
         #     X_test, y_test = get_hpo_test_data(classifier, optimized_parameters, n_test_samples)
