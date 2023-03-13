@@ -15,7 +15,7 @@ from utils.logging_utils import get_logger
 sys.modules['functions'] = functions_utils
 
 
-N_SAMPLES_SPACING = np.linspace(10, 20, 3, dtype=int).tolist()
+N_SAMPLES_SPACING = np.linspace(20, 200, 10, dtype=int).tolist()
 
 
 if __name__ == "__main__":
@@ -24,7 +24,7 @@ if __name__ == "__main__":
     symb_seeds = [0] #, 3, 6]
     symb_dir_name = "default"
     functions = get_functions2d()
-    models = ["DT"]
+    models = ["MLP", "SVM", "BDT", "DT"]
     #models = functions
     data_sets = ["digits", "iris"]
 
