@@ -108,6 +108,15 @@ if __name__ == "__main__":
 
         df_error_metrics_smac = pd.read_csv(f"learning_curves/runs_symb/{symb_dir_name}/smac/{run_name}/error_metrics.csv")
 
+        n_seeds_total = 0
+        error_test = {}
+        if evaluate_on_surrogate:
+            error_test[f"SR (BO-GP)"] = 0
+            error_test["GP (BO)"] = 0
+        else:
+            error_test[f"SR (BO)"] = 0
+            error_test[f"SR (Random)"] = 0
+
         for sampling_seed in df_samples_smac.seed.unique():
             logger.info(f"Considering sampling seed {sampling_seed}.")
             df_sampling_seed_smac = df_samples_smac.copy()[df_samples_smac["seed"] == sampling_seed]
@@ -119,7 +128,7 @@ if __name__ == "__main__":
             for symb_seed in df_error_metrics_smac.symb_seed.unique():
                 logger.info(f"Considering symb seed {symb_seed}.")
 
-                error_test = {}
+                n_seeds_total += 1
 
                 if evaluate_on_surrogate:
                     with open(
@@ -129,21 +138,16 @@ if __name__ == "__main__":
                     symb_pred_surr = symb_surr.predict(
                         X_test.T.reshape(X_test.shape[1] * X_test.shape[2], X_test.shape[0])
                     ).reshape(X_test.shape[2], X_test.shape[1]).T
-                    surr_conv = convert_symb(symb_surr, n_decimals=3)
-                    if len(str(surr_conv)) < 80:
-                        error_test[f"SR (BO-GP): {surr_conv}"] = np.abs(y_test - symb_pred_surr)
-                    else:
-                        error_test[f"SR (BO-GP)"] = np.abs(y_test - symb_pred_surr)
+                    error_test[f"SR (BO-GP)"] += np.abs(y_test - symb_pred_surr)
 
                     surr_dir = f"learning_curves/runs_surr/{run_name}"
                     with open(
                             f"{sampling_dir_smac}/surrogates/n_eval{n_eval}_samples{n_samples}_seed{sampling_seed}.pkl",
                             "rb") as surrogate_file:
                         surrogate_model = pickle.load(surrogate_file)
-                    error_test["GP (BO)"] = np.abs(y_test - np.array(get_surrogate_predictions(
+                    error_test["GP (BO)"] += np.abs(y_test - np.array(get_surrogate_predictions(
                         X_test.reshape(len(optimized_parameters), -1).T, classifier, surrogate_model)).reshape(
                         X_test.shape[1], X_test.shape[2]))
-                    X_train_list = [X_train_smac.T, None]
                 else:
                     with open(
                             f"{symb_dir_smac}/n_samples{n_samples}_sampling_seed{sampling_seed}_symb_seed{symb_seed}.pkl",
@@ -152,11 +156,7 @@ if __name__ == "__main__":
                     symb_pred_smac = symb_smac.predict(
                         X_test.T.reshape(X_test.shape[1] * X_test.shape[2], X_test.shape[0])
                     ).reshape(X_test.shape[2], X_test.shape[1]).T
-                    smac_conv = convert_symb(symb_smac, n_decimals=3)
-                    if len(str(smac_conv)) < 80:
-                        error_test[f"SR (BO): {smac_conv}"] = np.abs(y_test - symb_pred_smac)
-                    else:
-                        error_test[f"SR (BO)"] = np.abs(y_test - symb_pred_smac)
+                    error_test[f"SR (BO)"] += np.abs(y_test - symb_pred_smac)
 
                     with open(
                             f"{symb_dir_rand}/n_samples{n_samples}_sampling_seed{sampling_seed}_symb_seed{symb_seed}.pkl",
@@ -165,21 +165,17 @@ if __name__ == "__main__":
                     symb_pred_rand = symb_rand.predict(
                         X_test.T.reshape(X_test.shape[1] * X_test.shape[2], X_test.shape[0])
                     ).reshape(X_test.shape[2], X_test.shape[1]).T
-                    rand_conv = convert_symb(symb_rand, n_decimals=3)
-                    if len(str(rand_conv)) < 80:
-                        error_test[f"SR (Random): {rand_conv}"] = np.abs(y_test - symb_pred_rand)
-                    else:
-                        error_test[f"SR (Random)"] = np.abs(y_test - symb_pred_rand)
+                    error_test[f"SR (Random)"] += np.abs(y_test - symb_pred_rand)
 
-                    X_train_list = [X_train_smac.T, X_train_rand.T]
+                for key in error_test:
+                    error_test[key] = error_test[key]/n_seeds_total
 
-                filename = f"{classifier_name}_{'_'.join(parameter_names)}_{data_set}_n_samples{n_samples}_" \
-                           f"sampling_seed{sampling_seed}_symb_seed{symb_seed}"
+                filename = f"{classifier_name}_{'_'.join(parameter_names)}_{data_set}_n_samples{n_samples}"
                 if evaluate_on_surrogate:
                     filename = "_".join([filename, "surrogate"])
 
                 plot = plot_symb2d(
-                    X_train_list=X_train_list,
+                    X_train_list=[None, None],
                     X_test=X_test.copy(),
                     y_test=y_test.copy(),
                     function_name=classifier.name,
