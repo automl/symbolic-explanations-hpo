@@ -27,6 +27,7 @@ if __name__ == "__main__":
     models = ["MLP", "SVM", "BDT", "DT"]
     #models = functions
     data_sets = ["digits", "iris"]
+    evaluate_on_surrogate = True
 
     init_design_max_ratio = 0.25
     init_design_n_configs_per_hyperparamter = 8
@@ -76,7 +77,10 @@ if __name__ == "__main__":
 
         sampling_dir_smac = f"learning_curves/runs_sampling/smac/{run_name}"
         sampling_dir_rand = f"learning_curves/runs_sampling/rand/{run_name}"
-        symb_dir_smac = f"learning_curves/runs_symb/{symb_dir_name}/smac/{run_name}/symb_models"
+        if evaluate_on_surrogate:
+            symb_dir_smac = f"learning_curves/runs_symb/{symb_dir_name}/surr/{run_name}/symb_models"
+        else:
+            symb_dir_smac = f"learning_curves/runs_symb/{symb_dir_name}/smac/{run_name}/symb_models"
         symb_dir_rand = f"learning_curves/runs_symb/{symb_dir_name}/rand/{run_name}/symb_models"
 
         with open(f"{sampling_dir_smac}/classifier.pkl", "rb") as classifier_file:
