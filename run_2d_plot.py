@@ -20,13 +20,14 @@ N_SAMPLES_SPACING = np.linspace(20, 200, 10, dtype=int).tolist()
 
 if __name__ == "__main__":
     n_samples = 100
+    n_test_samples = 100
     symb_seeds = [0] #, 3, 6]
     symb_dir_name = "default"
     functions = get_functions2d()
-    #models = ["MLP", "SVM", "BDT", "DT"]
-    models = functions
+    models = ["MLP", "SVM", "BDT", "DT"]
+    #models = functions
     data_sets = ["digits", "iris"]
-    
+
     init_design_max_ratio = 0.25
     init_design_n_configs_per_hyperparamter = 8
 
@@ -95,8 +96,15 @@ if __name__ == "__main__":
 
         df_samples_rand = pd.read_csv(f"{sampling_dir_rand}/samples_{max(N_SAMPLES_SPACING)}.csv")
 
+        # Load test data
         logger.info(f"Get test data for {classifier_name}.")
-        X_test, y_test = get_hpo_test_data(classifier, optimized_parameters, 100)
+        # try:
+        X_test = np.array(
+            pd.read_csv(f"learning_curves/runs_symb/default/smac/{run_name}/x_test.csv", header=False))
+        y_test = np.array(pd.read_csv(f"learning_curves/runs_symb/default/smac/{run_name}/y_test.csv"))
+        # except:
+        #     logger.info(f"No test data found, create test data for {run_name}.")
+        #     X_test, y_test = get_hpo_test_data(classifier, optimized_parameters, n_test_samples)
 
         symbolic_models = {}
 
