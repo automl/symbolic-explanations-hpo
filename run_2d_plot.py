@@ -110,8 +110,6 @@ if __name__ == "__main__":
             logger.info(f"No test data found, create test data for {run_name}.")
             X_test, y_test = get_hpo_test_data(classifier, optimized_parameters, n_test_samples)
 
-        predictions_test = {}
-
         for sampling_seed in [0]: #df_samples_smac.seed.unique():
             logger.info(f"Considering sampling seed {sampling_seed}.")
             df_sampling_seed_smac = df_samples_smac.copy()[df_samples_smac["seed"] == sampling_seed]
@@ -123,6 +121,8 @@ if __name__ == "__main__":
             for symb_seed in symb_seeds:
                 logger.info(f"Considering symb seed {symb_seed}.")
 
+                predictions_test = {}
+                
                 if evaluate_on_surrogate:
                     with open(
                             f"{symb_dir_surr}/n_samples{n_samples}_sampling_seed{sampling_seed}_symb_seed{symb_seed}.pkl",

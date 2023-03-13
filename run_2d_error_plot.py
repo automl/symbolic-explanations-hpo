@@ -108,10 +108,7 @@ if __name__ == "__main__":
 
         df_error_metrics_smac = pd.read_csv(f"learning_curves/runs_symb/{symb_dir_name}/smac/{run_name}/error_metrics.csv")
 
-        error_test = {}
-
         for sampling_seed in df_samples_smac.seed.unique():
-            X_train_list = []
             logger.info(f"Considering sampling seed {sampling_seed}.")
             df_sampling_seed_smac = df_samples_smac.copy()[df_samples_smac["seed"] == sampling_seed]
             df_sampling_seed_rand = df_samples_rand.copy()[df_samples_rand["seed"] == sampling_seed]
@@ -121,6 +118,8 @@ if __name__ == "__main__":
 
             for symb_seed in df_error_metrics_smac.symb_seed.unique():
                 logger.info(f"Considering symb seed {symb_seed}.")
+
+                error_test = {}
 
                 if evaluate_on_surrogate:
                     with open(
@@ -144,8 +143,7 @@ if __name__ == "__main__":
                     error_test["GP (BO)"] = np.abs(y_test - np.array(get_surrogate_predictions(
                         X_test.reshape(len(optimized_parameters), -1).T, classifier, surrogate_model)).reshape(
                         X_test.shape[1], X_test.shape[2]))
-                    X_train_list.append(X_train_smac.T)
-                    X_train_list.append(None)
+                    X_train_list = [X_train_smac.T, None]
                 else:
                     with open(
                             f"{symb_dir_smac}/n_samples{n_samples}_sampling_seed{sampling_seed}_symb_seed{symb_seed}.pkl",
@@ -172,15 +170,13 @@ if __name__ == "__main__":
                         error_test[f"SR (Random): {rand_conv}"] = np.abs(y_test - symb_pred_rand)
                     else:
                         error_test[f"SR (Random)"] = np.abs(y_test - symb_pred_rand)
-                    X_train_list.append(X_train_smac.T)
-                    X_train_list.append(X_train_rand.T)
+
+                    X_train_list = [X_train_smac.T, X_train_rand.T]
 
                 filename = f"{classifier_name}_{'_'.join(parameter_names)}_{data_set}_n_samples{n_samples}_" \
                            f"sampling_seed{sampling_seed}_symb_seed{symb_seed}"
                 if evaluate_on_surrogate:
                     filename = "_".join([filename, "surrogate"])
-
-                logger.info(f"Length of X_train_list: {len(X_train_list)}")
 
                 plot = plot_symb2d(
                     X_train_list=X_train_list,
