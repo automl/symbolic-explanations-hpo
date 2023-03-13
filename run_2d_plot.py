@@ -148,9 +148,9 @@ if __name__ == "__main__":
                     X_train_list = [X_train_smac.T, None]
                 else:
                     with open(
-                            f"{symb_dir_rand}/n_samples{n_samples}_sampling_seed{sampling_seed}_symb_seed{symb_seed}.pkl",
-                            "rb") as symb_model_file_rand:
-                        symb_rand = pickle.load(symb_model_file_rand)
+                            f"{symb_dir_smac}/n_samples{n_samples}_sampling_seed{sampling_seed}_symb_seed{symb_seed}.pkl",
+                            "rb") as symb_model_file_smac:
+                        symb_smac = pickle.load(symb_model_file_smac)
                     symb_pred_smac = symb_smac.predict(
                             X_test.T.reshape(X_test.shape[1] * X_test.shape[2], X_test.shape[0])
                         ).reshape(X_test.shape[2], X_test.shape[1]).T
@@ -161,9 +161,9 @@ if __name__ == "__main__":
                         predictions_test[f"SR (BO)"] = symb_pred_smac
 
                     with open(
-                            f"{symb_dir_smac}/n_samples{n_samples}_sampling_seed{sampling_seed}_symb_seed{symb_seed}.pkl",
-                            "rb") as symb_model_file_smac:
-                        symb_smac = pickle.load(symb_model_file_smac)
+                            f"{symb_dir_rand}/n_samples{n_samples}_sampling_seed{sampling_seed}_symb_seed{symb_seed}.pkl",
+                            "rb") as symb_model_file_rand:
+                        symb_rand = pickle.load(symb_model_file_rand)
                     symb_prad_rand = symb_rand.predict(
                             X_test.T.reshape(X_test.shape[1] * X_test.shape[2], X_test.shape[0])
                         ).reshape(X_test.shape[2], X_test.shape[1]).T
@@ -172,6 +172,7 @@ if __name__ == "__main__":
                         predictions_test[f"SR (Random): {rand_conv}"] = symb_prad_rand
                     else:
                         predictions_test[f"SR (Random)"] = symb_prad_rand
+                        
                     X_train_list = [X_train_smac.T, X_train_rand.T]
 
                 filename = f"{classifier_name}_{'_'.join(parameter_names)}_{data_set}_n_samples{n_samples}_" \
