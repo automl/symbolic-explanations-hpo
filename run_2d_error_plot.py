@@ -41,7 +41,7 @@ if __name__ == "__main__":
 
     # set up directories
     plot_dir = f"learning_curves/plots"
-    viz_plot_dir = f"{plot_dir}/visualization"
+    viz_plot_dir = f"{plot_dir}/visualization_error"
     if not os.path.exists(viz_plot_dir):
         os.makedirs(viz_plot_dir)
 
