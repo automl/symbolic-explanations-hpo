@@ -99,11 +99,10 @@ if __name__ == "__main__":
         # Load test data
         logger.info(f"Get test data for {classifier_name}.")
         # try:
-        X_test = np.array(
-            pd.read_csv(f"learning_curves/runs_symb/default/smac/{run_name}/x_test.csv", header=0))
-        X_test = X_test.T.reshape(2, 10, 10)
+        X_test = get_hpo_test_data(classifier, optimized_parameters, n_test_samples, return_x=True)
         y_test = np.array(
-            pd.read_csv(f"learning_curves/runs_symb/default/smac/{run_name}/y_test.csv", header=None)).reshape(10, 10)
+            pd.read_csv(f"learning_curves/runs_symb/default/smac/{run_name}/y_test.csv", header=None))
+        y_test = y_test.reshape(X_test.shape[1], X_test.shape[2])
         # except:
         #     logger.info(f"No test data found, create test data for {run_name}.")
         #     X_test, y_test = get_hpo_test_data(classifier, optimized_parameters, n_test_samples)
