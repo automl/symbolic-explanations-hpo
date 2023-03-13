@@ -5,7 +5,7 @@ import numpy as np
 import dill as pickle
 from itertools import combinations
 
-from utils.utils import get_hpo_test_data, plot_symb2d, get_surrogate_predictions
+from utils.utils import get_hpo_test_data, plot_symb2d, get_surrogate_predictions, convert_symb
 from utils.functions_utils import get_functions2d, NamedFunction
 from utils.model_utils import get_hyperparams, get_classifier_from_run_conf
 from utils import functions_utils
@@ -77,10 +77,9 @@ if __name__ == "__main__":
 
         sampling_dir_smac = f"learning_curves/runs_sampling/smac/{run_name}"
         sampling_dir_rand = f"learning_curves/runs_sampling/rand/{run_name}"
-        if evaluate_on_surrogate:
-            symb_dir_smac = f"learning_curves/runs_symb/{symb_dir_name}/surr/{run_name}/symb_models"
-        else:
-            symb_dir_smac = f"learning_curves/runs_symb/{symb_dir_name}/smac/{run_name}/symb_models"
+
+        symb_dir_surr = f"learning_curves/runs_symb/{symb_dir_name}/surr/{run_name}/symb_models"
+        symb_dir_smac = f"learning_curves/runs_symb/{symb_dir_name}/smac/{run_name}/symb_models"
         symb_dir_rand = f"learning_curves/runs_symb/{symb_dir_name}/rand/{run_name}/symb_models"
 
         with open(f"{sampling_dir_smac}/classifier.pkl", "rb") as classifier_file:
@@ -102,16 +101,16 @@ if __name__ == "__main__":
 
         # Load test data
         logger.info(f"Get test data for {classifier_name}.")
-        # try:
-        X_test = get_hpo_test_data(classifier, optimized_parameters, n_test_samples, return_x=True)
-        y_test = np.array(
-            pd.read_csv(f"learning_curves/runs_symb/default/smac/{run_name}/y_test.csv", header=None))
-        y_test = y_test.reshape(X_test.shape[1], X_test.shape[2])
-        # except:
-        #     logger.info(f"No test data found, create test data for {run_name}.")
-        #     X_test, y_test = get_hpo_test_data(classifier, optimized_parameters, n_test_samples)
+        try:
+            X_test = get_hpo_test_data(classifier, optimized_parameters, n_test_samples, return_x=True)
+            y_test = np.array(
+                pd.read_csv(f"learning_curves/runs_symb/default/smac/{run_name}/y_test.csv", header=None))
+            y_test = y_test.reshape(X_test.shape[1], X_test.shape[2])
+        except:
+            logger.info(f"No test data found, create test data for {run_name}.")
+            X_test, y_test = get_hpo_test_data(classifier, optimized_parameters, n_test_samples)
 
-        symbolic_models = {}
+        predictions_test = {}
 
         for sampling_seed in [0]: #df_samples_smac.seed.unique():
             logger.info(f"Considering sampling seed {sampling_seed}.")
@@ -124,25 +123,56 @@ if __name__ == "__main__":
             for symb_seed in symb_seeds:
                 logger.info(f"Considering symb seed {symb_seed}.")
 
-                with open(f"{symb_dir_rand}/n_samples{n_samples}_sampling_seed{sampling_seed}_symb_seed{symb_seed}.pkl", "rb") as symb_model_file_rand:
-                    symb_rand = pickle.load(symb_model_file_rand)
-                with open(f"{symb_dir_smac}/n_samples{n_samples}_sampling_seed{sampling_seed}_symb_seed{symb_seed}.pkl", "rb") as symb_model_file_smac:
-                    symb_smac = pickle.load(symb_model_file_smac)
-
                 if evaluate_on_surrogate:
-                    symbolic_models["SR (BO-GP)"] = symb_smac
+                    with open(
+                            f"{symb_dir_surr}/n_samples{n_samples}_sampling_seed{sampling_seed}_symb_seed{symb_seed}.pkl",
+                            "rb") as symb_model_file_surr:
+                        symb_surr = pickle.load(symb_model_file_surr)
+                    symb_pred_surr = symb_surr.predict(
+                            X_test.T.reshape(X_test.shape[1] * X_test.shape[2], X_test.shape[0])
+                        ).reshape(X_test.shape[2], X_test.shape[1]).T
+                    surr_conv = convert_symb(symb_smac, n_decimals=3)
+                    if len(str(surr_conv)) < 80:
+                        predictions_test[f"SR (BO-GP): {surr_conv}"] = symb_pred_surr
+                    else:
+                        predictions_test[f"SR (BO-GP)"] = symb_pred_surr
+
                     surr_dir = f"learning_curves/runs_surr/{run_name}"
                     with open(
                             f"{sampling_dir_smac}/surrogates/n_eval{n_eval}_samples{n_samples}_seed{sampling_seed}.pkl",
                             "rb") as surrogate_file:
                         surrogate_model = pickle.load(surrogate_file)
-
-                    symbolic_models["GP (BO)"] = np.array(get_surrogate_predictions(
+                    predictions_test["GP (BO)"] = np.array(get_surrogate_predictions(
                         X_test.reshape(len(optimized_parameters), -1).T, classifier, surrogate_model)).reshape(
                         X_test.shape[1], X_test.shape[2])
+                    X_train_list = [X_train_smac.T, None]
                 else:
-                    symbolic_models["SR (BO)"] = symb_smac
-                    symbolic_models["SR (Random)"] = symb_rand
+                    with open(
+                            f"{symb_dir_rand}/n_samples{n_samples}_sampling_seed{sampling_seed}_symb_seed{symb_seed}.pkl",
+                            "rb") as symb_model_file_rand:
+                        symb_rand = pickle.load(symb_model_file_rand)
+                    symb_pred_smac = symb_smac.predict(
+                            X_test.T.reshape(X_test.shape[1] * X_test.shape[2], X_test.shape[0])
+                        ).reshape(X_test.shape[2], X_test.shape[1]).T
+                    smac_conv = convert_symb(symb_smac, n_decimals=3)
+                    if len(str(smac_conv)) < 80:
+                        predictions_test[f"SR (BO): {smac_conv}"] = symb_pred_smac
+                    else:
+                        predictions_test[f"SR (BO)"] = symb_pred_smac
+
+                    with open(
+                            f"{symb_dir_smac}/n_samples{n_samples}_sampling_seed{sampling_seed}_symb_seed{symb_seed}.pkl",
+                            "rb") as symb_model_file_smac:
+                        symb_smac = pickle.load(symb_model_file_smac)
+                    symb_prad_rand = symb_rand.predict(
+                            X_test.T.reshape(X_test.shape[1] * X_test.shape[2], X_test.shape[0])
+                        ).reshape(X_test.shape[2], X_test.shape[1]).T
+                    rand_conv = convert_symb(symb_rand, n_decimals=3)
+                    if len(str(rand_conv)) < 80:
+                        predictions_test[f"SR (Random): {rand_conv}"] = symb_prad_rand
+                    else:
+                        predictions_test[f"SR (Random)"] = symb_prad_rand
+                    X_train_list = [X_train_smac.T, X_train_rand.T]
 
                 filename = f"{classifier_name}_{'_'.join(parameter_names)}_{data_set}_n_samples{n_samples}_" \
                            f"sampling_seed{sampling_seed}_symb_seed{symb_seed}"
@@ -150,13 +180,12 @@ if __name__ == "__main__":
                     filename = "_".join([filename, "surrogate"])
 
                 plot = plot_symb2d(
-                                X_train_smac=X_train_smac.T,
-                                X_train_compare=X_train_rand.T,
+                                X_train_list=X_train_list,
                                 X_test=X_test,
                                 y_test=y_test,
                                 function_name=classifier.name,
                                 metric_name="Test Error Rate",
-                                symbolic_models=symbolic_models,
+                                predictions_test=predictions_test,
                                 parameters=optimized_parameters,
                                 plot_dir=viz_plot_dir,
                                 filename=filename

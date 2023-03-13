@@ -387,11 +387,10 @@ def plot_symb1d(
 
 
 def plot_symb2d(
-    X_train_smac,
-    X_train_compare,
+    X_train_list,
     X_test,
     y_test,
-    symbolic_models,
+    predictions_test,
     parameters,
     function_name,
     metric_name=None,
@@ -448,22 +447,12 @@ def plot_symb2d(
 
 
     fig, axes = plt.subplots(
-        ncols=1, nrows=len(symbolic_models) + 1, constrained_layout=True, figsize=(8, 5)
+        ncols=1, nrows=len(predictions_test) + 1, constrained_layout=True, figsize=(8, 5)
     )
 
     pred_test = []
-    for i, model_name in enumerate(symbolic_models):
-        if model_name == "GP (BO)":
-            pred_test.append(symbolic_models[model_name])
-        else:
-            symbolic_model = symbolic_models[model_name]
-            pred_test.append(
-                symbolic_model.predict(
-                    X_test.T.reshape(X_test.shape[1] * X_test.shape[2], X_test.shape[0])
-                )
-                .reshape(X_test.shape[2], X_test.shape[1])
-                .T
-            )
+    for i, model_name in enumerate(predictions_test):
+        pred_test.append(predictions_test[model_name])
     y_values = np.concatenate(
         (
             y_test.reshape(-1, 1),
@@ -500,16 +489,8 @@ def plot_symb2d(
     axes[0].tick_params(axis="both", which="major", labelsize=LABEL_SIZE)
     axes[0].grid(alpha=0)
 
-    for i, model_name in enumerate(symbolic_models):
-        if model_name == "GP (BO)":
-            label = model_name
-        else:
-            symbolic_model = symbolic_models[model_name]
-            conv = convert_symb(symbolic_model, n_decimals=3)
-            if len(str(conv)) < 80:
-                label = f"{model_name}: {conv}"
-            else:
-                label = f"{model_name}:"
+    for i, model_name in enumerate(predictions_test):
+        label = model_name
         im = axes[i + 1].pcolormesh(
             X_test[0],
             X_test[1],
@@ -528,15 +509,7 @@ def plot_symb2d(
         axes[i + 1].set_ylim(X1_lower, X1_upper)
         axes[i + 1].tick_params(axis="both", which="major", labelsize=LABEL_SIZE)
         axes[i + 1].grid(alpha=0)
-        if "BO" in model_name:
-            X_train = X_train_smac.copy()
-        elif "Random" in model_name:
-            X_train = X_train_compare.copy()
-        else:
-            X_train = None
-            print(
-                "No training data for model name. Model name should contain 'BO' or 'Random'."
-            )
+        X_train = X_train_list[i]
         if X_train is not None:
             if parameters[0].log:
                 X_train[0] = np.log(X_train[0])
