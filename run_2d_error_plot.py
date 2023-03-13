@@ -111,6 +111,7 @@ if __name__ == "__main__":
         error_test = {}
 
         for sampling_seed in df_samples_smac.seed.unique():
+            X_train_list = []
             logger.info(f"Considering sampling seed {sampling_seed}.")
             df_sampling_seed_smac = df_samples_smac.copy()[df_samples_smac["seed"] == sampling_seed]
             df_sampling_seed_rand = df_samples_rand.copy()[df_samples_rand["seed"] == sampling_seed]
@@ -143,7 +144,8 @@ if __name__ == "__main__":
                     error_test["GP (BO)"] = np.abs(y_test - np.array(get_surrogate_predictions(
                         X_test.reshape(len(optimized_parameters), -1).T, classifier, surrogate_model)).reshape(
                         X_test.shape[1], X_test.shape[2]))
-                    X_train_list = [X_train_smac.T, None]
+                    X_train_list.append(X_train_smac.T)
+                    X_train_list.append(None)
                 else:
                     with open(
                             f"{symb_dir_smac}/n_samples{n_samples}_sampling_seed{sampling_seed}_symb_seed{symb_seed}.pkl",
@@ -170,8 +172,8 @@ if __name__ == "__main__":
                         error_test[f"SR (Random): {rand_conv}"] = np.abs(y_test - symb_pred_rand)
                     else:
                         error_test[f"SR (Random)"] = np.abs(y_test - symb_pred_rand)
-
-                    X_train_list = [X_train_smac.T, X_train_rand.T]
+                    X_train_list.append(X_train_smac.T)
+                    X_train_list.append(X_train_rand.T)
 
                 filename = f"{classifier_name}_{'_'.join(parameter_names)}_{data_set}_n_samples{n_samples}_" \
                            f"sampling_seed{sampling_seed}_symb_seed{symb_seed}"
