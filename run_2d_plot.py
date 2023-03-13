@@ -122,7 +122,7 @@ if __name__ == "__main__":
                 logger.info(f"Considering symb seed {symb_seed}.")
 
                 predictions_test = {}
-                
+
                 if evaluate_on_surrogate:
                     with open(
                             f"{symb_dir_surr}/n_samples{n_samples}_sampling_seed{sampling_seed}_symb_seed{symb_seed}.pkl",
@@ -172,7 +172,7 @@ if __name__ == "__main__":
                         predictions_test[f"SR (Random): {rand_conv}"] = symb_prad_rand
                     else:
                         predictions_test[f"SR (Random)"] = symb_prad_rand
-                        
+
                     X_train_list = [X_train_smac.T, X_train_rand.T]
 
                 filename = f"{classifier_name}_{'_'.join(parameter_names)}_{data_set}_n_samples{n_samples}_" \

@@ -179,6 +179,7 @@ if __name__ == "__main__":
                     X_test=X_test.copy(),
                     y_test=y_test.copy(),
                     function_name=classifier.name,
+                    use_same_scale=False,
                     metric_name="Surrogate Abs. Error",
                     predictions_test=error_test,
                     parameters=optimized_parameters,
