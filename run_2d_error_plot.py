@@ -180,8 +180,8 @@ if __name__ == "__main__":
 
                 plot = plot_symb2d(
                     X_train_list=X_train_list,
-                    X_test=X_test,
-                    y_test=y_test,
+                    X_test=X_test.copy(),
+                    y_test=y_test.copy(),
                     function_name=classifier.name,
                     metric_name="Surrogate Abs. Error",
                     predictions_test=error_test,
