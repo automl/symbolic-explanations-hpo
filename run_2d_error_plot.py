@@ -180,6 +180,8 @@ if __name__ == "__main__":
                 if evaluate_on_surrogate:
                     filename = "_".join([filename, "surrogate"])
 
+                logger.info(f"Length of X_train_list: {len(X_train_list)}")
+
                 plot = plot_symb2d(
                     X_train_list=X_train_list,
                     X_test=X_test.copy(),
