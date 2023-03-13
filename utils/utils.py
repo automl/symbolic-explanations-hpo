@@ -463,13 +463,17 @@ def plot_symb2d(
     vmin, vmax = min(y_values), max(y_values)
 
     if parameters[0].log:
-        X_test[0] = np.log(X_test[0])
+        X0_test = np.log(X_test[0])
+    else:
+        X0_test = X_test[0]
     if parameters[1].log:
-        X_test[1] = np.log(X_test[1])
+        X1_test = np.log(X_test[1])
+    else:
+        X1_test = X_test[1]
 
     im = axes[0].pcolormesh(
-        X_test[0],
-        X_test[1],
+        X0_test,
+        X1_test,
         y_test,
         cmap="summer",
         shading="auto",
@@ -492,8 +496,8 @@ def plot_symb2d(
     for i, model_name in enumerate(predictions_test):
         label = model_name
         im = axes[i + 1].pcolormesh(
-            X_test[0],
-            X_test[1],
+            X0_test,
+            X1_test,
             pred_test[i],
             cmap="summer",
             shading="auto",
