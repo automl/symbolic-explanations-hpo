@@ -138,7 +138,8 @@ if __name__ == "__main__":
                         surrogate_model = pickle.load(surrogate_file)
 
                     symbolic_models["GP (BO)"] = np.array(get_surrogate_predictions(
-                        X_test.reshape(len(optimized_parameters), -1).T, classifier, surrogate_model))
+                        X_test.reshape(len(optimized_parameters), -1).T, classifier, surrogate_model)).reshape(
+                        X_test.shape[1], X_test.shape[2])
                 else:
                     symbolic_models["SR (BO)"] = symb_smac
                     symbolic_models["SR (Random)"] = symb_rand

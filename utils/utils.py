@@ -529,9 +529,9 @@ def plot_symb2d(
         axes[i + 1].tick_params(axis="both", which="major", labelsize=LABEL_SIZE)
         axes[i + 1].grid(alpha=0)
         if "BO" in model_name:
-            X_train = X_train_smac
+            X_train = X_train_smac.copy()
         elif "Random" in model_name:
-            X_train = X_train_compare
+            X_train = X_train_compare.copy()
         else:
             X_train = None
             print(
