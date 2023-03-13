@@ -5,7 +5,7 @@ import numpy as np
 import dill as pickle
 from itertools import combinations
 
-from utils.utils import get_hpo_test_data, plot_symb2d
+from utils.utils import get_hpo_test_data, plot_symb2d, get_surrogate_predictions
 from utils.functions_utils import get_functions2d, NamedFunction
 from utils.model_utils import get_hyperparams, get_classifier_from_run_conf
 from utils import functions_utils
@@ -94,10 +94,10 @@ if __name__ == "__main__":
 
         if init_design_max_ratio * n_samples < len(
                 optimized_parameters) * init_design_n_configs_per_hyperparamter:
-            df_samples_smac = pd.read_csv(f"{sampling_dir_smac}/samples_{n_samples}.csv")
+            n_eval = n_samples
         else:
-            df_samples_smac = pd.read_csv(f"{sampling_dir_smac}/samples_{max(N_SAMPLES_SPACING)}.csv")
-
+            n_eval = max(N_SAMPLES_SPACING)
+        df_samples_smac = pd.read_csv(f"{sampling_dir_smac}/samples_{n_eval}.csv")
         df_samples_rand = pd.read_csv(f"{sampling_dir_rand}/samples_{max(N_SAMPLES_SPACING)}.csv")
 
         # Load test data
@@ -129,8 +129,23 @@ if __name__ == "__main__":
                 with open(f"{symb_dir_smac}/n_samples{n_samples}_sampling_seed{sampling_seed}_symb_seed{symb_seed}.pkl", "rb") as symb_model_file_smac:
                     symb_smac = pickle.load(symb_model_file_smac)
 
-                symbolic_models["Symb-smac"] = symb_smac
-                symbolic_models["Symb-rand"] = symb_rand
+                if evaluate_on_surrogate:
+                    symbolic_models["SR (BO-GP)"] = symb_smac
+                    surr_dir = f"learning_curves/runs_surr/{run_name}"
+                    with open(
+                            f"{sampling_dir_smac}/surrogates/n_eval{n_eval}_samples{n_samples}_seed{sampling_seed}.pkl",
+                            "rb") as surrogate_file:
+                        surrogate_model = pickle.load(surrogate_file)
+
+                    symbolic_models["GP (BO)"] = get_surrogate_predictions(X_test, classifier, surrogate_model)
+                else:
+                    symbolic_models["SR (BO)"] = symb_smac
+                    symbolic_models["SR (Random)"] = symb_rand
+
+                filename = f"{classifier_name}_{'_'.join(parameter_names)}_{data_set}_n_samples{n_samples}_" \
+                           f"sampling_seed{sampling_seed}_symb_seed{symb_seed}"
+                if evaluate_on_surrogate:
+                    filename = "_".join([filename, "surrogate"])
 
                 plot = plot_symb2d(
                                 X_train_smac=X_train_smac.T,
@@ -142,5 +157,5 @@ if __name__ == "__main__":
                                 symbolic_models=symbolic_models,
                                 parameters=optimized_parameters,
                                 plot_dir=viz_plot_dir,
-                                filename=f"{classifier_name}_{'_'.join(parameter_names)}_{data_set}_n_samples{n_samples}_sampling_seed{sampling_seed}_symb_seed{symb_seed}"
+                                filename=filename
                             )

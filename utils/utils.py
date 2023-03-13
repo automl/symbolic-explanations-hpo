@@ -453,14 +453,17 @@ def plot_symb2d(
 
     pred_test = []
     for i, model_name in enumerate(symbolic_models):
-        symbolic_model = symbolic_models[model_name]
-        pred_test.append(
-            symbolic_model.predict(
-                X_test.T.reshape(X_test.shape[1] * X_test.shape[2], X_test.shape[0])
+        if model_name == "GP (BO)":
+            pred_test.append(symbolic_models[model_name])
+        else:
+            symbolic_model = symbolic_models[model_name]
+            pred_test.append(
+                symbolic_model.predict(
+                    X_test.T.reshape(X_test.shape[1] * X_test.shape[2], X_test.shape[0])
+                )
+                .reshape(X_test.shape[2], X_test.shape[1])
+                .T
             )
-            .reshape(X_test.shape[2], X_test.shape[1])
-            .T
-        )
     y_values = np.concatenate(
         (
             y_test.reshape(-1, 1),
@@ -498,12 +501,15 @@ def plot_symb2d(
     axes[0].grid(alpha=0)
 
     for i, model_name in enumerate(symbolic_models):
-        symbolic_model = symbolic_models[model_name]
-        conv = convert_symb(symbolic_model, n_decimals=3)
-        if len(str(conv)) < 80:
-            label = f"{model_name}: {conv}"
+        if model_name == "GP (BO)":
+            label = model_name
         else:
-            label = f"{model_name}:"
+            symbolic_model = symbolic_models[model_name]
+            conv = convert_symb(symbolic_model, n_decimals=3)
+            if len(str(conv)) < 80:
+                label = f"{model_name}: {conv}"
+            else:
+                label = f"{model_name}:"
         im = axes[i + 1].pcolormesh(
             X_test[0],
             X_test[1],
@@ -522,16 +528,14 @@ def plot_symb2d(
         axes[i + 1].set_ylim(X1_lower, X1_upper)
         axes[i + 1].tick_params(axis="both", which="major", labelsize=LABEL_SIZE)
         axes[i + 1].grid(alpha=0)
-        if "smac" in model_name:
+        if "BO" in model_name:
             X_train = X_train_smac
-        elif "rand" in model_name:
-            X_train = X_train_compare
-        elif "test" in model_name:
+        elif "Random" in model_name:
             X_train = X_train_compare
         else:
             X_train = None
             print(
-                "No training data for model name. Model name should contain 'smac' or 'rand'."
+                "No training data for model name. Model name should contain 'BO' or 'Random'."
             )
         if X_train is not None:
             if parameters[0].log:
