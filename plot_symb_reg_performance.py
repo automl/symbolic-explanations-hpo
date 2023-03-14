@@ -118,14 +118,14 @@ if __name__ == "__main__":
                         df_fitness = pd.DataFrame({"fitness": symb_model.run_details_["best_fitness"]})
                         df_fitness = df_fitness.reset_index()
                         df_fitness = df_fitness.rename(columns={"index": "generation"})
-                        # df_fitness.insert(0, "n_samples", n_samples)
+                        df_fitness.insert(0, "run", f"n_samples{n_samples}_sampling_seed{sampling_seed}_symb_seed{symb_seed}")
                         # df_fitness.insert(1, "sampling_seed", sampling_seed)
                         # df_fitness.insert(2, "symb_seed", symb_seed)
                         df_all_fitness = pd.concat((df_all_fitness, df_fitness))
 
                 plt.figure()
                 _, ax = plt.subplots(figsize=(8, 5))
-                sns.lineplot(data=df_all_fitness, x="generation", y="fitness")
+                sns.lineplot(data=df_all_fitness, x="generation", y="fitness", hue="run")
                               #linestyles="", capsize=0.2, scale=0.7, dodge=0.4)  # , showfliers=False)
                 if data_set:
                     plt.title(f"{classifier_title}, Dataset: {data_set}\nOptimize: {param0}, {param1}",
