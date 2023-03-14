@@ -404,6 +404,11 @@ def plot_symb2d(
     function and the functions fitted by symbolic models evaluated on a 2D grid.
     """
 
+    plt.rcParams.update({
+        "text.usetex": True,
+        "font.family": "Helvetica"
+    })
+
     LABEL_SIZE = 9
     X0_name = (
         "X0"
@@ -499,10 +504,7 @@ def plot_symb2d(
 
     if not use_same_scale:
         cbar = fig.colorbar(im, ax=axes[0])
-        if metric_name:
-            cbar.set_label("Test Error Rate", fontsize=LABEL_SIZE, rotation=270, labelpad=10)
-        else:
-            cbar.set_label("f(X0, X1)", fontsize=LABEL_SIZE, rotation=270, labelpad=10)
+        cbar.set_label("True $$\mathcal{L}$$", fontsize=LABEL_SIZE, rotation=270, labelpad=10)
         cbar.ax.tick_params(labelsize=LABEL_SIZE)
 
     for i, model_name in enumerate(predictions_test):
