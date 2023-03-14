@@ -12,6 +12,7 @@ def exp(x):
 
 def get_function_set():
     exp_func = make_function(function=exp, arity=1, name="exp")
+    sign_func = make_function(function=np.sign, arity=1, name="sign")
 
     function_set = [
         "add",
@@ -22,7 +23,9 @@ def get_function_set():
         "log",
         "sin",
         "cos",
+        "abs",
         exp_func,
+        sign_func
     ]
 
     return function_set
