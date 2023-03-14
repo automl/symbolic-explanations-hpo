@@ -499,7 +499,7 @@ def plot_symb2d(
 
     if not use_same_scale:
         cbar = fig.colorbar(im, ax=axes[0])
-        cbar.set_label(r'$\text{True} \mathcal{L}$', fontsize=LABEL_SIZE, rotation=270, labelpad=10)
+        cbar.set_label(r'True $\mathcal{L}$', fontsize=LABEL_SIZE, rotation=270, labelpad=10)
         cbar.ax.tick_params(labelsize=LABEL_SIZE)
 
     for i, model_name in enumerate(predictions_test):
