@@ -14,10 +14,10 @@ from utils.logging_utils import get_logger
 if __name__ == "__main__":
     labelsize = 12
     titlesize=14
-    symb_dir_name = "default"
+    symb_dir_name = "mult_testeval_add_func"
     functions = get_functions2d()
-    #models = ["MLP", "SVM", "BDT", "DT"]
-    models = functions
+    models = ["MLP", "SVM", "BDT", "DT"]
+    #models = functions
     data_sets = ["digits", "iris"]
     include_surr_diff = True
 
@@ -33,7 +33,7 @@ if __name__ == "__main__":
                     run_configs.append({"model": model, hp_conf[0]: True, hp_conf[1]: True, "data_set_name": ds})
 
     # Set up plot directories
-    plot_dir = f"learning_curves/plots/combined_plots_toy"
+    plot_dir = f"learning_curves/plots/combined_plots_mult_testeval_add_func"
     complexity_plot_dir = f"{plot_dir}/complexity"
     mse_plot_dir = f"{plot_dir}/mse"
     rmse_plot_dir = f"{plot_dir}/rmse"
@@ -73,8 +73,8 @@ if __name__ == "__main__":
 
         # Load test data
         logger.info(f"Get test data.")
-        X_test = np.array(pd.read_csv(f"learning_curves/runs_symb/{symb_dir_name}/smac/{run_name}/x_test.csv"))
-        y_test = np.array(pd.read_csv(f"learning_curves/runs_symb/{symb_dir_name}/smac/{run_name}/y_test.csv"))
+        X_test = np.array(pd.read_csv(f"learning_curves/runs_symb/{symb_dir_name}/surr/{run_name}/x_test.csv"))
+        y_test = np.array(pd.read_csv(f"learning_curves/runs_symb/{symb_dir_name}/surr/{run_name}/y_test.csv"))
 
         avg_cost = y_test.mean()
         std_cost = y_test.std()
@@ -82,7 +82,7 @@ if __name__ == "__main__":
         df_error_metrics_all = pd.DataFrame()
         df_complexity_all = pd.DataFrame()
 
-        for sampling_type in ["SR (Random)", "SR (BO)", "SR (BO-GP)", "GP (BO)"]:
+        for sampling_type in ["SR (BO-GP)", "GP (BO)"]: #"SR (Random)", "SR (BO)", 
 
             if sampling_type == "GP (BO)":
                 symb_dir = f"learning_curves/runs_surr/{run_name}"
