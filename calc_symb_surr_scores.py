@@ -122,7 +122,7 @@ if __name__ == "__main__":
                     df_metrics = get_scores(
                         get_surrogate_predictions(np.array(X_train), classifier, surrogate_model),
                         symb_surr.predict(X_train),
-                        get_surrogate_predictions(X_test_reshaped, classifier, surrogate_model),
+                        get_surrogate_predictions(X_test_reshaped.T, classifier, surrogate_model),
                         symb_surr.predict(X_test_reshaped)
                     )
                     df_metrics.insert(0, "n_samples", n_samples)
