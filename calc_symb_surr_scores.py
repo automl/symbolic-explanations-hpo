@@ -65,7 +65,6 @@ if __name__ == "__main__":
         sampling_dir_surr = f"learning_curves/runs_sampling/surr/{run_name}"
         sampling_dir_smac = f"learning_curves/runs_sampling/smac/{run_name}"
         symb_dir_surr = f"learning_curves/runs_symb/{symb_dir_name}/surr/{run_name}/symb_models"
-        symb_dir_smac = f"learning_curves/runs_symb/{symb_dir_name}/smac/{run_name}/symb_models"
 
         with open(f"{sampling_dir_smac}/classifier.pkl", "rb") as classifier_file:
             classifier = pickle.load(classifier_file)
@@ -81,7 +80,7 @@ if __name__ == "__main__":
         try:
             X_test = get_hpo_test_data(classifier, optimized_parameters, n_test_samples, return_x=True)
             y_test = np.array(
-                pd.read_csv(f"learning_curves/runs_symb/{symb_dir_name}/smac/{run_name}/y_test.csv", header=None))
+                pd.read_csv(f"learning_curves/runs_symb/{symb_dir_name}/surr/{run_name}/y_test.csv", header=None))
             y_test = y_test.reshape(X_test.shape[1], X_test.shape[2])
         except:
             logger.info(f"No test data found, create test data for {run_name}.")
