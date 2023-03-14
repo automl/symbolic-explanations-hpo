@@ -125,8 +125,8 @@ if __name__ == "__main__":
 
                 plt.figure()
                 _, ax = plt.subplots(figsize=(8, 5))
-                sns.lineplot(data=df_all_fitness, x="generation", y="fitness",
-                              linestyles="", capsize=0.2, scale=0.7, dodge=0.4)  # , showfliers=False)
+                sns.lineplot(data=df_all_fitness, x="generation", y="fitness")
+                              #linestyles="", capsize=0.2, scale=0.7, dodge=0.4)  # , showfliers=False)
                 if data_set:
                     plt.title(f"{classifier_title}, Dataset: {data_set}\nOptimize: {param0}, {param1}",
                               fontsize=titlesize)
