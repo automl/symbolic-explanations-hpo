@@ -27,7 +27,7 @@ if __name__ == "__main__":
 
     n_test_samples = 100
     n_seeds = 3
-    symb_dir_name = "default"
+    symb_dir_name = "mult_testeval_add_func"
 
     functions = get_functions2d()
     #models = ["MLP", "SVM", "BDT", "DT"]
@@ -87,6 +87,13 @@ if __name__ == "__main__":
     logger.info(f"Fit Symbolic Model for {run_name} ({run_type}).")
 
     logger.info(f"Get and save test data.")
+    # try:
+    #     X_test = get_hpo_test_data(classifier, optimized_parameters, n_test_samples, return_x=True)
+    #     y_test = np.array(
+    #         pd.read_csv(f"learning_curves/runs_symb/{symb_dir_name}/smac/{run_name}/y_test.csv", header=None))
+    #     y_test = y_test.reshape(X_test.shape[1], X_test.shape[2])
+    # except:
+        #logger.info(f"No test data found, create test data for {run_name}.")
     X_test, y_test = get_hpo_test_data(classifier, optimized_parameters, n_test_samples)
     X_test_reshaped = X_test.reshape(len(optimized_parameters), -1).T
     y_test_reshaped = y_test.reshape(-1)

@@ -30,6 +30,8 @@ if __name__ == "__main__":
     init_design_max_ratio = 0.25
     init_design_n_configs_per_hyperparamter = 8
     sampling_dir_name = "runs_sampling"
+    # only for loading test data
+    symb_dir_name = "mult_testeval_add_func"
 
     n_test_samples = 100
 
@@ -77,7 +79,7 @@ if __name__ == "__main__":
     try:
         X_test = get_hpo_test_data(classifier, optimized_parameters, n_test_samples, return_x=True)
         y_test = np.array(
-            pd.read_csv(f"learning_curves/runs_symb/default/smac/{run_name}/y_test.csv", header=None))
+            pd.read_csv(f"learning_curves/runs_symb/{symb_dir_name}/smac/{run_name}/y_test.csv", header=None))
         y_test = y_test.reshape(X_test.shape[1], X_test.shape[2])
     except:
         logger.info(f"No test data found, create test data for {run_name}.")

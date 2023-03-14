@@ -100,7 +100,7 @@ if __name__ == "__main__":
         df_samples_rand = pd.read_csv(f"{sampling_dir_rand}/samples_{max(N_SAMPLES_SPACING)}.csv")
 
         # Load test data
-        logger.info(f"Get test data for {classifier_name}.")
+        logger.info(f"Get test data for {run_name}.")
         try:
             X_test = get_hpo_test_data(classifier, optimized_parameters, n_test_samples, return_x=True)
             y_test = np.array(

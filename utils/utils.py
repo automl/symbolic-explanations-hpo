@@ -237,7 +237,7 @@ def get_hpo_test_data(classifier, optimized_parameters, n_test_samples, n_test_e
                 ([int(i) for i in param_space])
             )
             if optimized_parameters[i].upper not in int_spacing:
-                int_spacing = int_spacing + [optimized_parameters[i].upper]
+                int_spacing = np.append(int_spacing, optimized_parameters[i].upper)
             X_test_dimensions.append(int_spacing)
         else:
             X_test_dimensions.append(param_space)
@@ -245,6 +245,8 @@ def get_hpo_test_data(classifier, optimized_parameters, n_test_samples, n_test_e
     param_dict = {}
     if len(optimized_parameters) == 1:
         X_test = X_test_dimensions[0]
+        if return_x:
+            return X_test
         y_test = np.zeros(len(X_test_dimensions[0]))
         for n in range(len(X_test_dimensions[0])):
             param_dict[optimized_parameters[0].name] = X_test[n]
@@ -282,7 +284,7 @@ def get_hpo_test_data(classifier, optimized_parameters, n_test_samples, n_test_e
                 for i in range(n_test_eval):
                     seed = i * 3
                     y_test[n, m] += classifier.train(config=conf, seed=seed)
-                y_test[n, m] = y_test / n_test_eval
+                y_test[n, m] = y_test[n, m] / n_test_eval
     else:
         X_test = None
         y_test = None
