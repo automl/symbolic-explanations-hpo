@@ -404,11 +404,6 @@ def plot_symb2d(
     function and the functions fitted by symbolic models evaluated on a 2D grid.
     """
 
-    plt.rcParams.update({
-        "text.usetex": True,
-        "font.family": "Helvetica"
-    })
-
     LABEL_SIZE = 9
     X0_name = (
         "X0"
@@ -504,7 +499,7 @@ def plot_symb2d(
 
     if not use_same_scale:
         cbar = fig.colorbar(im, ax=axes[0])
-        cbar.set_label("True $$\mathcal{L}$$", fontsize=LABEL_SIZE, rotation=270, labelpad=10)
+        cbar.set_label(r'$\text{True} \mathcal{L}$', fontsize=LABEL_SIZE, rotation=270, labelpad=10)
         cbar.ax.tick_params(labelsize=LABEL_SIZE)
 
     for i, model_name in enumerate(predictions_test):
@@ -545,9 +540,9 @@ def plot_symb2d(
     if not use_same_scale:
         cbar = fig.colorbar(im, ax=axes[1:], shrink=0.4)
         if metric_name:
-            cbar.set_label(metric_name, fontsize=LABEL_SIZE, rotation=270, labelpad=10)
+            cbar.set_label(metric_name, fontsize=LABEL_SIZE, rotation=270, labelpad=15)
         else:
-            cbar.set_label("f(X0, X1)", fontsize=LABEL_SIZE, rotation=270, labelpad=10)
+            cbar.set_label("f(X0, X1)", fontsize=LABEL_SIZE, rotation=270, labelpad=15)
         cbar.ax.tick_params(labelsize=LABEL_SIZE)
 
     handles, labels = axes[-1].get_legend_handles_labels()
@@ -558,9 +553,9 @@ def plot_symb2d(
     if use_same_scale:
         cbar = fig.colorbar(im, ax=axes, shrink=0.4)
         if metric_name:
-            cbar.set_label(metric_name, fontsize=LABEL_SIZE, rotation=270, labelpad=10)
+            cbar.set_label(metric_name, fontsize=LABEL_SIZE, rotation=270, labelpad=15)
         else:
-            cbar.set_label("f(X0, X1)", fontsize=LABEL_SIZE, rotation=270, labelpad=10)
+            cbar.set_label("f(X0, X1)", fontsize=LABEL_SIZE, rotation=270, labelpad=15)
         cbar.ax.tick_params(labelsize=LABEL_SIZE)
     if plot_dir:
         if filename:

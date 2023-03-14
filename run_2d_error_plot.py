@@ -180,7 +180,7 @@ if __name__ == "__main__":
                     y_test=y_test.copy(),
                     function_name=classifier.name,
                     use_same_scale=False,
-                    metric_name="MAE($$\mathcal{L}, \hat{\mathcal{L}}$$",
+                    metric_name=r'$\text{MAE} (\mathcal{L}, \hat{\mathcal{L}})$',
                     predictions_test=error_test,
                     parameters=optimized_parameters,
                     plot_dir=viz_plot_dir,
