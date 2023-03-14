@@ -205,7 +205,8 @@ def write_dict_to_cfg_file(dictionary: dict, target_file_path: str):
         parser.write(f)
 
 
-def get_hpo_test_data(classifier, optimized_parameters, n_test_samples, return_x=False):
+def get_hpo_test_data(classifier, optimized_parameters, n_test_samples, n_test_eval=5, return_x=False):
+    # Get test grid configurations
     X_test_dimensions = []
     n_test_steps = (
         int(np.sqrt(n_test_samples))
@@ -234,7 +235,9 @@ def get_hpo_test_data(classifier, optimized_parameters, n_test_samples, return_x
         if isinstance(optimized_parameters[i], UniformIntegerHyperparameter):
             int_spacing = np.unique(
                 ([int(i) for i in param_space])
-            )  # + [optimized_parameters[i].upper]))
+            )
+            if optimized_parameters[i].upper not in int_spacing:
+                int_spacing = int_spacing + [optimized_parameters[i].upper]
             X_test_dimensions.append(int_spacing)
         else:
             X_test_dimensions.append(param_space)
@@ -261,6 +264,8 @@ def get_hpo_test_data(classifier, optimized_parameters, n_test_samples, return_x
         ).astype(float)
         if return_x:
             return X_test
+
+        # Train model to get actual loss for each test config
         y_test = np.zeros((X_test.shape[1], X_test.shape[2]))
         for n in range(X_test.shape[1]):
             for m in range(X_test.shape[2]):
@@ -274,14 +279,16 @@ def get_hpo_test_data(classifier, optimized_parameters, n_test_samples, return_x
                 conf = Configuration(
                     configuration_space=classifier.configspace, values=param_dict
                 )
-                y_test[n, m] = classifier.train(config=conf, seed=0)
+                for i in range(n_test_eval):
+                    seed = i * 3
+                    y_test[n, m] += classifier.train(config=conf, seed=seed)
+                y_test[n, m] = y_test / n_test_eval
     else:
         X_test = None
         y_test = None
         print("Not yet supported.")
 
     return X_test, y_test
-
 
 
 def plot_symb1d(
