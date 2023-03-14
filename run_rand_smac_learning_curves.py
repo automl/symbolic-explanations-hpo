@@ -19,6 +19,7 @@ if __name__ == "__main__":
     #models = ["MLP", "SVM", "BDT", "DT"]
     models = functions
     data_sets = ["digits", "iris"]
+    include_surr_diff = True
 
     run_configs = []
     for model in models:
@@ -102,6 +103,14 @@ if __name__ == "__main__":
             df_error_metrics["rmse_test"] = np.sqrt(df_error_metrics["mse_test"])
             df_error_metrics["rmse_train"] = np.sqrt(df_error_metrics["mse_train"])
             df_error_metrics.insert(0, "Experiment", f"{sampling_type}")
+            df_error_metrics_all = pd.concat((df_error_metrics_all, df_error_metrics))
+
+        if include_surr_diff:
+            df_error_metrics = pd.read_csv(
+                f"learning_curves/runs_symb/{symb_dir_name}/surr/{run_name}/error_metrics_compare_surr.csv")
+            df_error_metrics["rmse_test"] = np.sqrt(df_error_metrics["mse_test"])
+            df_error_metrics["rmse_train"] = np.sqrt(df_error_metrics["mse_train"])
+            df_error_metrics.insert(0, "Experiment", f"RMSE(SR (BO-GP), GP (BO))")
             df_error_metrics_all = pd.concat((df_error_metrics_all, df_error_metrics))
 
         logger.info(f"Create plots.")
