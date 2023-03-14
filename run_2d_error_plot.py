@@ -169,26 +169,25 @@ if __name__ == "__main__":
                     ).reshape(X_test.shape[2], X_test.shape[1]).T
                     error_test[f"SR (Random)"] += np.abs(y_test - symb_pred_rand)
 
-                logger.info(f"Final difference[SR (BO-GP)]: {np.abs(y_test - symb_pred_surr)[0, 7]}")
-                logger.info(f"Final error_test[SR (BO-GP)]: {error_test[f'SR (BO-GP)'][0, 7]}")
-                logger.info(f"Final n_seeds_total: {n_seeds_total}")
+        logger.info(f"Final error_test[SR (BO-GP)]: {error_test[f'SR (BO-GP)'][0, 7]}")
+        logger.info(f"Final n_seeds_total: {n_seeds_total}")
 
-                for key in error_test:
-                    error_test[key] = error_test[key]/n_seeds_total
+        for key in error_test:
+            error_test[key] = error_test[key]/n_seeds_total
 
-                filename = f"{classifier_name}_{'_'.join(parameter_names)}_{data_set}_n_samples{n_samples}"
-                if evaluate_on_surrogate:
-                    filename = "_".join([filename, "surrogate"])
+        filename = f"{classifier_name}_{'_'.join(parameter_names)}_{data_set}_n_samples{n_samples}"
+        if evaluate_on_surrogate:
+            filename = "_".join([filename, "surrogate"])
 
-                plot = plot_symb2d(
-                    X_train_list=[None, None],
-                    X_test=X_test.copy(),
-                    y_test=y_test.copy(),
-                    function_name=classifier.name,
-                    use_same_scale=False,
-                    metric_name=r'MAE $(\mathcal{L}, \hat{\mathcal{L}})$',
-                    predictions_test=error_test,
-                    parameters=optimized_parameters,
-                    plot_dir=viz_plot_dir,
-                    filename=filename
-                )
+        plot = plot_symb2d(
+            X_train_list=[None, None],
+            X_test=X_test.copy(),
+            y_test=y_test.copy(),
+            function_name=classifier.name,
+            use_same_scale=False,
+            metric_name=r'MAE $(\mathcal{L}, \hat{\mathcal{L}})$',
+            predictions_test=error_test,
+            parameters=optimized_parameters,
+            plot_dir=viz_plot_dir,
+            filename=filename
+        )
