@@ -87,7 +87,7 @@ if __name__ == "__main__":
 
         logger.info(f"Create plot for {run_name}.")
 
-        for n_samples in N_SAMPLES_SPACING:
+        for n_samples in [100, 200]:
             # For smac, get specific sampling file for each sample size for which the number of initial designs differs from
             # the maximum number of initial designs (number of hyperparameters * init_design_n_configs_per_hyperparamter)
             if init_design_max_ratio * n_samples < len(
@@ -98,7 +98,7 @@ if __name__ == "__main__":
             df_train_samples = pd.read_csv(f"{sampling_dir_smac}/samples_{n_eval}.csv")
             sampling_seeds = df_train_samples.seed.unique()
 
-            for sampling_type in ["SR (Random)", "SR (BO)", "SR (BO-GP)"]:
+            for sampling_type in ["SR (BO-GP)"]:
 
                 if sampling_type == "SR (BO)":
                     symb_dir = f"learning_curves/runs_symb/{symb_dir_name}/smac/{run_name}/symb_models"
