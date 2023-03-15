@@ -23,9 +23,9 @@ def get_function_set():
         "log",
         "sin",
         "cos",
-        #"abs",
+        "abs",
         exp_func,
-        sign_func
+        #sign_func
     ]
 
     return function_set
