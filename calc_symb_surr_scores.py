@@ -109,27 +109,31 @@ if __name__ == "__main__":
                 y_train = y_train_all_samples
 
                 for symb_seed in symb_seeds:
-                    with open(
-                            f"{symb_dir_surr}/n_samples{n_samples}_sampling_seed{sampling_seed}_symb_seed{symb_seed}.pkl",
-                            "rb") as symb_model_file_surr:
-                        symb_surr = pickle.load(symb_model_file_surr)
+                    try:
+                        with open(
+                                f"{symb_dir_surr}/n_samples{n_samples}_sampling_seed{sampling_seed}_symb_seed{symb_seed}.pkl",
+                                "rb") as symb_model_file_surr:
+                            symb_surr = pickle.load(symb_model_file_surr)
 
-                    with open(
-                            f"{sampling_dir_smac}/surrogates/n_eval{n_eval}_samples{n_samples}_seed{sampling_seed}.pkl",
-                            "rb") as surrogate_file:
-                        surrogate_model = pickle.load(surrogate_file)
+                        with open(
+                                f"{sampling_dir_smac}/surrogates/n_eval{n_eval}_samples{n_samples}_seed{sampling_seed}.pkl",
+                                "rb") as surrogate_file:
+                            surrogate_model = pickle.load(surrogate_file)
 
-                    df_metrics = get_scores(
-                        get_surrogate_predictions(np.array(X_train), classifier, surrogate_model),
-                        symb_surr.predict(X_train),
-                        get_surrogate_predictions(X_test_reshaped, classifier, surrogate_model),
-                        symb_surr.predict(X_test_reshaped)
-                    )
-                    df_metrics.insert(0, "n_samples", n_samples)
-                    df_metrics.insert(1, "sampling_seed", sampling_seed)
-                    df_metrics.insert(2, "symb_seed", symb_seed)
-                    df_all_metrics = pd.concat((df_all_metrics, df_metrics))
+                        df_metrics = get_scores(
+                            get_surrogate_predictions(np.array(X_train), classifier, surrogate_model),
+                            symb_surr.predict(X_train),
+                            get_surrogate_predictions(X_test_reshaped, classifier, surrogate_model),
+                            symb_surr.predict(X_test_reshaped)
+                        )
+                        df_metrics.insert(0, "n_samples", n_samples)
+                        df_metrics.insert(1, "sampling_seed", sampling_seed)
+                        df_metrics.insert(2, "symb_seed", symb_seed)
+                        df_all_metrics = pd.concat((df_all_metrics, df_metrics))
 
-                    df_all_metrics.to_csv(
-                        f"learning_curves/runs_symb/{symb_dir_name}/surr/{run_name}/error_metrics_compare_surr.csv",
-                        index=False)
+                        df_all_metrics.to_csv(
+                            f"learning_curves/runs_symb/{symb_dir_name}/surr/{run_name}/error_metrics_compare_surr.csv",
+                            index=False)
+                    except:
+                        logger.warning(f"Could not load surrogate models for n_samples{n_samples}_"
+                                       f"sampling_seed{sampling_seed}_symb_seed{symb_seed}, skip.")
