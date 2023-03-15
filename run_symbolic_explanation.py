@@ -27,11 +27,11 @@ if __name__ == "__main__":
 
     n_test_samples = 100
     n_seeds = 3
-    symb_dir_name = "mult_testeval_add_func"
+    symb_dir_name = "rmse"
 
     functions = get_functions2d()
-    #models = ["MLP", "SVM", "BDT", "DT"]
-    models = functions
+    models = ["MLP", "SVM", "BDT", "DT"]
+    #models = functions
     data_sets = ["digits", "iris"]
     use_random_samples = False
     evaluate_on_surrogate = True
@@ -106,9 +106,9 @@ if __name__ == "__main__":
 
     symb_params = dict(
         population_size=5000,
-        generations=50,
+        generations=20,
         function_set=get_function_set(),
-        metric="mse",
+        metric="rmse",
         verbose=1,
     )
 
