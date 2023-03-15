@@ -27,7 +27,7 @@ if __name__ == "__main__":
 
     n_test_samples = 100
     n_seeds = 3
-    symb_dir_name = "rmse_parsimony"
+    symb_dir_name = "rmse_parsimony_wo_abs"
     dir_with_test_data="learning_curves/runs_symb/mult_testeval_add_func/surr"
 
     functions = get_functions2d()
