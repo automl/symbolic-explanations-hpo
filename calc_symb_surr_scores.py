@@ -98,7 +98,7 @@ if __name__ == "__main__":
                 n_eval = n_samples
             else:
                 n_eval = max(N_SAMPLES_SPACING)
-            df_train_samples = pd.read_csv(f"{sampling_dir_surr}/samples_{n_eval}.csv")
+            df_train_samples = pd.read_csv(f"{sampling_dir_smac}/samples_{n_eval}.csv")
 
             sampling_seeds = df_train_samples.seed.unique()
 
