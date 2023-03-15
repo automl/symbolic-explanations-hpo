@@ -85,7 +85,7 @@ if __name__ == "__main__":
         except:
             logger.info(f"No test data found, create test data for {run_name}.")
             X_test, y_test = get_hpo_test_data(classifier, optimized_parameters, n_test_samples)
-        X_test_reshaped = X_test.reshape(len(optimized_parameters), -1).T
+        X_test_reshaped = X_test
         y_test_reshaped = y_test.reshape(-1)
 
         df_all_metrics = pd.DataFrame()
@@ -122,7 +122,7 @@ if __name__ == "__main__":
                     df_metrics = get_scores(
                         get_surrogate_predictions(np.array(X_train), classifier, surrogate_model),
                         symb_surr.predict(X_train),
-                        get_surrogate_predictions(X_test_reshaped.T, classifier, surrogate_model),
+                        get_surrogate_predictions(X_test_reshaped, classifier, surrogate_model),
                         symb_surr.predict(X_test_reshaped)
                     )
                     df_metrics.insert(0, "n_samples", n_samples)
