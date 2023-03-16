@@ -15,20 +15,17 @@ from utils.model_utils import get_hyperparams, get_classifier_from_run_conf
 from utils.logging_utils import get_logger
 
 
-N_SAMPLES_SPACING = np.linspace(20, 200, 10, dtype=int).tolist()
-
-
 if __name__ == "__main__":
-
     parser = argparse.ArgumentParser()
     parser.add_argument('--job_id')
     args = parser.parse_args()
     job_id = args.job_id
 
+    n_samples_spacing = np.linspace(20, 200, 10, dtype=int).tolist()
     n_test_samples = 100
     n_seeds = 3
     symb_dir_name = "rmse_parsimony_wo_sign"
-    dir_with_test_data="learning_curves/runs_symb/mult_testeval_add_func/surr"
+    dir_with_test_data = "learning_curves/runs_symb/mult_testeval_add_func/surr"
 
     functions = get_functions2d()
     models = ["MLP", "SVM", "BDT", "DT"]
@@ -119,14 +116,14 @@ if __name__ == "__main__":
         target_file_path=f"{symb_dir}/symbolic_regression_params.cfg",
     )
 
-    for n_samples in N_SAMPLES_SPACING:
+    for n_samples in n_samples_spacing:
         # For smac, get specific sampling file for each sample size for which the number of initial designs differs from
         # the maximum number of initial designs (number of hyperparameters * init_design_n_configs_per_hyperparamter)
         if run_type == "surr" or (run_type == "smac" and init_design_max_ratio * n_samples < len(
                 optimized_parameters) * init_design_n_configs_per_hyperparamter):
             df_train_samples = pd.read_csv(f"{sampling_run_dir}/samples_{n_samples}.csv")
         else:
-            df_train_samples = pd.read_csv(f"{sampling_run_dir}/samples_{max(N_SAMPLES_SPACING)}.csv")
+            df_train_samples = pd.read_csv(f"{sampling_run_dir}/samples_{max(n_samples_spacing)}.csv")
 
         sampling_seeds = df_train_samples.seed.unique()
 

@@ -12,16 +12,13 @@ from utils.model_utils import get_hyperparams, get_classifier_from_run_conf
 from utils.logging_utils import get_logger
 
 
-N_SAMPLES_SPACING = np.linspace(20, 200, 10, dtype=int).tolist()
-
-
 if __name__ == "__main__":
-
     parser = argparse.ArgumentParser()
     parser.add_argument('--job_id')
     args = parser.parse_args()
     job_id = args.job_id
 
+    n_samples_spacing = np.linspace(20, 200, 10, dtype=int).tolist()
     functions = get_functions2d()
     models = ["MLP", "SVM", "BDT", "DT"]
     #models = functions
@@ -87,14 +84,14 @@ if __name__ == "__main__":
 
     df_all_metrics = pd.DataFrame()
 
-    for n_samples in N_SAMPLES_SPACING:
+    for n_samples in n_samples_spacing:
         # Get specific surrogate file for each sample size for which the number of initial designs differs from
         # the maximum number of initial designs (number of hyperparameters * init_design_n_configs_per_hyperparamter)
         if init_design_max_ratio * n_samples < len(
                 optimized_parameters) * init_design_n_configs_per_hyperparamter:
             n_eval = n_samples
         else:
-            n_eval = max(N_SAMPLES_SPACING)
+            n_eval = max(n_samples_spacing)
 
         df_train_samples = pd.read_csv(f"{sampling_run_dir}/samples_{n_eval}.csv")
 

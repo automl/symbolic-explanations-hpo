@@ -19,14 +19,11 @@ class SurrogateModelCallback(Callback):
         if config._acquisition_function._eta:
             surrogate_model = config._model
             processed_configs = len(config._processed_configs)
-            if processed_configs in N_SAMPLES_SPACING:
+            if processed_configs in n_samples_spacing:
                 with open(
                         f"{sampling_run_dir}/surrogates/n_eval{n_samples}_samples{processed_configs}_seed{seed}.pkl",
                         "wb") as surrogate_file:
                     pickle.dump(surrogate_model, surrogate_file)
-
-
-N_SAMPLES_SPACING = np.linspace(20, 200, 10, dtype=int).tolist()
 
 
 if __name__ == "__main__":
@@ -36,6 +33,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     job_id = args.job_id
 
+    n_samples_spacing = np.linspace(20, 200, 10, dtype=int).tolist()
     functions = get_functions2d()
     n_seeds = 5
     #models = ["MLP", "SVM", "BDT", "DT"]
@@ -76,21 +74,21 @@ if __name__ == "__main__":
 
     if use_random_samples:
         run_type = "rand"
-        n_samples_to_eval = [max(N_SAMPLES_SPACING)]
+        n_samples_to_eval = [max(n_samples_spacing)]
     else:
         # SMAC uses at most scenario.n_trials * max_ratio number of configurations in the initial design
-        # If we run SMAC only once with n_trials = max(N_SAMPLES_SPACING), we would always use the maximum number of
+        # If we run SMAC only once with n_trials = max(n_samples_spacing), we would always use the maximum number of
         # initial designs, e.g. a run with 20 samples would have the same number of initial designs as a run with 200
         # Thus, we do separate runs for each sample size as long as the number of initial designs would differ
         if evaluate_on_surrogate:
             run_type = "surr"
-            n_samples_to_eval = N_SAMPLES_SPACING
+            n_samples_to_eval = n_samples_spacing
         else:
             run_type = "smac"
-            n_samples_to_eval = [n for n in N_SAMPLES_SPACING if init_design_max_ratio * n < len(
+            n_samples_to_eval = [n for n in n_samples_spacing if init_design_max_ratio * n < len(
                 optimized_parameters) * init_design_n_configs_per_hyperparamter]
-            if max(N_SAMPLES_SPACING) not in n_samples_to_eval:
-                n_samples_to_eval.append(max(N_SAMPLES_SPACING))
+            if max(n_samples_spacing) not in n_samples_to_eval:
+                n_samples_to_eval.append(max(n_samples_spacing))
 
     run_name = f"{function_name.replace(' ', '_')}_{'_'.join(parameter_names)}{data_set_postfix}"
 
@@ -117,7 +115,7 @@ if __name__ == "__main__":
                 optimized_parameters) * init_design_n_configs_per_hyperparamter:
             n_eval = n_samples
         else:
-            n_eval = max(N_SAMPLES_SPACING)
+            n_eval = max(n_samples_spacing)
 
         df_samples = pd.DataFrame()
 
@@ -151,7 +149,7 @@ if __name__ == "__main__":
             else:
                 configurations, performances, _ = run_smac_optimization(
                     configspace=classifier.configspace,
-                    facade=BlackBoxFacade,  # HyperparameterOptimizationFacade,
+                    facade=BlackBoxFacade,
                     target_function=classifier.train,
                     function_name=function_name,
                     n_eval=n_samples,

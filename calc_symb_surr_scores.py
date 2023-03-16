@@ -11,13 +11,12 @@ from utils import functions_utils
 from utils.logging_utils import get_logger
 
 
+# required to load pickled function objects
 sys.modules['functions'] = functions_utils
 
 
-N_SAMPLES_SPACING = np.linspace(20, 200, 10, dtype=int).tolist()
-
-
 if __name__ == "__main__":
+    n_samples_spacing = np.linspace(20, 200, 10, dtype=int).tolist()
     n_test_samples = 100
     symb_seeds = [0, 3, 6]
     symb_dir_name = "mult_testeval_add_func"
@@ -90,14 +89,14 @@ if __name__ == "__main__":
 
         df_all_metrics = pd.DataFrame()
 
-        for n_samples in N_SAMPLES_SPACING:
+        for n_samples in n_samples_spacing:
             # For smac, get specific sampling file for each sample size for which the number of initial designs differs from
             # the maximum number of initial designs (number of hyperparameters * init_design_n_configs_per_hyperparamter)
             if init_design_max_ratio * n_samples < len(
                     optimized_parameters) * init_design_n_configs_per_hyperparamter:
                 n_eval = n_samples
             else:
-                n_eval = max(N_SAMPLES_SPACING)
+                n_eval = max(n_samples_spacing)
             df_train_samples = pd.read_csv(f"{sampling_dir_smac}/samples_{n_eval}.csv")
 
             sampling_seeds = df_train_samples.seed.unique()

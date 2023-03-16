@@ -11,14 +11,12 @@ from utils.model_utils import get_hyperparams, get_classifier_from_run_conf
 from utils import functions_utils
 from utils.logging_utils import get_logger
 
-
+# required to load pickled function objects
 sys.modules['functions'] = functions_utils
 
 
-N_SAMPLES_SPACING = np.linspace(20, 200, 10, dtype=int).tolist()
-
-
 if __name__ == "__main__":
+    n_samples_spacing = np.linspace(20, 200, 10, dtype=int).tolist()
     n_samples = 100
     n_test_samples = 100
     symb_seeds = [0] #, 3, 6]
@@ -95,9 +93,9 @@ if __name__ == "__main__":
                 optimized_parameters) * init_design_n_configs_per_hyperparamter:
             n_eval = n_samples
         else:
-            n_eval = max(N_SAMPLES_SPACING)
+            n_eval = max(n_samples_spacing)
         df_samples_smac = pd.read_csv(f"{sampling_dir_smac}/samples_{n_eval}.csv")
-        df_samples_rand = pd.read_csv(f"{sampling_dir_rand}/samples_{max(N_SAMPLES_SPACING)}.csv")
+        df_samples_rand = pd.read_csv(f"{sampling_dir_rand}/samples_{max(n_samples_spacing)}.csv")
 
         # Load test data
         logger.info(f"Get test data for {run_name}.")

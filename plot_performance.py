@@ -11,10 +11,8 @@ from utils.model_utils import get_hyperparams, get_classifier_from_run_conf
 from utils.logging_utils import get_logger
 
 
-N_SAMPLES_SPACING = np.linspace(10, 20, 3, dtype=int).tolist()
-
-
 if __name__ == "__main__":
+    n_samples_spacing = np.linspace(10, 20, 3, dtype=int).tolist()
     symb_dir_name = "default"
     functions = get_functions2d()
     models = ["MLP", "SVM", "BDT", "DT"]
@@ -65,32 +63,39 @@ if __name__ == "__main__":
         optimized_parameters = classifier.configspace.get_hyperparameters()
         parameter_names = [param.name for param in optimized_parameters]
 
-        if use_random_samples:
-            run_type = "rand"
-        else:
-            run_type = "smac"
-
         run_name = f"{function_name.replace(' ', '_')}_{'_'.join(parameter_names)}{data_set_postfix}"
-
-        sampling_dir = f"learning_curves/{sampling_dir_name}/{run_type}"
-        sampling_run_dir = f"{sampling_dir}/{run_name}"
 
         logger.info(f"Create plot for {run_name}.")
 
-        df_train_samples_all = pd.DataFrame(columns=["n_samples", "seed"])
+        df_samples_all_experiments = pd.DataFrame()
 
-        for n_samples in reversed(N_SAMPLES_SPACING):
-            # Get specific sampling file for each sample size for which the number of initial designs differs from
-            # the maximum number of initial designs (number of hyperparameters * init_design_n_configs_per_hyperparamter)
-            if run_type == "smac" and init_design_max_ratio * n_samples < len(
-                    optimized_parameters) * init_design_n_configs_per_hyperparamter:
-                df_train_samples = pd.read_csv(f"{sampling_run_dir}/samples_{n_samples}.csv")
+        for sampling_type in ["Random Sampling", "BO Sampling"]:
+
+            if sampling_type == "BO Sampling":
+                run_type = "smac"
             else:
-                df_train_samples = pd.read_csv(f"{sampling_run_dir}/samples_{max(N_SAMPLES_SPACING)}.csv")
+                run_type = "rand"
+            sampling_dir = f"learning_curves/{sampling_dir_name}/{run_type}"
+            sampling_run_dir = f"{sampling_dir}/{run_name}"
 
-            df_train_samples_all = df_train_samples_all[df_train_samples_all["n_samples"] > n_samples]
-            df_train_samples_all = pd.concat((df_train_samples_all, df_train_samples), axis=0)
-        df_train_samples_spacing = df_train_samples_all[df_train_samples_all["n_samples"].isin(N_SAMPLES_SPACING)]
+            df_train_samples_all = pd.DataFrame(columns=["n_samples", "seed"])
+
+            for n_samples in reversed(n_samples_spacing):
+                # Get specific sampling file for each sample size for which the number of initial designs differs from
+                # the maximum number of initial designs (number of hyperparameters * init_design_n_configs_per_hyperparamter)
+                if run_type == "smac" and init_design_max_ratio * n_samples < len(
+                        optimized_parameters) * init_design_n_configs_per_hyperparamter:
+                    df_train_samples = pd.read_csv(f"{sampling_run_dir}/samples_{n_samples}.csv")
+                else:
+                    df_train_samples = pd.read_csv(f"{sampling_run_dir}/samples_{max(n_samples_spacing)}.csv")
+
+                df_train_samples_all = df_train_samples_all[df_train_samples_all["n_samples"] > n_samples]
+                df_train_samples_all = pd.concat((df_train_samples_all, df_train_samples), axis=0)
+
+            df_samples_spacing = df_train_samples_all[df_train_samples_all["n_samples"].isin(n_samples_spacing)]
+
+            df_samples_spacing.insert(0, "Experiment", f"{sampling_type}")
+            df_samples_all_experiments = pd.concat((df_samples_all_experiments, df_samples_spacing))
 
         classifier_titles = {
             "BDT": "Boosted Decision Tree",
