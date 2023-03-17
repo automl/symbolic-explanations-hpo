@@ -1,4 +1,5 @@
 import numpy as np
+from typing import Union
 from typing import Callable
 from ConfigSpace import ConfigurationSpace, UniformFloatHyperparameter
 
@@ -32,7 +33,7 @@ class NamedFunction:
         configspace.add_hyperparameters(configs)
         self.configspace = configspace
 
-    def apply(self, x: float | np.ndarray) -> float | np.ndarray:
+    def apply(self, x: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
         """
         Apply the callable function to a float or array.
         """
