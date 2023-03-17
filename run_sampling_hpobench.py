@@ -8,9 +8,9 @@ import dill as pickle
 from smac import BlackBoxFacade, Callback
 
 
-from utils.utils import get_surrogate_predictions
+from utils.run_utils import get_surrogate_predictions
 from utils.smac_utils import run_smac_optimization
-from utils.hpobench_utils import get_run_config, get_model_name
+from utils.hpobench_utils import get_run_config, get_benchmark_dict, get_task_dict
 
 
 class SurrogateModelCallback(Callback):
@@ -33,27 +33,28 @@ if __name__ == "__main__":
 
     use_random_samples = False
     evaluate_on_surrogate = False
-    sampling_dir_name = "runs_sampling"
+    sampling_dir_name = "runs_sampling_hpobench"
     n_optimized_params = 2
-    n_samples_spacing = np.linspace(10, 20, 3, dtype=int).tolist()
-    n_seeds = 2
+    n_samples_spacing = np.linspace(20, 200, 10, dtype=int).tolist()
+    n_seeds = 5
     surrogate_n_samples = 400
     init_design_max_ratio = 0.25
     init_design_n_configs_per_hyperparamter = 8
 
     run_conf = get_run_config(job_id=args.job_id, n_optimized_params=n_optimized_params)
 
-    data_set_postfix = f"_{run_conf['task_id']}"
+    task_dict = get_task_dict()
+    data_set_postfix = f"_{task_dict[run_conf['task_id']]}"
+    optimized_parameters = list(run_conf["hp_conf"])
+    model_name = get_benchmark_dict()[run_conf["benchmark"]]
     b = run_conf["benchmark"](task_id=run_conf["task_id"])
     cs = b.get_configuration_space()
-    optimized_parameters = list(run_conf["hp_conf"])
 
     # set all but the optimized hyperparameter bounds to the default value
     for param in cs.get_hyperparameters():
         if param.name not in optimized_parameters:
             param.upper = param.default_value
             param.lower = param.default_value
-    model_name = get_model_name(b)
 
     def optimization_function_wrapper(cfg, seed):
         """ Helper-function: simple wrapper to use the benchmark with smac """
