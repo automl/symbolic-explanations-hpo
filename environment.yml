@@ -20,5 +20,6 @@ dependencies:
   - dill
   - loguru
   - tqdm
+  - openml
   - pip:
     - smac==v2.0.0b1

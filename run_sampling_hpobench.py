@@ -8,10 +8,12 @@ import dill as pickle
 from smac import BlackBoxFacade, Callback
 from itertools import combinations
 
+from hpobench.benchmarks.ml.nn_benchmark import NNBenchmark
+from hpobench.benchmarks.ml.svm_benchmark import SVMBenchmark
+
 from utils.utils import get_surrogate_predictions
 from utils.smac_utils import run_smac_optimization
-from utils.functions_utils import get_functions2d, NamedFunction
-from utils.model_utils import get_hyperparams, get_classifier_from_run_conf
+from utils.hpobench_utils import get_model_name
 
 
 class SurrogateModelCallback(Callback):
@@ -33,44 +35,41 @@ if __name__ == "__main__":
     args = parser.parse_args()
     job_id = args.job_id
 
-    n_samples_spacing = np.linspace(20, 200, 10, dtype=int).tolist()
-    functions = get_functions2d()
-    n_seeds = 5
-    #models = ["MLP", "SVM", "BDT", "DT"]
-    models = functions
-    data_sets = ["digits", "iris"]
+    benchmarks = [SVMBenchmark, NNBenchmark]
+    task_ids = [146818]
+
     use_random_samples = False
     evaluate_on_surrogate = False
-    surrogate_n_samples = 400
 
+    sampling_dir_name = "runs_sampling"
+    n_samples_spacing = np.linspace(10, 20, 3, dtype=int).tolist()
+    n_seeds = 2
+    n_optimized_params = 2
+    surrogate_n_samples = 400
     init_design_max_ratio = 0.25
     init_design_n_configs_per_hyperparamter = 8
-    sampling_dir_name = "runs_sampling"
 
     run_configs = []
-    for model in models:
-        if isinstance(model, NamedFunction):
-            run_configs.append({"model": model, "data_set_name": None})
-        else:
-            hyperparams = get_hyperparams(model_name=model)
-            hp_comb = combinations(hyperparams, 2)
-            for hp_conf in hp_comb:
-                for ds in data_sets:
-                    run_configs.append({"model": model, hp_conf[0]: True, hp_conf[1]: True, "data_set_name": ds})
-    run_conf = run_configs[int(job_id)]
-    if run_conf['data_set_name']:
-        data_set_postfix = f"_{run_conf['data_set_name']}"
-    else:
-        data_set_postfix = ""
-    model = run_conf.pop("model")
-    if isinstance(model, NamedFunction):
-        classifier = model
-    else:
-        classifier = get_classifier_from_run_conf(model_name=model, run_conf=run_conf)
 
-    function_name = classifier.name if isinstance(classifier, NamedFunction) else model
-    optimized_parameters = classifier.configspace.get_hyperparameters()
+    for benchmark in benchmarks:
+        #hyperparams = get_hyperparams(model_name=model)
+        #hp_comb = combinations(hyperparams, 2)
+        #for hp_conf in hp_comb:
+        for task_id in task_ids:
+            run_configs.append({"benchmark": benchmark, "task_id": task_id})
+    run_conf = run_configs[int(job_id)]
+    data_set_postfix = f"_{run_conf['task_id']}"
+
+    b = run_conf["benchmark"](task_id=run_conf["task_id"])
+    cs = b.get_configuration_space()
+    optimized_parameters = cs.get_hyperparameters()
     parameter_names = [param.name for param in optimized_parameters]
+    model_name = get_model_name(b)
+
+    def optimization_function_wrapper(cfg, seed):
+        """ Helper-function: simple wrapper to use the benchmark with smac """
+        result_dict = b.objective_function(cfg, rng=seed)
+        return result_dict['function_value']
 
     if use_random_samples:
         run_type = "rand"
@@ -85,12 +84,12 @@ if __name__ == "__main__":
             n_samples_to_eval = n_samples_spacing
         else:
             run_type = "smac"
-            n_samples_to_eval = [n for n in n_samples_spacing if init_design_max_ratio * n < len(
-                optimized_parameters) * init_design_n_configs_per_hyperparamter]
+            n_samples_to_eval = [n for n in n_samples_spacing if
+                                 init_design_max_ratio * n < n_optimized_params * init_design_n_configs_per_hyperparamter]
             if max(n_samples_spacing) not in n_samples_to_eval:
                 n_samples_to_eval.append(max(n_samples_spacing))
 
-    run_name = f"{function_name.replace(' ', '_')}_{'_'.join(parameter_names)}{data_set_postfix}"
+    run_name = f"{model_name.replace(' ', '_')}_{'_'.join(parameter_names)}{data_set_postfix}"
 
     sampling_dir = f"learning_curves/{sampling_dir_name}/{run_type}"
     sampling_run_dir = f"{sampling_dir}/{run_name}"
@@ -100,9 +99,6 @@ if __name__ == "__main__":
     if run_type == "smac":
         os.makedirs(f"{sampling_run_dir}/surrogates")
 
-    with open(f"{sampling_run_dir}/classifier.pkl", "wb") as classifier_file:
-        pickle.dump(classifier, classifier_file)
-
     # setup logging
     logger = logging.getLogger(__name__)
 
@@ -110,9 +106,10 @@ if __name__ == "__main__":
 
     for n_samples in n_samples_to_eval:
 
+        logger.info(f"Start run to sample {n_samples} samples.")
+
         # required for surrogate evaluation
-        if init_design_max_ratio * n_samples < len(
-                optimized_parameters) * init_design_n_configs_per_hyperparamter:
+        if init_design_max_ratio * n_samples < n_optimized_params * init_design_n_configs_per_hyperparamter:
             n_eval = n_samples
         else:
             n_eval = max(n_samples_spacing)
@@ -124,34 +121,31 @@ if __name__ == "__main__":
 
             np.random.seed(seed)
 
-            if not isinstance(classifier, NamedFunction):
-                classifier.set_seed(seed)
-
-            logger.info(f"Sample configs and train {function_name} with seed {seed}.")
+            logger.info(f"Sample configs and train {model_name} with seed {seed}.")
 
             if use_random_samples:
-                configurations = classifier.configspace.sample_configuration(size=n_samples)
+                configurations = cs.sample_configuration(size=n_samples, seed=seed)
                 performances = np.array(
-                    [classifier.train(config=x, seed=seed) for x in configurations]
+                    [b.objective_function(config.get_dictionary(), seed=seed) for config in configurations]
                 )
                 configurations = np.array(
                     [list(i.get_dictionary().values()) for i in configurations]
                 ).T
             elif evaluate_on_surrogate:
-                configurations = classifier.configspace.sample_configuration(size=surrogate_n_samples)
+                configurations = cs.sample_configuration(size=surrogate_n_samples, seed=seed)
                 configurations = np.array(
                     [list(i.get_dictionary().values()) for i in configurations]
                 ).T
                 with open(f"learning_curves/{sampling_dir_name}/smac/{run_name}/surrogates/n_eval{n_eval}"
                           f"_samples{n_samples}_seed{seed}.pkl", "rb") as surrogate_file:
                     surrogate_model = pickle.load(surrogate_file)
-                performances = np.array(get_surrogate_predictions(configurations.T, classifier.configspace, surrogate_model))
+                performances = np.array(get_surrogate_predictions(configurations.T, cs, surrogate_model))
             else:
                 configurations, performances, _ = run_smac_optimization(
-                    configspace=classifier.configspace,
+                    configspace=cs,
                     facade=BlackBoxFacade,
-                    target_function=classifier.train,
-                    function_name=function_name,
+                    target_function=optimization_function_wrapper,
+                    function_name=model_name,
                     n_eval=n_samples,
                     run_dir=sampling_run_dir,
                     seed=seed,

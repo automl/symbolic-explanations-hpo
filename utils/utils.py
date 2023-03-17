@@ -177,14 +177,14 @@ def get_scores(
     return df_scores
 
 
-def get_surrogate_predictions(X, classifier, surrogate_model):
+def get_surrogate_predictions(X, cs, surrogate_model):
     y_surrogate = []
-    optimized_parameters = classifier.configspace.get_hyperparameters()
+    optimized_parameters = cs.get_hyperparameters()
     for i in range(X.shape[0]):
         x0 = int(X[i][0]) if isinstance(optimized_parameters[0], UniformIntegerHyperparameter) else X[i][0]
         x1 = int(X[i][1]) if isinstance(optimized_parameters[1], UniformIntegerHyperparameter) else X[i][1]
         conf = Configuration(
-            configuration_space=classifier.configspace,
+            configuration_space=cs,
             values={
                 optimized_parameters[0].name: x0,
                 optimized_parameters[1].name: x1
