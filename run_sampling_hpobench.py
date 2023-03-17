@@ -96,6 +96,7 @@ if __name__ == "__main__":
 
     for n_samples in n_samples_to_eval:
 
+        logger.info(f"Run: {run_name}")
         logger.info(f"Start run to sample {n_samples} samples.")
 
         # required for surrogate evaluation
@@ -111,6 +112,7 @@ if __name__ == "__main__":
 
             np.random.seed(seed)
 
+            logger.info(f"Run: {run_name}")
             logger.info(f"Sample configs and train {model_name} with seed {seed}.")
 
             if use_random_samples:
