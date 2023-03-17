@@ -1,6 +1,6 @@
+import openml
 from itertools import combinations
 
-import openml
 from hpobench.benchmarks.ml.lr_benchmark import LRBenchmarkBB
 from hpobench.benchmarks.ml.svm_benchmark import SVMBenchmarkBB
 from hpobench.benchmarks.ml.rf_benchmark import RandomForestBenchmarkBB

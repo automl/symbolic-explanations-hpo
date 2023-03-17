@@ -67,7 +67,7 @@ def run_smac_optimization(
     handler = logging.FileHandler(filename=f"{run_dir}/log.log", encoding="utf8")
     handler.setLevel("INFO")
     handler.setFormatter(
-        logging.Formatter("[%(levelname)s][%(filename)s:%(lineno)d] %(message)s")
+        logging.Formatter("[%(levelname)s][%(asctime)s;%(filename)s:%(lineno)d] %(message)s")
     )
     logger.root.addHandler(handler)
 

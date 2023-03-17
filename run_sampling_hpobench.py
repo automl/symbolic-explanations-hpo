@@ -7,7 +7,7 @@ import argparse
 import dill as pickle
 from smac import BlackBoxFacade, Callback
 
-
+from utils.logging_utils import get_logger
 from utils.run_utils import get_surrogate_predictions
 from utils.smac_utils import run_smac_optimization
 from utils.hpobench_utils import get_run_config, get_benchmark_dict, get_task_dict
@@ -90,7 +90,7 @@ if __name__ == "__main__":
         os.makedirs(f"{sampling_run_dir}/surrogates")
 
     # setup logging
-    logger = logging.getLogger(__name__)
+    logger = get_logger(filename=f"{sampling_run_dir}/sampling_log.log")
 
     logger.info(f"Start {run_type} sampling for {run_name}.")
 
