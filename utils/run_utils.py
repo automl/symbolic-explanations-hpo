@@ -16,6 +16,8 @@ from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 import configparser as cfgparse
 from ConfigSpace import Configuration, UniformIntegerHyperparameter
 from smac.runhistory.encoder.encoder import convert_configurations_to_array
+from utils.functions_utils import get_functions2d, NamedFunction
+from utils.model_utils import get_models
 
 plt.style.use("tableau-colorblind10")
 

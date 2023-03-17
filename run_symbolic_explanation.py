@@ -8,7 +8,7 @@ import shutil
 from itertools import combinations
 from gplearn.genetic import SymbolicRegressor
 
-from utils.utils import write_dict_to_cfg_file, get_hpo_test_data, get_scores, convert_symb
+from utils.run_utils import write_dict_to_cfg_file, get_hpo_test_data, get_scores, convert_symb
 from utils.symb_reg_utils import get_function_set
 from utils.functions_utils import get_functions2d, NamedFunction
 from utils.model_utils import get_hyperparams, get_classifier_from_run_conf

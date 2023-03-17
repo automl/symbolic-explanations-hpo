@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 from itertools import combinations
 
-from utils.utils import get_hpo_test_data, get_scores, get_surrogate_predictions
+from utils.run_utils import get_hpo_test_data, get_scores, get_surrogate_predictions
 from utils.functions_utils import get_functions2d, NamedFunction
 from utils.model_utils import get_hyperparams, get_classifier_from_run_conf
 from utils.logging_utils import get_logger
