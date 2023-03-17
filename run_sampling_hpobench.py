@@ -6,14 +6,11 @@ import shutil
 import argparse
 import dill as pickle
 from smac import BlackBoxFacade, Callback
-from itertools import combinations
 
-from hpobench.benchmarks.ml.nn_benchmark import NNBenchmark
-from hpobench.benchmarks.ml.svm_benchmark import SVMBenchmark
 
 from utils.utils import get_surrogate_predictions
 from utils.smac_utils import run_smac_optimization
-from utils.hpobench_utils import get_model_name
+from utils.hpobench_utils import get_run_config, get_model_name
 
 
 class SurrogateModelCallback(Callback):
@@ -33,37 +30,29 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--job_id')
     args = parser.parse_args()
-    job_id = args.job_id
-
-    benchmarks = [SVMBenchmark, NNBenchmark]
-    task_ids = [146818]
 
     use_random_samples = False
     evaluate_on_surrogate = False
-
     sampling_dir_name = "runs_sampling"
+    n_optimized_params = 2
     n_samples_spacing = np.linspace(10, 20, 3, dtype=int).tolist()
     n_seeds = 2
-    n_optimized_params = 2
     surrogate_n_samples = 400
     init_design_max_ratio = 0.25
     init_design_n_configs_per_hyperparamter = 8
 
-    run_configs = []
+    run_conf = get_run_config(job_id=args.job_id, n_optimized_params=n_optimized_params)
 
-    for benchmark in benchmarks:
-        #hyperparams = get_hyperparams(model_name=model)
-        #hp_comb = combinations(hyperparams, 2)
-        #for hp_conf in hp_comb:
-        for task_id in task_ids:
-            run_configs.append({"benchmark": benchmark, "task_id": task_id})
-    run_conf = run_configs[int(job_id)]
     data_set_postfix = f"_{run_conf['task_id']}"
-
     b = run_conf["benchmark"](task_id=run_conf["task_id"])
     cs = b.get_configuration_space()
-    optimized_parameters = cs.get_hyperparameters()
-    parameter_names = [param.name for param in optimized_parameters]
+    optimized_parameters = list(run_conf["hp_conf"])
+
+    # set all but the optimized hyperparameter bounds to the default value
+    for param in cs.get_hyperparameters():
+        if param.name not in optimized_parameters:
+            param.upper = param.default_value
+            param.lower = param.default_value
     model_name = get_model_name(b)
 
     def optimization_function_wrapper(cfg, seed):
@@ -89,7 +78,7 @@ if __name__ == "__main__":
             if max(n_samples_spacing) not in n_samples_to_eval:
                 n_samples_to_eval.append(max(n_samples_spacing))
 
-    run_name = f"{model_name.replace(' ', '_')}_{'_'.join(parameter_names)}{data_set_postfix}"
+    run_name = f"{model_name.replace(' ', '_')}_{'_'.join(optimized_parameters)}{data_set_postfix}"
 
     sampling_dir = f"learning_curves/{sampling_dir_name}/{run_type}"
     sampling_run_dir = f"{sampling_dir}/{run_name}"
@@ -157,7 +146,7 @@ if __name__ == "__main__":
             df = pd.DataFrame(
                 data=np.concatenate((configurations.T,
                                      performances.reshape(-1, 1)), axis=1),
-                columns=parameter_names + ["cost"])
+                columns=optimized_parameters + ["cost"])
             df.insert(0, "seed", seed)
             df = df.reset_index()
             df = df.rename(columns={"index": "n_samples"})
