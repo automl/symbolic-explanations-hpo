@@ -1,6 +1,10 @@
 from utils.model_wrapper import SVM, MLP, BDT, DT
 
 
+def get_models():
+    return ["MLP", "SVM", "BDT", "DT"]
+
+
 def get_hyperparams(model_name):
     if model_name == "MLP":
         hyperparams = [
