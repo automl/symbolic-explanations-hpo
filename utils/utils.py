@@ -1,8 +1,12 @@
 import os
 import time
+
+import pandas as pd
 import sympy
 import numpy as np
+from scipy.stats import kendalltau
 import matplotlib.pyplot as plt
+from functools import partial
 from gplearn.genetic import SymbolicRegressor
 from symbolic_meta_model_wrapper import (
     SymbolicMetaModelWrapper,
@@ -10,7 +14,8 @@ from symbolic_meta_model_wrapper import (
 )
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 import configparser as cfgparse
-from ConfigSpace import UniformIntegerHyperparameter
+from ConfigSpace import Configuration, UniformIntegerHyperparameter
+from smac.runhistory.encoder.encoder import convert_configurations_to_array
 
 plt.style.use("tableau-colorblind10")
 
@@ -19,8 +24,8 @@ def get_output_dirs() -> [str, str, str]:
     """
     Create directory for current run as well as a plot and result subdirectory.
     """
-    if not os.path.exists("runs"):
-        os.makedirs("runs")
+    if not os.path.exists("../runs"):
+        os.makedirs("../runs")
     run_dir = f"runs/run_{time.strftime('%Y%m%d-%H%M%S')}"
     res_dir = f"{run_dir}/results"
     plot_dir = f"{run_dir}/plots"
@@ -148,6 +153,47 @@ def append_scores(
     return df_scores
 
 
+def get_scores(
+    y_train,
+    pred_train,
+    y_test,
+    pred_test
+):
+    """
+    Get scores.
+    """
+    df_scores = pd.DataFrame.from_dict({
+        "mae_train": [mean_absolute_error(y_train, pred_train)],
+        "mae_test": [mean_absolute_error(y_test, pred_test)],
+        "mse_train": [mean_squared_error(y_train, pred_train)],
+        "mse_test": [mean_squared_error(y_test, pred_test)],
+        "r2_train": [r2_score(y_train, pred_train)],
+        "r2_test": [r2_score(y_test, pred_test)],
+        "kt_train": [kendalltau(y_train, pred_train)[0]],
+        "kt_test": [kendalltau(y_test, pred_test)[0]],
+        "kt_p_train": [kendalltau(y_train, pred_train)[1]],
+        "kt_p_test": [kendalltau(y_test, pred_test)[1]],
+    })
+    return df_scores
+
+
+def get_surrogate_predictions(X, classifier, surrogate_model):
+    y_surrogate = []
+    optimized_parameters = classifier.configspace.get_hyperparameters()
+    for i in range(X.shape[0]):
+        x0 = int(X[i][0]) if isinstance(optimized_parameters[0], UniformIntegerHyperparameter) else X[i][0]
+        x1 = int(X[i][1]) if isinstance(optimized_parameters[1], UniformIntegerHyperparameter) else X[i][1]
+        conf = Configuration(
+            configuration_space=classifier.configspace,
+            values={
+                optimized_parameters[0].name: x0,
+                optimized_parameters[1].name: x1
+            },
+        )
+        y_surrogate.append(surrogate_model.predict(convert_configurations_to_array([conf]))[0][0][0])
+    return y_surrogate
+
+
 def write_dict_to_cfg_file(dictionary: dict, target_file_path: str):
     parser = cfgparse.ConfigParser()
     section = "symbolic_regression"
@@ -157,6 +203,94 @@ def write_dict_to_cfg_file(dictionary: dict, target_file_path: str):
         parser.set(section, key, str(dictionary[key]))
     with open(target_file_path, "w") as f:
         parser.write(f)
+
+
+def get_hpo_test_data(classifier, optimized_parameters, n_test_samples, n_test_eval=5, return_x=False):
+    # Get test grid configurations
+    X_test_dimensions = []
+    n_test_steps = (
+        int(np.sqrt(n_test_samples))
+        if len(optimized_parameters) == 2
+        else n_test_samples
+        if len(optimized_parameters) == 1
+        else None
+    )
+    for i in range(len(optimized_parameters)):
+        space = (
+            partial(np.logspace, base=np.e)
+            if optimized_parameters[i].log
+            else np.linspace
+        )
+        if optimized_parameters[i].log:
+            lower = np.log(optimized_parameters[i].lower)
+            upper = np.log(optimized_parameters[i].upper)
+        else:
+            lower = optimized_parameters[i].lower
+            upper = optimized_parameters[i].upper
+        param_space = space(
+            lower + 0.5 * (upper - lower) / n_test_steps,
+            upper - (0.5 * (upper - lower) / n_test_steps),
+            n_test_steps,
+        )
+        if isinstance(optimized_parameters[i], UniformIntegerHyperparameter):
+            int_spacing = np.unique(
+                ([int(i) for i in param_space])
+            )
+            if optimized_parameters[i].upper not in int_spacing:
+                int_spacing = np.append(int_spacing, optimized_parameters[i].upper)
+            X_test_dimensions.append(int_spacing)
+        else:
+            X_test_dimensions.append(param_space)
+
+    param_dict = {}
+    if len(optimized_parameters) == 1:
+        X_test = X_test_dimensions[0]
+        if return_x:
+            return X_test
+        y_test = np.zeros(len(X_test_dimensions[0]))
+        for n in range(len(X_test_dimensions[0])):
+            param_dict[optimized_parameters[0].name] = X_test[n]
+            conf = Configuration(
+                configuration_space=classifier.configspace, values=param_dict
+            )
+            y_test[n] = classifier.train(config=conf, seed=0)
+        X_test, y_test = X_test.astype(float).reshape(
+            1, X_test.shape[0]
+        ), y_test.reshape(-1)
+    elif len(optimized_parameters) == 2:
+        X_test = np.array(
+            np.meshgrid(
+                X_test_dimensions[0],
+                X_test_dimensions[1],
+            )
+        ).astype(float)
+        if return_x:
+            return X_test
+
+        # Train model to get actual loss for each test config
+        y_test = np.zeros((X_test.shape[1], X_test.shape[2]))
+        for n in range(X_test.shape[1]):
+            for m in range(X_test.shape[2]):
+                for i, param in enumerate(optimized_parameters):
+                    if isinstance(
+                        optimized_parameters[i], UniformIntegerHyperparameter
+                    ):
+                        param_dict[optimized_parameters[i].name] = int(X_test[i, n, m])
+                    else:
+                        param_dict[optimized_parameters[i].name] = X_test[i, n, m]
+                conf = Configuration(
+                    configuration_space=classifier.configspace, values=param_dict
+                )
+                for i in range(n_test_eval):
+                    seed = i * 3
+                    y_test[n, m] += classifier.train(config=conf, seed=seed)
+                y_test[n, m] = y_test[n, m] / n_test_eval
+    else:
+        X_test = None
+        y_test = None
+        print("Not yet supported.")
+
+    return X_test, y_test
 
 
 def plot_symb1d(
@@ -262,16 +396,17 @@ def plot_symb1d(
 
 
 def plot_symb2d(
-    X_train_smac,
-    X_train_compare,
+    X_train_list,
     X_test,
     y_test,
-    symbolic_models,
+    predictions_test,
     parameters,
     function_name,
+    use_same_scale=True,
     metric_name=None,
     function_expression=None,
     plot_dir=None,
+    filename=None,
 ):
     """
     In the 2D setting, create a plot showing the training points from SMAC and another sampling, as well as the true
@@ -301,32 +436,33 @@ def plot_symb2d(
         X0_lower = parameters[0].lower
     if isinstance(parameters[0], UniformIntegerHyperparameter):
         dim_x = X_test[0][0].astype(int)
+        if parameters[0].log:
+            dim_x = np.log(dim_x)
     else:
         step_x = (X0_upper - X0_lower) / X_test.shape[2]
-        dim_x = np.arange(np.min(X_test[0]), np.max(X_test[0]) + step_x / 2, step_x)
+        if parameters[0].log:
+            dim_x = np.arange(np.log(np.min(X_test[0])), np.log(np.max(X_test[0])) + step_x / 2, step_x)
+        else:
+            dim_x = np.arange(np.min(X_test[0]), np.max(X_test[0]) + step_x / 2, step_x)
     if parameters[1].log:
         X1_upper = np.log(parameters[1].upper)
         X1_lower = np.log(parameters[1].lower)
+        step_y = 1 / 2 * (np.log(np.max(X_test[1])) - np.log(np.min(X_test[1])))
+        dim_y = np.arange(np.log(np.min(X_test[1])), np.log(np.max(X_test[1])) + step_y / 2, step_y)
     else:
         X1_upper = parameters[1].upper
         X1_lower = parameters[1].lower
-    step_y = 1 / 2 * (np.max(X_test[1]) - np.min(X_test[1]))
-    dim_y = np.arange(np.min(X_test[1]), np.max(X_test[1]) + step_y / 2, step_y)
+        step_y = 1 / 2 * (np.max(X_test[1]) - np.min(X_test[1]))
+        dim_y = np.arange(np.min(X_test[1]), np.max(X_test[1]) + step_y / 2, step_y)
+
 
     fig, axes = plt.subplots(
-        ncols=1, nrows=len(symbolic_models) + 1, constrained_layout=True, figsize=(8, 5)
+        ncols=1, nrows=len(predictions_test) + 1, constrained_layout=True, figsize=(8, 5)
     )
 
     pred_test = []
-    for i, model_name in enumerate(symbolic_models):
-        symbolic_model = symbolic_models[model_name]
-        pred_test.append(
-            symbolic_model.predict(
-                X_test.T.reshape(X_test.shape[1] * X_test.shape[2], X_test.shape[0])
-            )
-            .reshape(X_test.shape[2], X_test.shape[1])
-            .T
-        )
+    for i, model_name in enumerate(predictions_test):
+        pred_test.append(predictions_test[model_name])
     y_values = np.concatenate(
         (
             y_test.reshape(-1, 1),
@@ -334,11 +470,23 @@ def plot_symb2d(
             pred_test[1].reshape(-1, 1),
         )
     )
-    vmin, vmax = min(y_values), max(y_values)
+    if use_same_scale:
+        vmin, vmax = min(y_values), max(y_values)
+    else:
+        vmin, vmax = None, None
+
+    if parameters[0].log:
+        X0_test = np.log(X_test[0])
+    else:
+        X0_test = X_test[0]
+    if parameters[1].log:
+        X1_test = np.log(X_test[1])
+    else:
+        X1_test = X_test[1]
 
     im = axes[0].pcolormesh(
-        X_test[0],
-        X_test[1],
+        X0_test,
+        X1_test,
         y_test,
         cmap="summer",
         shading="auto",
@@ -358,16 +506,16 @@ def plot_symb2d(
     axes[0].tick_params(axis="both", which="major", labelsize=LABEL_SIZE)
     axes[0].grid(alpha=0)
 
-    for i, model_name in enumerate(symbolic_models):
-        symbolic_model = symbolic_models[model_name]
-        conv = convert_symb(symbolic_model, n_decimals=3)
-        if len(str(conv)) < 80:
-            label = f"{model_name}: {conv}"
-        else:
-            label = f"{model_name}:"
+    if not use_same_scale:
+        cbar = fig.colorbar(im, ax=axes[0])
+        cbar.set_label(r'True $\mathcal{L}$', fontsize=LABEL_SIZE, rotation=270, labelpad=10)
+        cbar.ax.tick_params(labelsize=LABEL_SIZE)
+
+    for i, model_name in enumerate(predictions_test):
+        label = model_name
         im = axes[i + 1].pcolormesh(
-            X_test[0],
-            X_test[1],
+            X0_test,
+            X1_test,
             pred_test[i],
             cmap="summer",
             shading="auto",
@@ -383,18 +531,12 @@ def plot_symb2d(
         axes[i + 1].set_ylim(X1_lower, X1_upper)
         axes[i + 1].tick_params(axis="both", which="major", labelsize=LABEL_SIZE)
         axes[i + 1].grid(alpha=0)
-        if "smac" in model_name:
-            X_train = X_train_smac
-        elif "rand" in model_name:
-            X_train = X_train_compare
-        elif "test" in model_name:
-            X_train = X_train_compare
-        else:
-            X_train = None
-            print(
-                "No training data for model name. Model name should contain 'smac' or 'rand'."
-            )
+        X_train = X_train_list[i]
         if X_train is not None:
+            if parameters[0].log:
+                X_train[0] = np.log(X_train[0])
+            if parameters[1].log:
+                X_train[1] = np.log(X_train[1])
             axes[i + 1].scatter(
                 X_train[0],
                 X_train[1],
@@ -404,20 +546,31 @@ def plot_symb2d(
                 s=40,
                 label="Train points",
             )
+    if not use_same_scale:
+        cbar = fig.colorbar(im, ax=axes[1:], shrink=0.4)
+        if metric_name:
+            cbar.set_label(metric_name, fontsize=LABEL_SIZE, rotation=270, labelpad=15)
+        else:
+            cbar.set_label("f(X0, X1)", fontsize=LABEL_SIZE, rotation=270, labelpad=15)
+        cbar.ax.tick_params(labelsize=LABEL_SIZE)
 
     handles, labels = axes[-1].get_legend_handles_labels()
     leg = fig.legend(
         handles, labels, loc="lower right", fontsize=LABEL_SIZE, framealpha=0.0
     )
     leg.get_frame().set_linewidth(0.0)
-    cbar = fig.colorbar(im, ax=axes, shrink=0.4)
-    if metric_name:
-        cbar.set_label(metric_name, fontsize=LABEL_SIZE, rotation=270, labelpad=10)
-    else:
-        cbar.set_label("f(X0, X1)", fontsize=LABEL_SIZE, rotation=270, labelpad=10)
-    cbar.ax.tick_params(labelsize=LABEL_SIZE)
+    if use_same_scale:
+        cbar = fig.colorbar(im, ax=axes, shrink=0.4)
+        if metric_name:
+            cbar.set_label(metric_name, fontsize=LABEL_SIZE, rotation=270, labelpad=15)
+        else:
+            cbar.set_label("f(X0, X1)", fontsize=LABEL_SIZE, rotation=270, labelpad=15)
+        cbar.ax.tick_params(labelsize=LABEL_SIZE)
     if plot_dir:
-        plt.savefig(f"{plot_dir}/{function_name}", dpi=800)
+        if filename:
+            plt.savefig(f"{plot_dir}/{filename}", dpi=800)
+        else:
+            plt.savefig(f"{plot_dir}/{function_name}", dpi=800)
     else:
         plt.show()
     plt.close()

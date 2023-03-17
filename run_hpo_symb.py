@@ -2,37 +2,35 @@ import logging
 from os import path
 import numpy as np
 import pandas as pd
-from functools import partial
 from gplearn.genetic import SymbolicRegressor
-from smac import BlackBoxFacade, HyperparameterOptimizationFacade
+from smac import BlackBoxFacade
 from smac.runhistory.encoder.encoder import convert_configurations_to_array
 from ConfigSpace import (
     Configuration,
     UniformIntegerHyperparameter,
-    UniformFloatHyperparameter,
 )
 
 from symbolic_meta_model_wrapper import (
     SymbolicMetaModelWrapper,
     SymbolicPursuitModelWrapper,
 )
-from symb_reg_utils import get_function_set
-from utils import (
+from utils.symb_reg_utils import get_function_set
+from utils.model_utils import get_classifier
+from utils.utils import (
     get_output_dirs,
     convert_symb,
     append_scores,
+    get_hpo_test_data,
     plot_symb1d,
     plot_symb2d,
     plot_symb2d_surrogate,
     write_dict_to_cfg_file,
 )
-from smac_utils import run_smac_optimization
-from model_wrapper import SVM, MLP, BDT, DT
-
+from utils.smac_utils import run_smac_optimization
 
 if __name__ == "__main__":
-    seed = 42
-    n_smac_samples = 20
+    seed = 3
+    n_smac_samples = 10
     n_test_samples = 100
     model = "MLP"
     symb_reg = True
@@ -42,29 +40,7 @@ if __name__ == "__main__":
     train_on_surrogate = False
     compare_on_test = False
 
-    if model == "MLP":
-        classifier = MLP(
-            optimize_n_neurons=False,
-            optimize_n_layer=False,
-            optimize_batch_size=False,
-            optimize_learning_rate_init=True,
-            optimize_max_iter=False,
-            seed=seed,
-        )
-    elif model == "SVM":  # set lower tolerance, iris (stopping_criteria=0.00001)
-        classifier = SVM(
-            optimize_C=False,
-            optimize_degree=True,
-            optimize_coef=True,
-            optimize_gamma=False,
-        )
-    elif model == "BDT":
-        classifier = BDT(optimize_learning_rate=True, optimize_n_estimators=True)
-    elif model == "DT":
-        classifier = DT(optimize_max_depth=True, optimize_min_samples_leaf=True)
-    else:
-        print(f"Unknown model: {model}")
-        classifier = None
+    classifier = get_classifier(model_name=model, seed=seed)
 
     np.random.seed(seed)
 
@@ -96,77 +72,7 @@ if __name__ == "__main__":
     logger.info(f"Create grid configs for testing and train {model}.")
 
     # get test samples for SR
-    X_test_dimensions = []
-    n_test_steps = (
-        int(np.sqrt(n_test_samples))
-        if len(optimized_parameters) == 2
-        else n_test_samples
-        if len(optimized_parameters) == 1
-        else None
-    )
-    for i in range(len(optimized_parameters)):
-        space = (
-            partial(np.logspace, base=np.e)
-            if optimized_parameters[i].log
-            else np.linspace
-        )
-        if optimized_parameters[i].log:
-            lower = np.log(optimized_parameters[i].lower)
-            upper = np.log(optimized_parameters[i].upper)
-        else:
-            lower = optimized_parameters[i].lower
-            upper = optimized_parameters[i].upper
-        param_space = space(
-            lower + 0.5 * (upper - lower) / n_test_steps,
-            upper - (0.5 * (upper - lower) / n_test_steps),
-            n_test_steps,
-        )
-        if isinstance(optimized_parameters[i], UniformIntegerHyperparameter):
-            int_spacing = np.unique(
-                ([int(i) for i in param_space])
-            )  # + [optimized_parameters[i].upper]))
-            X_test_dimensions.append(int_spacing)
-        else:
-            X_test_dimensions.append(param_space)
-
-    param_dict = {}
-    if len(optimized_parameters) == 1:
-        X_test = X_test_dimensions[0]
-        y_test = np.zeros(len(X_test_dimensions[0]))
-        for n in range(len(X_test_dimensions[0])):
-            param_dict[optimized_parameters[0].name] = X_test[n]
-            conf = Configuration(
-                configuration_space=classifier.configspace, values=param_dict
-            )
-            y_test[n] = classifier.train(config=conf, seed=seed)
-        X_test, y_test = X_test.astype(float).reshape(
-            1, X_test.shape[0]
-        ), y_test.reshape(-1)
-    elif len(optimized_parameters) == 2:
-        X_test = np.array(
-            np.meshgrid(
-                X_test_dimensions[0],
-                X_test_dimensions[1],
-            )
-        ).astype(float)
-        y_test = np.zeros((X_test.shape[1], X_test.shape[2]))
-        for n in range(X_test.shape[1]):
-            for m in range(X_test.shape[2]):
-                for i, param in enumerate(optimized_parameters):
-                    if isinstance(
-                        optimized_parameters[i], UniformIntegerHyperparameter
-                    ):
-                        param_dict[optimized_parameters[i].name] = int(X_test[i, n, m])
-                    else:
-                        param_dict[optimized_parameters[i].name] = X_test[i, n, m]
-                conf = Configuration(
-                    configuration_space=classifier.configspace, values=param_dict
-                )
-                y_test[n, m] = classifier.train(config=conf, seed=seed)
-    else:
-        X_test = None
-        y_test = None
-        print("Not yet supported.")
+    X_test, y_test = get_hpo_test_data(classifier, optimized_parameters, n_test_samples)
 
     if compare_on_test:
         X_train_compare = X_test.copy().reshape(len(optimized_parameters), -1)
@@ -231,22 +137,22 @@ if __name__ == "__main__":
         # TODO: log symb regression logs?
         symb_params = dict(
             population_size=5000,
-            generations=50,
-            stopping_criteria=0.001,
-            p_crossover=0.7,
-            p_subtree_mutation=0.1,
-            p_hoist_mutation=0.05,
-            p_point_mutation=0.1,
-            max_samples=0.9,
-            parsimony_coefficient=0.01,
+            generations=3,
+            # stopping_criteria=0.001,
+            # p_crossover=0.7,
+            # p_subtree_mutation=0.1,
+            # p_hoist_mutation=0.05,
+            # p_point_mutation=0.1,
+            # max_samples=0.9,
+            # parsimony_coefficient=0.01,
             function_set=get_function_set(),
             metric="mse",  # "mean absolute error",
-            random_state=0,
+            random_state=3,
             verbose=1,
-            const_range=(
-                100,
-                100,
-            ),  # Range for constants, rather arbitrary setting here?
+            # const_range=(
+            #     100,
+            #     100,
+            # ),  # Range for constants, rather arbitrary setting here?
         )
 
         write_dict_to_cfg_file(
@@ -264,6 +170,12 @@ if __name__ == "__main__":
         else:
             symb_smac.fit(X_train_smac.T, y_train_smac)
         symbolic_models["Symb-smac"] = symb_smac
+        import dill as pickle
+        with open(
+                f"{res_dir}/symb.pkl", "wb") as symb_model_file:
+            # pickling all programs lead to huge files
+            delattr(symb_smac, "_programs")
+            pickle.dump(symb_smac, symb_model_file)
 
         # run SR on compare samples (either random samples or test grid samples)
         symb_compare = SymbolicRegressor(**symb_params)
@@ -411,7 +323,7 @@ if __name__ == "__main__":
                 X_test=X_test,
                 y_test=y_test,
                 function_name=model,
-                metric_name="Cost",
+                metric_name="1 - Accuracy",
                 symbolic_models=symbolic_models,
                 parameters=optimized_parameters,
                 plot_dir=plot_dir,

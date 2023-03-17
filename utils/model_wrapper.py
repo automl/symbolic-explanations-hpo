@@ -20,6 +20,7 @@ from sklearn.tree import DecisionTreeClassifier
 
 iris = datasets.load_iris()
 digits = load_digits()
+datasets = {"digits": digits, "iris": iris}
 
 
 class MLP:
@@ -32,6 +33,8 @@ class MLP:
         optimize_batch_size=False,
         optimize_learning_rate_init=False,
         optimize_max_iter=False,
+        data_set_name="digits",
+        name="MLP",
         seed=0,
     ):
         self.optimize_n_neurons = optimize_n_neurons
@@ -41,23 +44,28 @@ class MLP:
         self.optimize_batch_size = optimize_batch_size
         self.optimize_learning_rate_init = optimize_learning_rate_init
         self.optimize_max_iter = optimize_max_iter
+        self.data_set = datasets[data_set_name]
+        self.name = name
+        self.seed = seed
+
+    def set_seed(self, seed):
         self.seed = seed
 
     @property
     def configspace(self) -> ConfigurationSpace:
         cs = ConfigurationSpace(seed=self.seed)
 
-        n_layer = Integer("n_layer", (1, 5), default=1)
-        n_neurons = Integer("n_neurons", (8, 256), log=True, default=10)
+        n_layer = Integer("n_layer", (1, 10), default=5)
+        n_neurons = Integer("n_neurons", (8, 256), log=True, default=64)
         activation = Categorical(
             "activation", ["logistic", "tanh", "relu"], default="tanh"
         )
         solver = Categorical("solver", ["lbfgs", "sgd", "adam"], default="adam")
         batch_size = Integer("batch_size", (30, 300), default=200)
         learning_rate_init = Float(
-            "learning_rate_init", (0.0001, 1.0), default=0.001, log=True
+            "learning_rate_init", (0.00001, 0.1), default=0.001, log=True
         )
-        max_iter = Integer("max_iter", (10, 100), default=25)
+        max_iter = Integer("max_iter", (20, 200), default=50)
 
         if self.optimize_n_layer:
             cs.add_hyperparameter(n_layer)
@@ -89,21 +97,21 @@ class MLP:
     def train(self, config: Configuration, seed: int) -> float:
         """Train an MLP based on a configuration and evaluate it on the
         digit-dataset using cross-validation."""
-        n_layer = config["n_layer"] if "n_layer" in config else 1
-        n_neurons = config["n_neurons"] if "n_neurons" in config else 10
+        n_layer = config["n_layer"] if "n_layer" in config else 5
+        n_neurons = config["n_neurons"] if "n_neurons" in config else 64
         activation = config["activation"] if "activation" in config else "tanh"
         solver = config["solver"] if "solver" in config else "adam"
         batch_size = config["batch_size"] if "batch_size" in config else 200
         lr_init = (
             config["learning_rate_init"] if "learning_rate_init" in config else 0.001
         )
-        max_iter = config["max_iter"] if "max_iter" in config else 25
+        max_iter = config["max_iter"] if "max_iter" in config else 50
 
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore")
 
             classifier = MLPClassifier(
-                hidden_layer_sizes=n_neurons * n_layer,
+                hidden_layer_sizes=[n_neurons] * n_layer,
                 solver=solver,
                 batch_size=batch_size,
                 activation=activation,
@@ -115,7 +123,7 @@ class MLP:
 
             cv = StratifiedKFold(n_splits=5, random_state=self.seed, shuffle=True)
             score = cross_val_score(
-                classifier, digits.data, digits.target, cv=cv, error_score="raise"
+                classifier, self.data_set.data, self.data_set.target, cv=cv, error_score="raise"
             )
 
         return 1 - np.mean(score)
@@ -126,10 +134,17 @@ class BDT:
         self,
         optimize_learning_rate=False,
         optimize_n_estimators=False,
+        name="BDT",
+        data_set_name="digits",
         seed=0,
     ):
         self.optimize_learning_rate = optimize_learning_rate
         self.optimize_n_estimators = optimize_n_estimators
+        self.name = name
+        self.data_set = datasets[data_set_name]
+        self.seed = seed
+
+    def set_seed(self, seed):
         self.seed = seed
 
     @property
@@ -164,7 +179,7 @@ class BDT:
 
             cv = StratifiedKFold(n_splits=5, random_state=self.seed, shuffle=True)
             score = cross_val_score(
-                classifier, digits.data, digits.target, cv=cv, error_score="raise"
+                classifier, self.data_set.data, self.data_set.target, cv=cv, error_score="raise"
             )
 
         return 1 - np.mean(score)
@@ -175,10 +190,17 @@ class DT:
         self,
         optimize_max_depth=False,
         optimize_min_samples_leaf=False,
+        name="DT",
+        data_set_name="digits",
         seed=0,
     ):
         self.optimize_max_depth = optimize_max_depth
         self.optimize_min_samples_leaf = optimize_min_samples_leaf
+        self.name = name
+        self.data_set = datasets[data_set_name]
+        self.seed = seed
+
+    def set_seed(self, seed):
         self.seed = seed
 
     @property
@@ -219,7 +241,7 @@ class DT:
 
             cv = StratifiedKFold(n_splits=5, random_state=self.seed, shuffle=True)
             score = cross_val_score(
-                classifier, digits.data, digits.target, cv=cv, error_score="raise"
+                classifier, self.data_set.data, self.data_set.target, cv=cv, error_score="raise"
             )
 
         return 1 - np.mean(score)
@@ -234,6 +256,8 @@ class SVM:
         optimize_degree=False,
         optimize_coef=False,
         optimize_gamma=False,
+        name="SVM",
+        data_set_name="digits",
         seed=0,
     ):
         self.optimize_kernel = optimize_kernel
@@ -242,11 +266,16 @@ class SVM:
         self.optimize_degree = optimize_degree
         self.optimize_coef = optimize_coef
         self.optimize_gamma = optimize_gamma
+        self.name = name
+        self.data_set = datasets[data_set_name]
+        self.seed = seed
+
+    def set_seed(self, seed):
         self.seed = seed
 
     @property
     def configspace(self) -> ConfigurationSpace:
-        cs = ConfigurationSpace(seed=0)
+        cs = ConfigurationSpace(seed=self.seed)
 
         kernel = Categorical(
             "kernel", ["linear", "poly", "rbf", "sigmoid"], default="poly"
@@ -305,7 +334,7 @@ class SVM:
             random_state=self.seed,
         )
         scores = cross_val_score(
-            classifier, digits.data, digits.target, cv=5
+            classifier, self.data_set.data, self.data_set.target, cv=5
         )  # score: accuracy
         cost = 1 - np.mean(scores)
 

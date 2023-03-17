@@ -12,9 +12,13 @@ dependencies:
   - scikit-learn
   - jupyter
   - matplotlib
+  - seaborn
   - gplearn
   - sympy
   - xgboost
   - black
+  - dill
+  - loguru
+  - tqdm
   - pip:
     - smac==v2.0.0b1

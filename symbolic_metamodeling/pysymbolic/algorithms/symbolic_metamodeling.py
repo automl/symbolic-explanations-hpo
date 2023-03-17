@@ -20,7 +20,8 @@ from sympy.utilities.autowrap import ufuncify
 
 from symbolic_metamodeling.pysymbolic.models.special_functions import *
 
-from tqdm import tqdm, trange, tqdm_notebook, tnrange
+# TODO: problem on noctua2?!
+#from tqdm import tqdm, trange, tqdm_notebook, tnrange
 
 import warnings
 warnings.filterwarnings("ignore")
