@@ -188,11 +188,14 @@ class RandomForestBenchmarkBBDefaultHP(RandomForestBenchmarkBB):
 
         config = deepcopy(config)
         n_features = self.train_X.shape[1]
-        config["max_features"] = int(np.rint(np.power(n_features, config["max_features"])))
+        if "max_features" in config:
+            max_features = int(np.rint(np.power(n_features, config["max_features"])))
+        else:
+            max_features = int(np.rint(np.power(n_features, 0.5)))
         model = RandomForestClassifier(
             max_depth=config["max_depth"] if "max_depth" in config else 10,
             min_samples_split=config["min_samples_split"] if "min_samples_split" in config else 32,
-            max_features=config["max_features"] if "max_features" in config else 0.5,
+            max_features=max_features,
             min_samples_leaf=config["min_samples_leaf"] if "min_samples_leaf" in config else 1,
             n_estimators=fidelity['n_estimators'],  # a fidelity being used during initialization
             bootstrap=True,
