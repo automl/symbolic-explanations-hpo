@@ -22,4 +22,4 @@ dependencies:
   - tqdm
   - openml
   - pip:
-    - smac==v2.0.0b1
+    - smac==v2.0.0

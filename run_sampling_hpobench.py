@@ -50,9 +50,10 @@ if __name__ == "__main__":
     cs = b.get_configuration_space()
 
     # set all but the optimized hyperparameter bounds to the default value
-    for param in cs.get_hyperparameters():
-        if param.name not in optimized_parameters:
-            param = ConfigSpace.Constant(param.name, value=param.default_value)
+    for param in b.configuration_space._hyperparameters:
+        if param not in optimized_parameters:
+            b.configuration_space._hyperparameters[param] = ConfigSpace.Constant(param, value=
+            b.configuration_space._hyperparameters[param].default_value)
 
     def optimization_function_wrapper(cfg, seed):
         """ Helper-function: simple wrapper to use the benchmark with smac """
