@@ -4,7 +4,6 @@ import pandas as pd
 import shutil
 import argparse
 import dill as pickle
-import ConfigSpace
 from smac import BlackBoxFacade, Callback
 
 from utils.logging_utils import get_logger
@@ -30,7 +29,7 @@ if __name__ == "__main__":
     parser.add_argument('--job_id')
     args = parser.parse_args()
 
-    use_random_samples = True
+    use_random_samples = False
     evaluate_on_surrogate = False
     sampling_dir_name = "runs_sampling_hpobench"
     n_optimized_params = 2
@@ -46,14 +45,10 @@ if __name__ == "__main__":
     data_set_postfix = f"_{task_dict[run_conf['task_id']]}"
     optimized_parameters = list(run_conf["hp_conf"])
     model_name = get_benchmark_dict()[run_conf["benchmark"]]
-    b = run_conf["benchmark"](task_id=run_conf["task_id"])
+    b = run_conf["benchmark"](task_id=run_conf["task_id"], hyperparameters=optimized_parameters)
 
-    # set all but the optimized hyperparameter bounds to the default value
-    for param in b.configuration_space._hyperparameters:
-        if param not in optimized_parameters:
-            b.configuration_space._hyperparameters[param] = ConfigSpace.Constant(param, value=
-            b.configuration_space._hyperparameters[param].default_value)
-    cs = b.configuration_space
+    # add only parameters to be optimized to configspace
+    cs = b.get_configuration_space(hyperparameters=optimized_parameters)
 
     def optimization_function_wrapper(cfg, seed):
         """ Helper-function: simple wrapper to use the benchmark with smac """
@@ -117,7 +112,8 @@ if __name__ == "__main__":
             if use_random_samples:
                 configurations = cs.sample_configuration(size=n_samples)
                 performances = np.array(
-                    [b.objective_function(config.get_dictionary(), seed=seed) for config in configurations]
+                    [b.objective_function(config.get_dictionary(), seed=seed)["function_value"] for config in
+                     configurations]
                 )
                 configurations = np.array(
                     [list(i.get_dictionary().values()) for i in configurations]
