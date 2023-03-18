@@ -30,7 +30,7 @@ if __name__ == "__main__":
     parser.add_argument('--job_id')
     args = parser.parse_args()
 
-    use_random_samples = False
+    use_random_samples = True
     evaluate_on_surrogate = False
     sampling_dir_name = "runs_sampling_hpobench"
     n_optimized_params = 2
@@ -53,7 +53,7 @@ if __name__ == "__main__":
         if param not in optimized_parameters:
             b.configuration_space._hyperparameters[param] = ConfigSpace.Constant(param, value=
             b.configuration_space._hyperparameters[param].default_value)
-    cs = b.get_configuration_space()
+    cs = b.configuration_space
 
     def optimization_function_wrapper(cfg, seed):
         """ Helper-function: simple wrapper to use the benchmark with smac """
@@ -115,7 +115,7 @@ if __name__ == "__main__":
             logger.info(f"Sample configs and train {model_name} with seed {seed}.")
 
             if use_random_samples:
-                configurations = cs.sample_configuration(size=n_samples, seed=seed)
+                configurations = cs.sample_configuration(size=n_samples)
                 performances = np.array(
                     [b.objective_function(config.get_dictionary(), seed=seed) for config in configurations]
                 )
@@ -123,7 +123,7 @@ if __name__ == "__main__":
                     [list(i.get_dictionary().values()) for i in configurations]
                 ).T
             elif evaluate_on_surrogate:
-                configurations = cs.sample_configuration(size=surrogate_n_samples, seed=seed)
+                configurations = cs.sample_configuration(size=surrogate_n_samples)
                 configurations = np.array(
                     [list(i.get_dictionary().values()) for i in configurations]
                 ).T
