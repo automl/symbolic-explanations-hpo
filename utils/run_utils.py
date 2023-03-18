@@ -18,6 +18,7 @@ from ConfigSpace import Configuration, UniformIntegerHyperparameter
 from smac.runhistory.encoder.encoder import convert_configurations_to_array
 from utils.functions_utils import get_functions2d, NamedFunction
 from utils.model_utils import get_models
+from hpobench.dependencies.ml.ml_benchmark_template import MLBenchmark
 
 plt.style.use("tableau-colorblind10")
 
@@ -252,10 +253,20 @@ def get_hpo_test_data(classifier, optimized_parameters, n_test_samples, n_test_e
         y_test = np.zeros(len(X_test_dimensions[0]))
         for n in range(len(X_test_dimensions[0])):
             param_dict[optimized_parameters[0].name] = X_test[n]
+            if isinstance(classifier, MLBenchmark):
+                cs = classifier.get_configuration_space()
+            else:
+                cs = classifier.configspace
             conf = Configuration(
-                configuration_space=classifier.configspace, values=param_dict
+                configuration_space=cs, values=param_dict
             )
-            y_test[n] = classifier.train(config=conf, seed=0)
+            for i in range(n_test_eval):
+                seed = i * 3
+                if isinstance(classifier, MLBenchmark):
+                    y_test[n] = classifier.objective_function(conf.get_dictionary(), seed=seed)
+                else:
+                    y_test[n] = classifier.train(config=conf, seed=seed)
+            y_test[n] = y_test[n] / n_test_eval
         X_test, y_test = X_test.astype(float).reshape(
             1, X_test.shape[0]
         ), y_test.reshape(-1)
@@ -280,12 +291,20 @@ def get_hpo_test_data(classifier, optimized_parameters, n_test_samples, n_test_e
                         param_dict[optimized_parameters[i].name] = int(X_test[i, n, m])
                     else:
                         param_dict[optimized_parameters[i].name] = X_test[i, n, m]
+                if isinstance(classifier, MLBenchmark):
+                    cs = classifier.get_configuration_space()
+                else:
+                    cs = classifier.configspace
                 conf = Configuration(
-                    configuration_space=classifier.configspace, values=param_dict
+                    configuration_space=cs, values=param_dict
                 )
                 for i in range(n_test_eval):
                     seed = i * 3
-                    y_test[n, m] += classifier.train(config=conf, seed=seed)
+                    if isinstance(classifier, MLBenchmark):
+                        y_test[n, m] = classifier.objective_function(configuration=conf.get_dictionary(), seed=seed)[
+                            "function_value"]
+                    else:
+                        y_test[n, m] = classifier.train(config=conf, seed=seed)
                 y_test[n, m] = y_test[n, m] / n_test_eval
     else:
         X_test = None
