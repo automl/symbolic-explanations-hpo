@@ -47,13 +47,13 @@ if __name__ == "__main__":
     optimized_parameters = list(run_conf["hp_conf"])
     model_name = get_benchmark_dict()[run_conf["benchmark"]]
     b = run_conf["benchmark"](task_id=run_conf["task_id"])
-    cs = b.get_configuration_space()
 
     # set all but the optimized hyperparameter bounds to the default value
     for param in b.configuration_space._hyperparameters:
         if param not in optimized_parameters:
             b.configuration_space._hyperparameters[param] = ConfigSpace.Constant(param, value=
             b.configuration_space._hyperparameters[param].default_value)
+    cs = b.get_configuration_space()
 
     def optimization_function_wrapper(cfg, seed):
         """ Helper-function: simple wrapper to use the benchmark with smac """
