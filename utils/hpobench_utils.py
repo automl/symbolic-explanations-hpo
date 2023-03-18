@@ -13,10 +13,10 @@ ALL_TASKS = openml.tasks.list_tasks()
 
 def get_benchmark_dict():
     benchmark_dict = {
-        LRBenchmarkBB: "LR",
-        SVMBenchmarkBB: "SVM",
-        RandomForestBenchmarkBB: "RF",
-        XGBoostBenchmarkBB: "XGBoost",
+        #LRBenchmarkBB: "LR",
+        #SVMBenchmarkBB: "SVM",
+        #RandomForestBenchmarkBB: "RF",
+        #XGBoostBenchmarkBB: "XGBoost",
         NNBenchmarkBB: "NN",
     }
     return benchmark_dict
