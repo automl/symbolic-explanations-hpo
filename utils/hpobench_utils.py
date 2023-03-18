@@ -23,7 +23,7 @@ def get_benchmark_dict():
 
 
 def get_task_dict():
-    task_ids = [10101] #, 53, 146818, 146821, 9952, 146822, 31, 3917]
+    task_ids = [10101, 53, 146818, 146821, 9952, 146822, 31, 3917]
     task_dict = {tid: ALL_TASKS[tid]["name"] for tid in task_ids}
     return task_dict
 
