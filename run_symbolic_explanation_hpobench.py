@@ -5,14 +5,12 @@ import numpy as np
 import pandas as pd
 import sympy
 import shutil
-from itertools import combinations
 from gplearn.genetic import SymbolicRegressor
 
 from utils.logging_utils import get_logger
 from utils.run_utils import write_dict_to_cfg_file, get_hpo_test_data, get_scores, convert_symb
 from utils.symb_reg_utils import get_function_set
-from utils.functions_utils import get_functions2d, NamedFunction
-from utils.model_utils import get_hyperparams, get_classifier_from_run_conf
+from utils.hpobench_utils import get_run_config, get_benchmark_dict, get_task_dict
 
 
 if __name__ == "__main__":
@@ -21,47 +19,28 @@ if __name__ == "__main__":
     args = parser.parse_args()
     job_id = args.job_id
 
-    n_samples_spacing = np.linspace(20, 200, 10, dtype=int).tolist()
-    n_test_samples = 100
-    n_seeds = 3
-    symb_dir_name = "rmse_parsimony_wo_sign"
-    dir_with_test_data = "learning_curves/runs_symb/mult_testeval_add_func/surr"
-
-    functions = get_functions2d()
-    models = ["MLP", "SVM", "BDT", "DT"]
-    #models = functions
-    data_sets = ["digits", "iris"]
     use_random_samples = False
-    evaluate_on_surrogate = True
-
+    evaluate_on_surrogate = False
+    symb_dir_name = "parsimony0005"
+    sampling_dir_name = "runs_sampling_hpobench"
+    dir_with_test_data = ""
+    n_optimized_params = 2
+    n_samples_spacing = np.linspace(20, 200, 10, dtype=int).tolist()
+    n_seeds = 3
+    n_test_samples = 100
     init_design_max_ratio = 0.25
     init_design_n_configs_per_hyperparamter = 8
-    sampling_dir_name = "runs_sampling"
 
-    run_configs = []
-    for model in models:
-        if isinstance(model, NamedFunction):
-            run_configs.append({"model": model, "data_set_name": None})
-        else:
-            hyperparams = get_hyperparams(model_name=model)
-            hp_comb = combinations(hyperparams, 2)
-            for hp_conf in hp_comb:
-                for ds in data_sets:
-                    run_configs.append({"model": model, hp_conf[0]: True, hp_conf[1]: True, "data_set_name": ds})
-    run_conf = run_configs[int(job_id)]
-    if run_conf['data_set_name']:
-        data_set_postfix = f"_{run_conf['data_set_name']}"
-    else:
-        data_set_postfix = ""
-    model = run_conf.pop("model")
-    if isinstance(model, NamedFunction):
-        classifier = model
-    else:
-        classifier = get_classifier_from_run_conf(model_name=model, run_conf=run_conf)
+    run_conf = get_run_config(job_id=args.job_id, n_optimized_params=n_optimized_params)
 
-    function_name = classifier.name if isinstance(classifier, NamedFunction) else model
-    optimized_parameters = classifier.configspace.get_hyperparameters()
-    parameter_names = [param.name for param in optimized_parameters]
+    task_dict = get_task_dict()
+    data_set_postfix = f"_{task_dict[run_conf['task_id']]}"
+    optimized_parameters = list(run_conf["hp_conf"])
+    model_name = get_benchmark_dict()[run_conf["benchmark"]]
+    b = run_conf["benchmark"](task_id=run_conf["task_id"], hyperparameters=optimized_parameters)
+
+    # add only parameters to be optimized to configspace
+    cs = b.get_configuration_space(hyperparameters=optimized_parameters)
 
     if use_random_samples:
         run_type = "rand"
@@ -70,12 +49,12 @@ if __name__ == "__main__":
     else:
         run_type = "smac"
 
-    run_name = f"{function_name.replace(' ', '_')}_{'_'.join(parameter_names)}{data_set_postfix}"
+    run_name = f"{model_name.replace(' ', '_')}_{'_'.join(optimized_parameters)}{data_set_postfix}"
 
     sampling_dir = f"learning_curves/{sampling_dir_name}/{run_type}"
     sampling_run_dir = f"{sampling_dir}/{run_name}"
 
-    symb_dir = f"learning_curves/runs_symb/{symb_dir_name}/{run_type}/{run_name}"
+    symb_dir = f"learning_curves/runs_symb_hpobench/{symb_dir_name}/{run_type}/{run_name}"
     if os.path.exists(symb_dir):
         shutil.rmtree(symb_dir)
     os.makedirs(f"{symb_dir}/symb_models")
@@ -86,16 +65,16 @@ if __name__ == "__main__":
 
     logger.info(f"Get and save test data.")
     if dir_with_test_data:
-        X_test = get_hpo_test_data(classifier, optimized_parameters, n_test_samples, return_x=True)
+        X_test = get_hpo_test_data(b, cs.get_hyperparameters(), n_test_samples, return_x=True)
         y_test = np.array(
         pd.read_csv(f"{dir_with_test_data}/{run_name}/y_test.csv", header=None))
         y_test = y_test.reshape(X_test.shape[1], X_test.shape[2])
     else:
         logger.info(f"No previous test data dir provided, create test data for {run_name}.")
-        X_test, y_test = get_hpo_test_data(classifier, optimized_parameters, n_test_samples)
+        X_test, y_test = get_hpo_test_data(b, cs.get_hyperparameters(), n_test_samples)
     X_test_reshaped = X_test.reshape(len(optimized_parameters), -1).T
     y_test_reshaped = y_test.reshape(-1)
-    pd.DataFrame(X_test_reshaped, columns=parameter_names).to_csv(f"{symb_dir}/x_test.csv", index=False)
+    pd.DataFrame(X_test_reshaped, columns=optimized_parameters).to_csv(f"{symb_dir}/x_test.csv", index=False)
     pd.DataFrame(y_test_reshaped).to_csv(f"{symb_dir}/y_test.csv", header=False, index=False)
 
     df_all_metrics = pd.DataFrame()
@@ -107,7 +86,7 @@ if __name__ == "__main__":
         generations=20,
         function_set=get_function_set(),
         metric="rmse",
-        parsimony_coefficient=0.0001,
+        parsimony_coefficient=0.0005,
         verbose=1,
     )
 
@@ -128,7 +107,7 @@ if __name__ == "__main__":
         sampling_seeds = df_train_samples.seed.unique()
 
         for sampling_seed in sampling_seeds:
-            X_train_all_samples = df_train_samples.query(f"seed == {sampling_seed}")[parameter_names]
+            X_train_all_samples = df_train_samples.query(f"seed == {sampling_seed}")[optimized_parameters]
             y_train_all_samples = df_train_samples.query(f"seed == {sampling_seed}")["cost"]
 
 
