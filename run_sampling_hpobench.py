@@ -4,6 +4,7 @@ import pandas as pd
 import shutil
 import argparse
 import dill as pickle
+import ConfigSpace
 from smac import BlackBoxFacade, Callback
 
 from utils.logging_utils import get_logger
@@ -51,8 +52,7 @@ if __name__ == "__main__":
     # set all but the optimized hyperparameter bounds to the default value
     for param in cs.get_hyperparameters():
         if param.name not in optimized_parameters:
-            param.upper = param.default_value
-            param.lower = param.default_value
+            param = ConfigSpace.Constant(param.name, value=param.default_value)
 
     def optimization_function_wrapper(cfg, seed):
         """ Helper-function: simple wrapper to use the benchmark with smac """
