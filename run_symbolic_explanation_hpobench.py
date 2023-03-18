@@ -19,7 +19,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     job_id = args.job_id
 
-    use_random_samples = True
+    use_random_samples = False
     evaluate_on_surrogate = False
     symb_dir_name = "parsimony0005"
     sampling_dir_name = "runs_sampling_hpobench"
