@@ -254,7 +254,7 @@ def get_hpo_test_data(classifier, optimized_parameters, n_test_samples, n_test_e
         for n in range(len(X_test_dimensions[0])):
             param_dict[optimized_parameters[0].name] = X_test[n]
             if isinstance(classifier, MLBenchmark):
-                cs = classifier.get_configuration_space(hyperparameters=optimized_parameters)
+                cs = classifier.configuration_space
             else:
                 cs = classifier.configspace
             conf = Configuration(
@@ -292,7 +292,7 @@ def get_hpo_test_data(classifier, optimized_parameters, n_test_samples, n_test_e
                     else:
                         param_dict[optimized_parameters[i].name] = X_test[i, n, m]
                 if isinstance(classifier, MLBenchmark):
-                    cs = classifier.get_configuration_space(hyperparameters=optimized_parameters)
+                    cs = classifier.configuration_space
                 else:
                     cs = classifier.configspace
                 conf = Configuration(
