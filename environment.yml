@@ -23,3 +23,4 @@ dependencies:
   - pip:
     - smac==v2.0.0
     - xgboost==1.3.1
+    - interruptingcow

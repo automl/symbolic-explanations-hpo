@@ -56,13 +56,13 @@ if __name__ == "__main__":
             logger.info(f"Get test data.")
             X_test = np.array(pd.read_csv(f"learning_curves/runs_symb_hpobench/{symb_dir_name}/surr/{run_name}/x_test.csv"))
             y_test = np.array(pd.read_csv(f"learning_curves/runs_symb_hpobench/{symb_dir_name}/surr/{run_name}/y_test.csv"))
-    
+
             avg_cost = y_test.mean()
             std_cost = y_test.std()
-    
+
             df_error_metrics_all = pd.DataFrame()
             df_complexity_all = pd.DataFrame()
-    
+
             for sampling_type in ["SR (BO-GP)", "GP (BO)", "SR (Random)", "SR (BO)"]:
 
                 if sampling_type == "GP (BO)":
