@@ -17,7 +17,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--job_id')
     args = parser.parse_args()
-    job_id = args.job_id
 
     use_random_samples = False
     evaluate_on_surrogate = True
