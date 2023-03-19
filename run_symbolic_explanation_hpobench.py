@@ -22,7 +22,7 @@ if __name__ == "__main__":
     evaluate_on_surrogate = False
     symb_dir_name = "parsimony0005"
     sampling_dir_name = "runs_sampling_hpobench"
-    dir_with_test_data = "learning_curves/runs_symb_hpobench/parsimony0005/smac"
+    dir_with_test_data = "learning_curves/runs_symb_hpobench/parsimony0005/surr"
     n_optimized_params = 2
     n_samples_spacing = np.linspace(20, 200, 10, dtype=int).tolist()
     n_seeds = 3
