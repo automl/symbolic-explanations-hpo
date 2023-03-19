@@ -19,11 +19,11 @@ if __name__ == "__main__":
     args = parser.parse_args()
     job_id = args.job_id
 
-    use_random_samples = True
-    evaluate_on_surrogate = False
+    use_random_samples = False
+    evaluate_on_surrogate = True
     symb_dir_name = "parsimony0005"
     sampling_dir_name = "runs_sampling_hpobench"
-    dir_with_test_data = ""
+    dir_with_test_data = "learning_curves/runs_symb_hpobench/parsimony0005/smac"
     n_optimized_params = 2
     n_samples_spacing = np.linspace(20, 200, 10, dtype=int).tolist()
     n_seeds = 3
