@@ -51,20 +51,20 @@ if __name__ == "__main__":
 
         logger.info(f"Create plot for {run_name}.")
 
-        # Load test data
-        logger.info(f"Get test data.")
-        X_test = np.array(pd.read_csv(f"learning_curves/runs_symb_hpobench/{symb_dir_name}/surr/{run_name}/x_test.csv"))
-        y_test = np.array(pd.read_csv(f"learning_curves/runs_symb_hpobench/{symb_dir_name}/surr/{run_name}/y_test.csv"))
+        try:
+            # Load test data
+            logger.info(f"Get test data.")
+            X_test = np.array(pd.read_csv(f"learning_curves/runs_symb_hpobench/{symb_dir_name}/surr/{run_name}/x_test.csv"))
+            y_test = np.array(pd.read_csv(f"learning_curves/runs_symb_hpobench/{symb_dir_name}/surr/{run_name}/y_test.csv"))
+    
+            avg_cost = y_test.mean()
+            std_cost = y_test.std()
+    
+            df_error_metrics_all = pd.DataFrame()
+            df_complexity_all = pd.DataFrame()
+    
+            for sampling_type in ["SR (BO-GP)", "GP (BO)", "SR (Random)", "SR (BO)"]:
 
-        avg_cost = y_test.mean()
-        std_cost = y_test.std()
-
-        df_error_metrics_all = pd.DataFrame()
-        df_complexity_all = pd.DataFrame()
-
-        for sampling_type in ["SR (BO-GP)", "GP (BO)", "SR (Random)", "SR (BO)"]:
-
-            try:
                 if sampling_type == "GP (BO)":
                     symb_dir = f"learning_curves/runs_surr_hpobench/{run_name}"
                 else:
@@ -175,6 +175,6 @@ if __name__ == "__main__":
                 plt.savefig(f"{complexity_plot_dir}/{run_name}_complexity_pointplot.png", dpi=400)
                 plt.close()
 
-            except:
-                logger.warning(f"Could not process {run_name}, {sampling_type}. Skip.")
+        except:
+            logger.warning(f"Could not process {run_name}. Skip.")
 
