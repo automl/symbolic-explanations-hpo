@@ -95,19 +95,10 @@ if __name__ == "__main__":
 
         logger.info(f"Create plots.")
 
-        classifier_titles = {
-            "BDT": "Boosted Decision Tree",
-            "DT": "Decision Tree",
-            "SVM": "Support Vector Machine",
-            "MLP": "Neural Network",
-        }
-        if model_name in classifier_titles.keys():
-            classifier_title = classifier_titles[model_name]
-        else:
-            classifier_title = model_name
+        classifier_title = model_name
 
-        param0 = f"log({optimized_parameters[0].name})" if optimized_parameters[0].log else optimized_parameters[0].name
-        param1 = f"log({optimized_parameters[1].name})" if optimized_parameters[1].log else optimized_parameters[1].name
+        param0 = f"log({optimized_parameters[0]})" if cs.get_hyperparameters()[0].log else optimized_parameters[0]
+        param1 = f"log({optimized_parameters[1]})" if cs.get_hyperparameters()[1].log else optimized_parameters[1]
 
         # Plot RMSE
         plt.figure()
