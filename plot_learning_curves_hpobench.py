@@ -20,7 +20,7 @@ if __name__ == "__main__":
     run_configs = get_run_config(n_optimized_params=n_optimized_params)
 
     # Set up plot directories
-    plot_dir = f"learning_curves/plots/combined_plots_{symb_dir_name}"
+    plot_dir = f"learning_curves/plots/combined_plots_hpobench_{symb_dir_name}"
     complexity_plot_dir = f"{plot_dir}/complexity"
     mse_plot_dir = f"{plot_dir}/mse"
     rmse_plot_dir = f"{plot_dir}/rmse"
@@ -53,8 +53,8 @@ if __name__ == "__main__":
 
         # Load test data
         logger.info(f"Get test data.")
-        X_test = np.array(pd.read_csv(f"learning_curves/runs_symb/{symb_dir_name}/surr/{run_name}/x_test.csv"))
-        y_test = np.array(pd.read_csv(f"learning_curves/runs_symb/{symb_dir_name}/surr/{run_name}/y_test.csv"))
+        X_test = np.array(pd.read_csv(f"learning_curves/runs_symb_hpobench/{symb_dir_name}/surr/{run_name}/x_test.csv"))
+        y_test = np.array(pd.read_csv(f"learning_curves/runs_symb_hpobench/{symb_dir_name}/surr/{run_name}/y_test.csv"))
 
         avg_cost = y_test.mean()
         std_cost = y_test.std()
@@ -65,14 +65,14 @@ if __name__ == "__main__":
         for sampling_type in ["SR (BO-GP)", "GP (BO)", "SR (Random)", "SR (BO)"]:
 
             if sampling_type == "GP (BO)":
-                symb_dir = f"learning_curves/runs_surr/{run_name}"
+                symb_dir = f"learning_curves/runs_surr_hpobench/{run_name}"
             else:
                 if sampling_type == "SR (BO)":
-                    symb_dir = f"learning_curves/runs_symb/{symb_dir_name}/smac/{run_name}"
+                    symb_dir = f"learning_curves/runs_symb_hpobench/{symb_dir_name}/smac/{run_name}"
                 elif sampling_type == "SR (Random)":
-                    symb_dir = f"learning_curves/runs_symb/{symb_dir_name}/rand/{run_name}"
+                    symb_dir = f"learning_curves/runs_symb_hpobench/{symb_dir_name}/rand/{run_name}"
                 else:
-                    symb_dir = f"learning_curves/runs_symb/{symb_dir_name}/surr/{run_name}"
+                    symb_dir = f"learning_curves/runs_symb_hpobench/{symb_dir_name}/surr/{run_name}"
                 df_complexity = pd.read_csv(f"{symb_dir}/complexity.csv")
                 df_complexity.insert(0, "Experiment", f"{sampling_type}")
                 df_complexity_all = pd.concat((df_complexity_all, df_complexity))
@@ -87,7 +87,7 @@ if __name__ == "__main__":
 
         if include_surr_diff:
             df_error_metrics = pd.read_csv(
-                f"learning_curves/runs_symb/{symb_dir_name}/surr/{run_name}/error_metrics_compare_surr.csv")
+                f"learning_curves/runs_symb_hpobench/{symb_dir_name}/surr/{run_name}/error_metrics_compare_surr.csv")
             df_error_metrics["rmse_test"] = np.sqrt(df_error_metrics["mse_test"])
             df_error_metrics["rmse_train"] = np.sqrt(df_error_metrics["mse_train"])
             df_error_metrics.insert(0, "Experiment", f"RMSE(SR (BO-GP), GP (BO))")
