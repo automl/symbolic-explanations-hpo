@@ -64,114 +64,117 @@ if __name__ == "__main__":
 
         for sampling_type in ["SR (BO-GP)", "GP (BO)", "SR (Random)", "SR (BO)"]:
 
-            if sampling_type == "GP (BO)":
-                symb_dir = f"learning_curves/runs_surr_hpobench/{run_name}"
-            else:
-                if sampling_type == "SR (BO)":
-                    symb_dir = f"learning_curves/runs_symb_hpobench/{symb_dir_name}/smac/{run_name}"
-                elif sampling_type == "SR (Random)":
-                    symb_dir = f"learning_curves/runs_symb_hpobench/{symb_dir_name}/rand/{run_name}"
+            try:
+                if sampling_type == "GP (BO)":
+                    symb_dir = f"learning_curves/runs_surr_hpobench/{run_name}"
                 else:
-                    symb_dir = f"learning_curves/runs_symb_hpobench/{symb_dir_name}/surr/{run_name}"
-                df_complexity = pd.read_csv(f"{symb_dir}/complexity.csv")
-                df_complexity.insert(0, "Experiment", f"{sampling_type}")
-                df_complexity_all = pd.concat((df_complexity_all, df_complexity))
+                    if sampling_type == "SR (BO)":
+                        symb_dir = f"learning_curves/runs_symb_hpobench/{symb_dir_name}/smac/{run_name}"
+                    elif sampling_type == "SR (Random)":
+                        symb_dir = f"learning_curves/runs_symb_hpobench/{symb_dir_name}/rand/{run_name}"
+                    else:
+                        symb_dir = f"learning_curves/runs_symb_hpobench/{symb_dir_name}/surr/{run_name}"
+                    df_complexity = pd.read_csv(f"{symb_dir}/complexity.csv")
+                    df_complexity.insert(0, "Experiment", f"{sampling_type}")
+                    df_complexity_all = pd.concat((df_complexity_all, df_complexity))
 
-            df_complexity_all = df_complexity_all[df_complexity_all["program_operations"] != -1]
+                df_complexity_all = df_complexity_all[df_complexity_all["program_operations"] != -1]
 
-            df_error_metrics = pd.read_csv(f"{symb_dir}/error_metrics.csv")
-            df_error_metrics["rmse_test"] = np.sqrt(df_error_metrics["mse_test"])
-            df_error_metrics["rmse_train"] = np.sqrt(df_error_metrics["mse_train"])
-            df_error_metrics.insert(0, "Experiment", f"{sampling_type}")
-            df_error_metrics_all = pd.concat((df_error_metrics_all, df_error_metrics))
+                df_error_metrics = pd.read_csv(f"{symb_dir}/error_metrics.csv")
+                df_error_metrics["rmse_test"] = np.sqrt(df_error_metrics["mse_test"])
+                df_error_metrics["rmse_train"] = np.sqrt(df_error_metrics["mse_train"])
+                df_error_metrics.insert(0, "Experiment", f"{sampling_type}")
+                df_error_metrics_all = pd.concat((df_error_metrics_all, df_error_metrics))
 
-        if include_surr_diff:
-            df_error_metrics = pd.read_csv(
-                f"learning_curves/runs_symb_hpobench/{symb_dir_name}/surr/{run_name}/error_metrics_compare_surr.csv")
-            df_error_metrics["rmse_test"] = np.sqrt(df_error_metrics["mse_test"])
-            df_error_metrics["rmse_train"] = np.sqrt(df_error_metrics["mse_train"])
-            df_error_metrics.insert(0, "Experiment", f"RMSE(SR (BO-GP), GP (BO))")
-            df_error_metrics_all = pd.concat((df_error_metrics_all, df_error_metrics))
+                if include_surr_diff:
+                    df_error_metrics = pd.read_csv(
+                        f"learning_curves/runs_symb_hpobench/{symb_dir_name}/surr/{run_name}/error_metrics_compare_surr.csv")
+                    df_error_metrics["rmse_test"] = np.sqrt(df_error_metrics["mse_test"])
+                    df_error_metrics["rmse_train"] = np.sqrt(df_error_metrics["mse_train"])
+                    df_error_metrics.insert(0, "Experiment", f"RMSE(SR (BO-GP), GP (BO))")
+                    df_error_metrics_all = pd.concat((df_error_metrics_all, df_error_metrics))
 
-        logger.info(f"Create plots.")
+                logger.info(f"Create plots.")
 
-        classifier_title = model_name
+                classifier_title = model_name
 
-        param0 = f"log({optimized_parameters[0]})" if cs.get_hyperparameters()[0].log else optimized_parameters[0]
-        param1 = f"log({optimized_parameters[1]})" if cs.get_hyperparameters()[1].log else optimized_parameters[1]
+                param0 = f"log({optimized_parameters[0]})" if cs.get_hyperparameters()[0].log else optimized_parameters[0]
+                param1 = f"log({optimized_parameters[1]})" if cs.get_hyperparameters()[1].log else optimized_parameters[1]
 
-        # Plot RMSE
-        plt.figure()
-        _, ax = plt.subplots(figsize=(8, 5))
-        line = plt.axhline(y=std_cost, color='darkred', linestyle='--', linewidth=0.5, label="Test Std.")
-        sns.pointplot(data=df_error_metrics_all, x="n_samples", y="rmse_test", hue="Experiment", errorbar="sd",
-                      linestyles="", capsize=0.2, errwidth=0.7, scale=0.7, dodge=0.4)#, showfliers=False)
-        plt.title(f"{classifier_title}, Dataset: {data_set}\nOptimize: {param0}, {param1}", fontsize=titlesize)
-        #plt.title(f"Test Mean: {avg_cost:.3f}, Test Std.: {std_cost:.3f}", fontsize=10),
-        plt.ylabel("Test RMSE", fontsize=titlesize)
-        plt.yticks(fontsize=labelsize)
-        plt.xlabel("Number of Samples", fontsize=titlesize)
-        plt.xticks(fontsize=labelsize)
-        #plt.ylim(0., 0.4)
-        plt.tight_layout(rect=(0, 0.05, 1, 1))
-        sns.move_legend(
-            ax, "lower center",
-            bbox_to_anchor=(0.45, -0.27),
-            ncol=5,
-            title=None, frameon=False,
-            fontsize=labelsize
-        )
-        plt.savefig(f"{rmse_plot_dir}/{run_name}_pointplot.png", dpi=400)
-        plt.close()
+                # Plot RMSE
+                plt.figure()
+                _, ax = plt.subplots(figsize=(8, 5))
+                line = plt.axhline(y=std_cost, color='darkred', linestyle='--', linewidth=0.5, label="Test Std.")
+                sns.pointplot(data=df_error_metrics_all, x="n_samples", y="rmse_test", hue="Experiment", errorbar="sd",
+                              linestyles="", capsize=0.2, errwidth=0.7, scale=0.7, dodge=0.4)#, showfliers=False)
+                plt.title(f"{classifier_title}, Dataset: {data_set}\nOptimize: {param0}, {param1}", fontsize=titlesize)
+                #plt.title(f"Test Mean: {avg_cost:.3f}, Test Std.: {std_cost:.3f}", fontsize=10),
+                plt.ylabel("Test RMSE", fontsize=titlesize)
+                plt.yticks(fontsize=labelsize)
+                plt.xlabel("Number of Samples", fontsize=titlesize)
+                plt.xticks(fontsize=labelsize)
+                #plt.ylim(0., 0.4)
+                plt.tight_layout(rect=(0, 0.05, 1, 1))
+                sns.move_legend(
+                    ax, "lower center",
+                    bbox_to_anchor=(0.45, -0.27),
+                    ncol=5,
+                    title=None, frameon=False,
+                    fontsize=labelsize
+                )
+                plt.savefig(f"{rmse_plot_dir}/{run_name}_pointplot.png", dpi=400)
+                plt.close()
 
+                # Plot Kendall
+                plt.figure()
+                _, ax = plt.subplots(figsize=(8, 5))
+                sns.pointplot(data=df_error_metrics_all, x="n_samples", y="kt_test", hue="Experiment", errorbar="sd",
+                              linestyles="", capsize=0.2, errwidth=0.7, scale=0.7, dodge=0.4)#, showfliers=False)
+                if data_set:
+                    plt.title(f"{classifier_title}, Dataset: {data_set}\nOptimize: {param0}, {param1}", fontsize=titlesize)
+                else:
+                    plt.title(f"{classifier_title}\nOptimize: {param0}, {param1}", fontsize=titlesize)
+                plt.ylabel("Test Kendall Tau", fontsize=titlesize)
+                plt.yticks(fontsize=labelsize)
+                plt.xlabel("Number of Samples", fontsize=titlesize)
+                plt.xticks(fontsize=labelsize)
+                plt.ylim(-0.6, 1.)
+                plt.tight_layout(rect=(0, 0.05, 1, 1))
+                sns.move_legend(
+                    ax, "lower center",
+                    bbox_to_anchor=(0.45, -0.27),
+                    ncol=5,
+                    title=None, frameon=False,
+                    fontsize=labelsize
+                )
+                plt.savefig(f"{kt_plot_dir}/{run_name}_pointplot.png", dpi=400)
+                plt.close()
 
-        # Plot Kendall
-        plt.figure()
-        _, ax = plt.subplots(figsize=(8, 5))
-        sns.pointplot(data=df_error_metrics_all, x="n_samples", y="kt_test", hue="Experiment", errorbar="sd",
-                      linestyles="", capsize=0.2, errwidth=0.7, scale=0.7, dodge=0.4)#, showfliers=False)
-        if data_set:
-            plt.title(f"{classifier_title}, Dataset: {data_set}\nOptimize: {param0}, {param1}", fontsize=titlesize)
-        else:
-            plt.title(f"{classifier_title}\nOptimize: {param0}, {param1}", fontsize=titlesize)
-        plt.ylabel("Test Kendall Tau", fontsize=titlesize)
-        plt.yticks(fontsize=labelsize)
-        plt.xlabel("Number of Samples", fontsize=titlesize)
-        plt.xticks(fontsize=labelsize)
-        plt.ylim(-0.6, 1.)
-        plt.tight_layout(rect=(0, 0.05, 1, 1))
-        sns.move_legend(
-            ax, "lower center",
-            bbox_to_anchor=(0.45, -0.27),
-            ncol=5,
-            title=None, frameon=False,
-            fontsize=labelsize
-        )
-        plt.savefig(f"{kt_plot_dir}/{run_name}_pointplot.png", dpi=400)
-        plt.close()
+                # Plot Complexity
+                plt.figure()
+                _, ax = plt.subplots(figsize=(8, 5))
+                sns.pointplot(data=df_complexity_all, x="n_samples", y="program_operations", hue="Experiment", errorbar="sd",
+                              linestyles="", capsize=0.2, errwidth=0.7, scale=0.7, dodge=0.2)#, showfliers=False)
+                if data_set:
+                    plt.title(f"{classifier_title}, Dataset: {data_set}\nOptimize: {param0}, {param1}", fontsize=titlesize)
+                else:
+                    plt.title(f"{classifier_title}\nOptimize: {param0}, {param1}", fontsize=titlesize)
+                plt.ylabel("Number of Operations in Formula", fontsize=titlesize)
+                plt.xlabel("Number of Samples", fontsize=titlesize)
+                plt.xticks(fontsize=labelsize)
+                #plt.ylim(0, 18.5)
+                #plt.yticks(np.arange(0, 20, 2.0), fontsize=labelsize)
+                plt.tight_layout(rect=(0, 0.05, 1, 1))
+                sns.move_legend(
+                    ax, "lower center",
+                    bbox_to_anchor=(0.45, -0.27),
+                    ncol=3,
+                    title=None, frameon=False,
+                    fontsize=labelsize
+                )
+                plt.savefig(f"{complexity_plot_dir}/{run_name}_complexity_pointplot.png", dpi=400)
+                plt.close()
 
-        # Plot Complexity
-        plt.figure()
-        _, ax = plt.subplots(figsize=(8, 5))
-        sns.pointplot(data=df_complexity_all, x="n_samples", y="program_operations", hue="Experiment", errorbar="sd",
-                      linestyles="", capsize=0.2, errwidth=0.7, scale=0.7, dodge=0.2)#, showfliers=False)
-        if data_set:
-            plt.title(f"{classifier_title}, Dataset: {data_set}\nOptimize: {param0}, {param1}", fontsize=titlesize)
-        else:
-            plt.title(f"{classifier_title}\nOptimize: {param0}, {param1}", fontsize=titlesize)
-        plt.ylabel("Number of Operations in Formula", fontsize=titlesize)
-        plt.xlabel("Number of Samples", fontsize=titlesize)
-        plt.xticks(fontsize=labelsize)
-        #plt.ylim(0, 18.5)
-        #plt.yticks(np.arange(0, 20, 2.0), fontsize=labelsize)
-        plt.tight_layout(rect=(0, 0.05, 1, 1))
-        sns.move_legend(
-            ax, "lower center",
-            bbox_to_anchor=(0.45, -0.27),
-            ncol=3,
-            title=None, frameon=False,
-            fontsize=labelsize
-        )
-        plt.savefig(f"{complexity_plot_dir}/{run_name}_complexity_pointplot.png", dpi=400)
-        plt.close()
+            except:
+                logger.warning(f"Could not process {run_name}, {sampling_type}. Skip.")
 
