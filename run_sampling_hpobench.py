@@ -29,7 +29,7 @@ if __name__ == "__main__":
     parser.add_argument('--job_id')
     args = parser.parse_args()
 
-    use_random_samples = False
+    use_random_samples = True
     evaluate_on_surrogate = False
     sampling_dir_name = "runs_sampling_hpobench"
     n_optimized_params = 2
