@@ -18,8 +18,8 @@ if __name__ == "__main__":
     parser.add_argument('--job_id')
     args = parser.parse_args()
 
-    use_random_samples = True
-    evaluate_on_surrogate = False
+    use_random_samples = False
+    evaluate_on_surrogate = True
     symb_dir_name = "parsimony0005"
     sampling_dir_name = "runs_sampling_hpobench"
     dir_with_test_data = "learning_curves/runs_surr_hpobench"
