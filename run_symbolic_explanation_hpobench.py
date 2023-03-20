@@ -19,7 +19,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     use_random_samples = False
-    evaluate_on_surrogate = True
+    evaluate_on_surrogate = False
     symb_dir_name = "parsimony0005"
     sampling_dir_name = "runs_sampling_hpobench"
     dir_with_test_data = "learning_curves/runs_surr_hpobench"
