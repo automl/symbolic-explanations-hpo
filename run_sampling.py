@@ -37,7 +37,7 @@ if __name__ == "__main__":
     n_samples_spacing = np.linspace(20, 200, 10, dtype=int).tolist()
     functions = get_functions2d()
     n_seeds = 5
-    models = ["LR", "MLP", "SVM", "BDT", "DT"]
+    models = ["SVM", "BDT", "DT"] #"LR", "MLP", 
     #models = functions
     data_sets = ["credit-g", "digits", "iris"]
     use_random_samples = False
