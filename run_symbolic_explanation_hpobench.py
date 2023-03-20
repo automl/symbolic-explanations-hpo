@@ -5,6 +5,7 @@ import numpy as np
 import pandas as pd
 import sympy
 import shutil
+from interruptingcow import timeout
 from gplearn.genetic import SymbolicRegressor
 
 from utils.logging_utils import get_logger
@@ -29,6 +30,8 @@ if __name__ == "__main__":
     n_test_samples = 100
     init_design_max_ratio = 0.25
     init_design_n_configs_per_hyperparamter = 8
+    # allow fit of SR to run for at max 15 minutes
+    max_seconds_per_fit = 900
 
     run_conf = get_run_config(job_id=args.job_id, n_optimized_params=n_optimized_params)
 
@@ -130,60 +133,67 @@ if __name__ == "__main__":
 
                 logger.info(f"Using seed {symb_seed} for symbolic regression.")
 
-                # run SR on SMAC samples
-                symb_model = SymbolicRegressor(**symb_params, random_state=symb_seed)
-                symb_model.fit(X_train, y_train)
-
-                # pickle symbolic regression model
-                with open(
-                        f"{symb_dir}/symb_models/n_samples{n_samples}_sampling_seed{sampling_seed}_"
-                        f"symb_seed{symb_seed}.pkl", "wb") as symb_model_file:
-                    # pickling all programs lead to huge files
-                    delattr(symb_model, "_programs")
-                    pickle.dump(symb_model, symb_model_file)
-
-                df_metrics = get_scores(
-                    y_train,
-                    symb_model.predict(X_train),
-                    y_test_reshaped,
-                    symb_model.predict(X_test_reshaped)
-                )
-                df_metrics.insert(0, "n_samples", n_samples)
-                df_metrics.insert(1, "sampling_seed", sampling_seed)
-                df_metrics.insert(2, "symb_seed", symb_seed)
-                df_all_metrics = pd.concat((df_all_metrics, df_metrics))
-
-
-                program_length_before_simplification = symb_model._program.length_
+                # In some cases, gplearn gets stuck without raising and error. Thus, we continue after a given time.
                 try:
-                    conv_expr = convert_symb(symb_model, n_dim=len(optimized_parameters), n_decimals=3)
-                except:
-                    conv_expr = ""
-                    logger.warning(f"Could not convert expression for n_samples: {n_samples}, "
-                                   f"sampling_seed: {sampling_seed}, symb_seed: {symb_seed}.")
-                try:
-                    program_operations = sympy.count_ops(conv_expr)
-                except:
-                    try:
-                        program_operations = sympy.count_ops(symb_model)
-                    except:
-                        program_operations = -1
+                    with timeout(max_seconds_per_fit, exception=RuntimeError):
+                        # run SR on SMAC samples
+                        symb_model = SymbolicRegressor(**symb_params, random_state=symb_seed)
+                        symb_model.fit(X_train, y_train)
 
-                df_expr = pd.DataFrame({"expr": [conv_expr]})
-                df_expr.insert(0, "n_samples", n_samples)
-                df_expr.insert(1, "sampling_seed", sampling_seed)
-                df_expr.insert(2, "symb_seed", symb_seed)
-                df_all_expr = pd.concat((df_all_expr, df_expr))
+                        # pickle symbolic regression model
+                        with open(
+                                f"{symb_dir}/symb_models/n_samples{n_samples}_sampling_seed{sampling_seed}_"
+                                f"symb_seed{symb_seed}.pkl", "wb") as symb_model_file:
+                            # pickling all programs lead to huge files
+                            delattr(symb_model, "_programs")
+                            pickle.dump(symb_model, symb_model_file)
 
-                df_complexity = pd.DataFrame({
-                    "n_samples": [n_samples],
-                    "sampling_seed": [sampling_seed],
-                    "symb_seed": [symb_seed],
-                    "program_operations": [program_operations],
-                    "program_length_before_simplification": [program_length_before_simplification],
-                })
-                df_all_complexity = pd.concat((df_all_complexity, df_complexity))
+                        df_metrics = get_scores(
+                            y_train,
+                            symb_model.predict(X_train),
+                            y_test_reshaped,
+                            symb_model.predict(X_test_reshaped)
+                        )
+                        df_metrics.insert(0, "n_samples", n_samples)
+                        df_metrics.insert(1, "sampling_seed", sampling_seed)
+                        df_metrics.insert(2, "symb_seed", symb_seed)
+                        df_all_metrics = pd.concat((df_all_metrics, df_metrics))
 
-                df_all_metrics.to_csv(f"{symb_dir}/error_metrics.csv", index=False)
-                df_all_complexity.to_csv(f"{symb_dir}/complexity.csv", index=False)
-                df_all_expr.to_csv(f"{symb_dir}/expressions.csv", index=False)
+                        program_length_before_simplification = symb_model._program.length_
+                        try:
+                            conv_expr = convert_symb(symb_model, n_dim=len(optimized_parameters), n_decimals=3)
+                        except:
+                            conv_expr = ""
+                            logger.warning(f"Could not convert expression for n_samples: {n_samples}, "
+                                           f"sampling_seed: {sampling_seed}, symb_seed: {symb_seed}.")
+                        try:
+                            program_operations = sympy.count_ops(conv_expr)
+                        except:
+                            try:
+                                program_operations = sympy.count_ops(symb_model)
+                            except:
+                                program_operations = -1
+
+                        df_expr = pd.DataFrame({"expr": [conv_expr]})
+                        df_expr.insert(0, "n_samples", n_samples)
+                        df_expr.insert(1, "sampling_seed", sampling_seed)
+                        df_expr.insert(2, "symb_seed", symb_seed)
+                        df_all_expr = pd.concat((df_all_expr, df_expr))
+
+                        df_complexity = pd.DataFrame({
+                            "n_samples": [n_samples],
+                            "sampling_seed": [sampling_seed],
+                            "symb_seed": [symb_seed],
+                            "program_operations": [program_operations],
+                            "program_length_before_simplification": [program_length_before_simplification],
+                        })
+                        df_all_complexity = pd.concat((df_all_complexity, df_complexity))
+
+                        df_all_metrics.to_csv(f"{symb_dir}/error_metrics.csv", index=False)
+                        df_all_complexity.to_csv(f"{symb_dir}/complexity.csv", index=False)
+                        df_all_expr.to_csv(f"{symb_dir}/expressions.csv", index=False)
+
+                except RuntimeError:
+                    logger.warning(f"Fit of symbolic regression took longer than {max_seconds_per_fit} seconds for "
+                                   f"n_samples: {n_samples}, sampling_seed: {sampling_seed}, symb_seed: {symb_seed}. "
+                                   f"Skip.")
