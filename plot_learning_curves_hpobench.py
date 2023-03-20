@@ -174,6 +174,6 @@ if __name__ == "__main__":
                 plt.savefig(f"{complexity_plot_dir}/{run_name}_complexity_pointplot.png", dpi=400)
                 plt.close()
 
-        except:
-            logger.warning(f"Could not process {run_name}. Skip.")
+        except Exception as e:
+            logger.warning(f"Skipping {run_name}, could not process: \n{e}")
 
