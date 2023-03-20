@@ -60,6 +60,10 @@ if __name__ == "__main__":
     else:
         logger.info(f"No previous test data dir provided, create test data for {run_name}.")
         X_test, y_test = get_hpo_test_data(b, cs.get_hyperparameters(), n_test_samples)
+    X_test_reshaped = X_test.reshape(len(optimized_parameters), -1).T
+    y_test_reshaped = y_test.reshape(-1)
+    pd.DataFrame(X_test_reshaped, columns=optimized_parameters).to_csv(f"{surr_dir}/x_test.csv", index=False)
+    pd.DataFrame(y_test_reshaped).to_csv(f"{surr_dir}/y_test.csv", header=False, index=False)
 
     df_all_metrics = pd.DataFrame()
 
