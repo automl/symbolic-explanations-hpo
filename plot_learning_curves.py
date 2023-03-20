@@ -19,7 +19,7 @@ if __name__ == "__main__":
     models = ["LR", "MLP", "SVM", "BDT", "DT"]
     #models = functions
     data_sets = ["credit-g", "digits", "iris"]
-    include_surr_diff = True
+    include_surr_diff = False
 
     run_configs = []
     for model in models:
