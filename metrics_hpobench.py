@@ -67,7 +67,7 @@ if __name__ == "__main__":
                 df_error_metrics["rmse_test"] = np.sqrt(df_error_metrics["mse_test"])
                 df_error_metrics["rmse_train"] = np.sqrt(df_error_metrics["mse_train"])
 
-                run_count[sampling_type] = df_error_metrics["rmse_test"].count(axis=0)
+                run_count[sampling_type] = df_error_metrics["rmse_test"].count()
                 run_rmse_mean[sampling_type] = df_error_metrics["rmse_test"].mean(axis=0)
                 run_rmse_std[sampling_type] = df_error_metrics["rmse_test"].std(axis=0)
 
