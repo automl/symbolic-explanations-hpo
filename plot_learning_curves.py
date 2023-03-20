@@ -1,3 +1,5 @@
+import logging
+
 import pandas as pd
 import os
 import shutil
@@ -45,7 +47,7 @@ if __name__ == "__main__":
     os.makedirs(rmse_plot_dir)
     os.makedirs(kt_plot_dir)
 
-    logger = get_logger(filename=f"{plot_dir}/plot_log.log")
+    logger = logging.getLogger(__name__) #get_logger(filename=f"{plot_dir}/plot_log.log")
 
     logger.info(f"Save plots to {plot_dir}.")
 
@@ -120,6 +122,7 @@ if __name__ == "__main__":
             "DT": "Decision Tree",
             "SVM": "Support Vector Machine",
             "MLP": "Neural Network",
+            "LR": "Logistic Regression"
         }
         if classifier.name in classifier_titles.keys():
             classifier_title = classifier_titles[classifier.name]
