@@ -175,5 +175,5 @@ if __name__ == "__main__":
                 plt.close()
 
         except Exception as e:
-            logger.warning(f"Skipping {run_name}, could not process: \n{e}")
+            logger.warning(f"Could not process {run_name}: \n{e}")
 
