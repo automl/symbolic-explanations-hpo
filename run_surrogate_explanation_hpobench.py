@@ -18,7 +18,7 @@ if __name__ == "__main__":
     sampling_dir_name = "runs_sampling_hpobench"
     # only for loading test data
     symb_dir_name = "parsimony0005"
-    dir_with_test_data = "learning_curves/runs_symb_hpobench/parsimony0005/smac"
+    dir_with_test_data = ""
     n_optimized_params = 2
     n_samples_spacing = np.linspace(20, 200, 10, dtype=int).tolist()
     n_test_samples = 100
