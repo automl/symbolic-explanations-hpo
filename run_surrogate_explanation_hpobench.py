@@ -34,7 +34,7 @@ if __name__ == "__main__":
     b = run_conf["benchmark"](task_id=run_conf["task_id"], hyperparameters=optimized_parameters)
 
     # add only parameters to be optimized to configspace
-    cs = b.get_configuration_space(hyperparameters=optimized_parameters)
+    cs = b.get_configuration_space(seed=0, hyperparameters=optimized_parameters)
 
     run_name = f"{model_name.replace(' ', '_')}_{'_'.join(optimized_parameters)}{data_set_postfix}"
 
