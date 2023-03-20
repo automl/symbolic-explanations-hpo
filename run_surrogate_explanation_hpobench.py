@@ -44,6 +44,7 @@ if __name__ == "__main__":
     if os.path.exists(surr_dir):
         shutil.rmtree(surr_dir)
     os.makedirs(surr_dir)
+    os.makedirs(f"{surr_dir}/surr_preds")
 
     # setup logging
     logger = get_logger(filename=f"{surr_dir}/surrogate_log.log")
@@ -111,6 +112,10 @@ if __name__ == "__main__":
                 df_metrics.insert(0, "n_samples", n_samples)
                 df_metrics.insert(0, "sampling_seed", sampling_seed)
                 df_all_metrics = pd.concat((df_all_metrics, df_metrics))
+
+                # Save surrogate test predictions
+                test_pred = get_surrogate_predictions(X_test.reshape(len(optimized_parameters), -1).T, cs, surrogate_model)
+                pd.DataFrame(test_pred).to_csv(f"{surr_dir}/surr_preds/test_pred_samples{n_samples}_seed{sampling_seed}.csv", index=False)
             except:
                 logger.warning(f"File n_eval{n_eval}_samples{n_samples}_seed{sampling_seed}.pkl could not be loaded, "
                                f"skip.")
