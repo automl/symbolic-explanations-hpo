@@ -21,7 +21,7 @@ if __name__ == "__main__":
 
     use_random_samples = False
     evaluate_on_surrogate = True
-    symb_dir_name = "parsimony0005"
+    symb_dir_name = "parsimony00001"
     sampling_dir_name = "runs_sampling_hpobench"
     dir_with_test_data = "learning_curves/runs_surr_hpobench"
     n_optimized_params = 2
@@ -88,7 +88,7 @@ if __name__ == "__main__":
         generations=20,
         function_set=get_function_set(),
         metric="rmse",
-        parsimony_coefficient=0.0005,
+        parsimony_coefficient=0.0001,
         verbose=1,
     )
 
