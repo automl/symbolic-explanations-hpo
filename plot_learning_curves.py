@@ -16,9 +16,9 @@ if __name__ == "__main__":
     titlesize=14
     symb_dir_name = "mult_testeval_add_func"
     functions = get_functions2d()
-    models = ["MLP", "SVM", "BDT", "DT"]
+    models = ["LR", "MLP", "SVM", "BDT", "DT"]
     #models = functions
-    data_sets = ["digits", "iris"]
+    data_sets = ["credit-g", "digits", "iris"]
     include_surr_diff = True
 
     run_configs = []
@@ -82,7 +82,7 @@ if __name__ == "__main__":
         df_error_metrics_all = pd.DataFrame()
         df_complexity_all = pd.DataFrame()
 
-        for sampling_type in ["SR (BO-GP)", "GP (BO)"]: #"SR (Random)", "SR (BO)", 
+        for sampling_type in ["GP (BO)"]: #"SR (BO-GP)", , "SR (Random)", "SR (BO)", 
 
             if sampling_type == "GP (BO)":
                 symb_dir = f"learning_curves/runs_surr/{run_name}"
