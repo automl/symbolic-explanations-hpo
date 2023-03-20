@@ -77,16 +77,8 @@ if __name__ == "__main__":
 
         # Load test data
         logger.info(f"Get test data.")
-        logger.info(f"Get test data.")
-        try:
-            X_test = np.array(pd.read_csv(f"learning_curves/runs_surr/{symb_dir_name}/surr/{run_name}/x_test.csv"))
-            y_test = np.array(pd.read_csv(f"learning_curves/runs_surr/{symb_dir_name}/surr/{run_name}/y_test.csv"))
-        except:
-            logger.info(f"No test data found, create test data for {run_name}.")
-            X_test, y_test = get_hpo_test_data(classifier, optimized_parameters, n_test_samples)
-            X_test = X_test.reshape(len(optimized_parameters), -1).T
-            y_test = y_test.reshape(-1)
-
+        X_test = np.array(pd.read_csv(f"learning_curves/runs_surr/{symb_dir_name}/surr/{run_name}/x_test.csv"))
+        y_test = np.array(pd.read_csv(f"learning_curves/runs_surr/{symb_dir_name}/surr/{run_name}/y_test.csv"))
 
         avg_cost = y_test.mean()
         std_cost = y_test.std()
