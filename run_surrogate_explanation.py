@@ -20,9 +20,9 @@ if __name__ == "__main__":
 
     n_samples_spacing = np.linspace(20, 200, 10, dtype=int).tolist()
     functions = get_functions2d()
-    models = ["MLP", "SVM", "BDT", "DT"]
+    models = ["LR", "MLP", "SVM", "BDT", "DT"]
     #models = functions
-    data_sets = ["digits", "iris"]
+    data_sets = ["credit-g", "digits", "iris"]
 
     init_design_max_ratio = 0.25
     init_design_n_configs_per_hyperparamter = 8
