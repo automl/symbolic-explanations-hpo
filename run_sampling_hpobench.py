@@ -30,7 +30,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     use_random_samples = False
-    evaluate_on_surrogate = False
+    evaluate_on_surrogate = True
     sampling_dir_name = "runs_sampling_hpobench"
     n_optimized_params = 2
     n_samples_spacing = np.linspace(20, 200, 10, dtype=int).tolist()
@@ -46,9 +46,6 @@ if __name__ == "__main__":
     optimized_parameters = list(run_conf["hp_conf"])
     model_name = get_benchmark_dict()[run_conf["benchmark"]]
     b = run_conf["benchmark"](task_id=run_conf["task_id"], hyperparameters=optimized_parameters)
-
-    # add only parameters to be optimized to configspace
-    cs = b.get_configuration_space(hyperparameters=optimized_parameters)
 
     def optimization_function_wrapper(cfg, seed):
         """ Helper-function: simple wrapper to use the benchmark with smac """
@@ -105,6 +102,9 @@ if __name__ == "__main__":
             seed = i * 3
 
             np.random.seed(seed)
+
+            # add only parameters to be optimized to configspace
+            cs = b.get_configuration_space(seed=seed, hyperparameters=optimized_parameters)
 
             logger.info(f"Run: {run_name}")
             logger.info(f"Sample configs and train {model_name} with seed {seed}.")
