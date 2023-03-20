@@ -40,7 +40,7 @@ if __name__ == "__main__":
     models = ["LR", "MLP", "SVM", "BDT", "DT"]
     #models = functions
     data_sets = ["credit-g", "digits", "iris"]
-    use_random_samples = True
+    use_random_samples = False
     evaluate_on_surrogate = False
     surrogate_n_samples = 400
     init_design_max_ratio = 0.25
