@@ -8,6 +8,7 @@ import seaborn as sns
 import numpy as np
 from itertools import combinations
 
+from utils.run_utils import get_hpo_test_data
 from utils.functions_utils import get_functions2d, NamedFunction
 from utils.model_utils import get_hyperparams, get_classifier_from_run_conf
 from utils.logging_utils import get_logger
@@ -21,6 +22,7 @@ if __name__ == "__main__":
     models = ["LR", "MLP", "SVM", "BDT", "DT"]
     #models = functions
     data_sets = ["credit-g", "digits", "iris"]
+    n_test_samples = 100
     include_surr_diff = False
 
     run_configs = []
@@ -75,8 +77,16 @@ if __name__ == "__main__":
 
         # Load test data
         logger.info(f"Get test data.")
-        X_test = np.array(pd.read_csv(f"learning_curves/runs_symb/{symb_dir_name}/surr/{run_name}/x_test.csv"))
-        y_test = np.array(pd.read_csv(f"learning_curves/runs_symb/{symb_dir_name}/surr/{run_name}/y_test.csv"))
+        logger.info(f"Get test data.")
+        try:
+            X_test = np.array(pd.read_csv(f"learning_curves/runs_surr/{symb_dir_name}/surr/{run_name}/x_test.csv"))
+            y_test = np.array(pd.read_csv(f"learning_curves/runs_surr/{symb_dir_name}/surr/{run_name}/y_test.csv"))
+        except:
+            logger.info(f"No test data found, create test data for {run_name}.")
+            X_test, y_test = get_hpo_test_data(classifier, optimized_parameters, n_test_samples)
+            X_test = X_test.reshape(len(optimized_parameters), -1).T
+            y_test = y_test.reshape(-1)
+
 
         avg_cost = y_test.mean()
         std_cost = y_test.std()
