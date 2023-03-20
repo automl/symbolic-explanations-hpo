@@ -23,6 +23,10 @@ if __name__ == "__main__":
 
     logger.info(f"Save plots to {metric_dir}.")
 
+    df_run_rmse_mean_all = pd.DataFrame()
+    df_run_rmse_std_all = pd.DataFrame()
+    df_run_count_all = pd.DataFrame()
+
     for run_conf in run_configs:
 
         task_dict = get_task_dict()
@@ -45,7 +49,7 @@ if __name__ == "__main__":
             avg_cost = y_test.mean()
             std_cost = y_test.std()
 
-            run_rmse_mean, run_rmse_std = {}, {}
+            run_count, run_rmse_mean, run_rmse_std = {}, {}, {}
 
             for sampling_type in ["SR (BO)", "SR (Random)", "SR (BO-GP)", "GP (BO)"]:
 
@@ -62,14 +66,24 @@ if __name__ == "__main__":
                 df_error_metrics = pd.read_csv(f"{symb_dir}/error_metrics.csv")
                 df_error_metrics["rmse_test"] = np.sqrt(df_error_metrics["mse_test"])
                 df_error_metrics["rmse_train"] = np.sqrt(df_error_metrics["mse_train"])
+
+                run_count[sampling_type] = df_error_metrics["rmse_test"].count(axis=0)
                 run_rmse_mean[sampling_type] = df_error_metrics["rmse_test"].mean(axis=0)
+                run_rmse_std[sampling_type] = df_error_metrics["rmse_test"].std(axis=0)
+
+            df_run_count = pd.DataFrame(run_count, index=[run_name])
+            df_run_count_all = pd.concat((df_run_count_all, df_run_count))
+            df_run_count_all.to_csv(f"{metric_dir}/count.csv")
 
             run_rmse_mean["Test Mean"] = avg_cost
-            run_rmse_std["Test Std"] = std_cost
             df_run_rmse_mean = pd.DataFrame(run_rmse_mean, index=[run_name])
+            df_run_rmse_mean_all = pd.concat((df_run_rmse_mean_all, df_run_rmse_mean))
+            df_run_rmse_mean_all.to_csv(f"{metric_dir}/rmse_mean.csv")
+
+            run_rmse_std["Test Std"] = std_cost
             df_run_rmse_std = pd.DataFrame(run_rmse_std, index=[run_name])
-            df_run_rmse_mean.to_csv(f"{metric_dir}/rmse_mean.csv")
-            df_run_rmse_mean.to_csv(f"{metric_dir}/rmse_std.csv")
+            df_run_rmse_std_all = pd.concat((df_run_rmse_std_all, df_run_rmse_std))
+            df_run_rmse_std_all.to_csv(f"{metric_dir}/rmse_std.csv")
 
         except Exception as e:
             logger.warning(f"Could not process {run_name}: \n{e}")
