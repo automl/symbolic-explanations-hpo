@@ -263,9 +263,9 @@ def get_hpo_test_data(classifier, optimized_parameters, n_test_samples, n_test_e
             for i in range(n_test_eval):
                 seed = i * 3
                 if isinstance(classifier, MLBenchmark):
-                    y_test[n] = classifier.objective_function(conf.get_dictionary(), seed=seed)
+                    y_test[n] += classifier.objective_function(conf.get_dictionary(), seed=seed)
                 else:
-                    y_test[n] = classifier.train(config=conf, seed=seed)
+                    y_test[n] += classifier.train(config=conf, seed=seed)
             y_test[n] = y_test[n] / n_test_eval
         X_test, y_test = X_test.astype(float).reshape(
             1, X_test.shape[0]
@@ -301,10 +301,10 @@ def get_hpo_test_data(classifier, optimized_parameters, n_test_samples, n_test_e
                 for i in range(n_test_eval):
                     seed = i * 3
                     if isinstance(classifier, MLBenchmark):
-                        y_test[n, m] = classifier.objective_function(configuration=conf.get_dictionary(), seed=seed)[
+                        y_test[n, m] += classifier.objective_function(configuration=conf.get_dictionary(), seed=seed)[
                             "function_value"]
                     else:
-                        y_test[n, m] = classifier.train(config=conf, seed=seed)
+                        y_test[n, m] += classifier.train(config=conf, seed=seed)
                 y_test[n, m] = y_test[n, m] / n_test_eval
     else:
         X_test = None
