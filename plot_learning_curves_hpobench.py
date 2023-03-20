@@ -11,7 +11,7 @@ from utils.hpobench_utils import get_run_config, get_benchmark_dict, get_task_di
 if __name__ == "__main__":
     include_surr_diff = False
     symb_dir_name = "parsimony0005"
-    dir_with_test_data = "learning_curves/runs_symb_hpobench/parsimony0005/surr"
+    dir_with_test_data = "learning_curves/runs_surr_hpobench"
     n_optimized_params = 2
 
     labelsize = 12
@@ -54,8 +54,8 @@ if __name__ == "__main__":
         try:
             # Load test data
             logger.info(f"Get test data.")
-            X_test = np.array(pd.read_csv(f"learning_curves/runs_symb_hpobench/{symb_dir_name}/surr/{run_name}/x_test.csv"))
-            y_test = np.array(pd.read_csv(f"learning_curves/runs_symb_hpobench/{symb_dir_name}/surr/{run_name}/y_test.csv"))
+            X_test = np.array(pd.read_csv(f"{dir_with_test_data}/{run_name}/x_test.csv"))
+            y_test = np.array(pd.read_csv(f"{dir_with_test_data}/{run_name}/y_test.csv"))
 
             avg_cost = y_test.mean()
             std_cost = y_test.std()
