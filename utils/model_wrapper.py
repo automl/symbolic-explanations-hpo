@@ -17,10 +17,82 @@ from sklearn.model_selection import StratifiedKFold, cross_val_score
 from sklearn.neural_network import MLPClassifier
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.tree import DecisionTreeClassifier
+from sklearn.linear_model import SGDClassifier
+from sklearn.datasets import fetch_openml 
+
 
 iris = datasets.load_iris()
 digits = load_digits()
-datasets = {"digits": digits, "iris": iris}
+credit_g = fetch_openml(name='credit-g', as_frame=False) 
+datasets = {"digits": digits, "iris": iris, "credit-g": credit_g}
+
+
+class LR:
+    def __init__(
+        self,
+        optimize_alpha=False,
+        optimize_eta0=False,
+        name="LR",
+        data_set_name="digits",
+        seed=0,
+    ):
+        self.optimize_alpha = optimize_alpha
+        self.optimize_eta0 = optimize_eta0
+        self.name = name
+        self.data_set = datasets[data_set_name]
+        self.seed = seed
+
+    def set_seed(self, seed):
+        self.seed = seed
+
+    @property
+    def configspace(self) -> ConfigurationSpace:
+        cs = ConfigurationSpace(seed=self.seed)
+
+        alpha = Float(
+            "alpha",
+            (1e-5, 1),
+            log=True,
+            default=1e-3,
+        )
+        eta0 = Float("eta0", (1e-5, 1), log=True, default=1e-2)
+
+        if self.optimize_alpha:
+            cs.add_hyperparameter(alpha)
+        if self.optimize_eta0:
+            cs.add_hyperparameter(eta0)
+
+        return cs
+
+    def train(self, config: Configuration, seed: int) -> float:
+        """Train a Logistic Regression Classifier based on a configuration and evaluate it on the
+        digit-dataset using cross-validation."""
+
+        alpha = config["alpha"] if "alpha" in config else 1e-3
+        eta0 = (
+            config["eta0"] if "eta0" in config else 1e-2
+        )
+
+        with warnings.catch_warnings():
+            warnings.filterwarnings("ignore")
+
+            classifier = SGDClassifier(
+                alpha=alpha,
+                eta0=eta0,
+                loss="log",  # performs Logistic Regression
+                max_iter=1000,
+                learning_rate="adaptive",
+                tol=None,
+                random_state=self.seed,
+
+            )
+
+            cv = StratifiedKFold(n_splits=5, random_state=self.seed, shuffle=True)
+            score = cross_val_score(
+                classifier, self.data_set.data, self.data_set.target, cv=cv, error_score="raise"
+            )
+
+        return 1 - np.mean(score)
 
 
 class MLP:

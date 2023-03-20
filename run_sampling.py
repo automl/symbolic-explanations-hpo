@@ -8,7 +8,8 @@ import dill as pickle
 from smac import BlackBoxFacade, Callback
 from itertools import combinations
 
-from utils.utils import get_surrogate_predictions
+from utils.logging_utils import get_logger
+from utils.run_utils import get_surrogate_predictions
 from utils.smac_utils import run_smac_optimization
 from utils.functions_utils import get_functions2d, NamedFunction
 from utils.model_utils import get_hyperparams, get_classifier_from_run_conf
@@ -36,13 +37,12 @@ if __name__ == "__main__":
     n_samples_spacing = np.linspace(20, 200, 10, dtype=int).tolist()
     functions = get_functions2d()
     n_seeds = 5
-    #models = ["MLP", "SVM", "BDT", "DT"]
-    models = functions
-    data_sets = ["digits", "iris"]
-    use_random_samples = False
+    models = ["LR", "MLP", "SVM", "BDT", "DT"]
+    #models = functions
+    data_sets = ["credit-g", "digits", "iris"]
+    use_random_samples = True
     evaluate_on_surrogate = False
     surrogate_n_samples = 400
-
     init_design_max_ratio = 0.25
     init_design_n_configs_per_hyperparamter = 8
     sampling_dir_name = "runs_sampling"
@@ -57,6 +57,7 @@ if __name__ == "__main__":
             for hp_conf in hp_comb:
                 for ds in data_sets:
                     run_configs.append({"model": model, hp_conf[0]: True, hp_conf[1]: True, "data_set_name": ds})
+
     run_conf = run_configs[int(job_id)]
     if run_conf['data_set_name']:
         data_set_postfix = f"_{run_conf['data_set_name']}"
@@ -104,7 +105,7 @@ if __name__ == "__main__":
         pickle.dump(classifier, classifier_file)
 
     # setup logging
-    logger = logging.getLogger(__name__)
+    logger = get_logger(filename=f"{sampling_run_dir}/sampling_log.log")
 
     logger.info(f"Start {run_type} sampling for {run_name}.")
 

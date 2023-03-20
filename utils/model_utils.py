@@ -1,8 +1,8 @@
-from utils.model_wrapper import SVM, MLP, BDT, DT
+from utils.model_wrapper import SVM, MLP, BDT, DT, LR
 
 
 def get_models():
-    return ["MLP", "SVM", "BDT", "DT"]
+    return ["MLP", "SVM", "BDT", "DT", "LR"]
 
 
 def get_hyperparams(model_name):
@@ -28,6 +28,10 @@ def get_hyperparams(model_name):
         hyperparams = [
             "optimize_max_depth", "optimize_min_samples_leaf"
         ]
+    elif model_name == "LR":
+        hyperparams = [
+            "optimize_alpha", "optimize_eta0"
+        ]
     else:
         hyperparams = None
     return hyperparams
@@ -42,6 +46,8 @@ def get_classifier_from_run_conf(model_name, run_conf):
         classifier = BDT(**run_conf)
     elif model_name == "DT":
         classifier = DT(**run_conf)
+    elif model_name == "LR":
+        classifier = LR(**run_conf)
     else:
         print(f"Unknown model: {model_name}")
         classifier = None
