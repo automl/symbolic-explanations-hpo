@@ -53,6 +53,8 @@ if __name__ == "__main__":
 
         for parsimony in parsimony_coefficient_space:
 
+            logger.info(f"Evaluate parsimony {parsimony}")
+
             symb_dir = f"learning_curves/runs_symb_hpobench/parsimony{parsimony}/surr/{run_name}"
 
             df_complexity = pd.read_csv(f"{symb_dir}/complexity.csv")
@@ -71,10 +73,9 @@ if __name__ == "__main__":
             df_joined.insert(0, "Parsimony", parsimony)
             df_joined_all = pd.concat((df_joined_all, df_joined))
 
-            logger.info(f"Create plots.")
-
         sns.scatterplot(data=df_joined_all, x="complexity", y="rmse_test", hue="Parsimony",
                       linestyles="")
+        plt.close()
 
         plt.savefig(f"{plot_dir}/{run_name}_pointplot.png", dpi=400)
 
