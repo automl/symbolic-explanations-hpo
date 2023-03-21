@@ -30,11 +30,11 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     use_random_samples = False
-    evaluate_on_surrogate = True
+    evaluate_on_surrogate = False
     sampling_dir_name = "runs_sampling_hpobench"
     n_optimized_params = 2
     n_samples_spacing = np.linspace(20, 200, 10, dtype=int).tolist()
-    n_seeds = 5
+    n_seeds = 1
     surrogate_n_samples = 400
     init_design_max_ratio = 0.25
     init_design_n_configs_per_hyperparamter = 8
