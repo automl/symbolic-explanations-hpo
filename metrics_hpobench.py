@@ -10,6 +10,8 @@ if __name__ == "__main__":
     symb_dir_name = "parsimony0005"
     dir_with_test_data = "learning_curves/runs_surr_hpobench"
     n_optimized_params = 2
+    # if None, average metrics over all sample sizes
+    eval_at_n_samples = 200 # None
 
     run_configs = get_run_config(n_optimized_params=n_optimized_params)
 
@@ -51,9 +53,9 @@ if __name__ == "__main__":
 
             run_count, run_rmse_mean, run_rmse_std = {}, {}, {}
 
-            for sampling_type in ["SR (BO)", "SR (Random)", "SR (BO-GP)", "GP (BO)"]:
+            for sampling_type in ["GP Baseline", "SR (BO)", "SR (Random)", "SR (BO-GP)"]:
                 try:
-                    if sampling_type == "GP (BO)":
+                    if sampling_type == "GP Baseline":
                         symb_dir = f"learning_curves/runs_surr_hpobench/{run_name}"
                     else:
                         if sampling_type == "SR (BO)":
@@ -67,25 +69,42 @@ if __name__ == "__main__":
                     df_error_metrics["rmse_test"] = np.sqrt(df_error_metrics["mse_test"])
                     df_error_metrics["rmse_train"] = np.sqrt(df_error_metrics["mse_train"])
 
+                    if eval_at_n_samples:
+                        df_error_metrics = df_error_metrics[df_error_metrics["n_samples"] == eval_at_n_samples]
+
                     run_count[sampling_type] = df_error_metrics["rmse_test"].count()
                     run_rmse_mean[sampling_type] = df_error_metrics["rmse_test"].mean(axis=0)
                     run_rmse_std[sampling_type] = df_error_metrics["rmse_test"].std(axis=0)
                 except Exception as e:
                     logger.warning(f"Could not process {sampling_type} for {run_name}: \n{e}")
 
+            if eval_at_n_samples:
+                n_samples_postfix = f"_n_samples{eval_at_n_samples}"
+            else:
+                n_samples_postfix = "_all_sample_sizes"
+
             df_run_count = pd.DataFrame(run_count, index=[run_name])
+            df_run_count["Model"] = model_name
+            df_run_count["Hyperparameters"] = ', '.join(optimized_parameters)
+            df_run_count["Dataset"] = data_set
             df_run_count_all = pd.concat((df_run_count_all, df_run_count))
-            df_run_count_all.to_csv(f"{metric_dir}/count.csv")
+            df_run_count_all.to_csv(f"{metric_dir}/count{n_samples_postfix}.csv")
 
-            run_rmse_mean["Test Mean"] = avg_cost
+            #run_rmse_mean["Test Mean"] = avg_cost
             df_run_rmse_mean = pd.DataFrame(run_rmse_mean, index=[run_name])
+            df_run_rmse_mean["Model"] = model_name
+            df_run_rmse_mean["Hyperparameters"] = ', '.join(optimized_parameters)
+            df_run_rmse_mean["Dataset"] = data_set
             df_run_rmse_mean_all = pd.concat((df_run_rmse_mean_all, df_run_rmse_mean))
-            df_run_rmse_mean_all.to_csv(f"{metric_dir}/rmse_mean.csv")
+            df_run_rmse_mean_all.to_csv(f"{metric_dir}/rmse_mean{n_samples_postfix}.csv")
 
-            run_rmse_std["Test Std"] = std_cost
+            #run_rmse_std["Test Std"] = std_cost
             df_run_rmse_std = pd.DataFrame(run_rmse_std, index=[run_name])
+            df_run_rmse_std["Model"] = model_name
+            df_run_rmse_std["Hyperparameters"] = ', '.join(optimized_parameters)
+            df_run_rmse_std["Dataset"] = data_set
             df_run_rmse_std_all = pd.concat((df_run_rmse_std_all, df_run_rmse_std))
-            df_run_rmse_std_all.to_csv(f"{metric_dir}/rmse_std.csv")
+            df_run_rmse_std_all.to_csv(f"{metric_dir}/rmse_std{n_samples_postfix}.csv")
 
         except Exception as e:
             logger.warning(f"Could not process {run_name}: \n{e}")
