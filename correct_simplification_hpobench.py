@@ -16,7 +16,7 @@ if __name__ == "__main__":
 
     logger.info(f"Run simplification correction for symb dir {symb_dir_name}.")
 
-    for run_conf in run_configs[0]:
+    for run_conf in run_configs[:1]:
 
         task_dict = get_task_dict()
         data_set = f"{task_dict[run_conf['task_id']]}"
@@ -31,7 +31,7 @@ if __name__ == "__main__":
 
         logger.info(f"Correct for {run_name}.")
 
-        for sampling_type in ["GP Baseline", "SR (BO)", "SR (Random)"]:
+        for sampling_type in ["SR (BO)"]:
             if sampling_type == "SR (BO)":
                 symb_dir = f"learning_curves/runs_symb_hpobench/{symb_dir_name}/smac/{run_name}"
             elif sampling_type == "SR (Random)":

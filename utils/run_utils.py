@@ -88,11 +88,11 @@ def convert_symb(symb, n_dim: int = None, n_decimals: int = None) -> sympy.core.
         sqrt_pos = []
         prev_inserts = 0
         for i, f in enumerate(symb._program.program):
-            if f == functions.sqrt1:
+            if isinstance(f, functions._Function) and f.name == "sqrt":
                 sqrt_pos.append(i)
         for i in sqrt_pos:
-            prev_inserts += 1
             symb._program.program.insert(i + prev_inserts + 1, functions.abs1)
+            prev_inserts += 1
         symb_str = str(symb._program)
     elif isinstance(symb, SymbolicMetaModelWrapper) or isinstance(
         symb, SymbolicPursuitModelWrapper
