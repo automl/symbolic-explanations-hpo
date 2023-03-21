@@ -65,25 +65,28 @@ if __name__ == "__main__":
 
             for sampling_type in ["SR (BO)", "SR (Random)", "SR (BO-GP)", "GP (BO)"]:
 
-                if sampling_type == "GP (BO)":
-                    symb_dir = f"learning_curves/runs_surr_hpobench/{run_name}"
-                else:
-                    if sampling_type == "SR (BO)":
-                        symb_dir = f"learning_curves/runs_symb_hpobench/{symb_dir_name}/smac/{run_name}"
-                    elif sampling_type == "SR (Random)":
-                        symb_dir = f"learning_curves/runs_symb_hpobench/{symb_dir_name}/rand/{run_name}"
+                try:
+                    if sampling_type == "GP (BO)":
+                        symb_dir = f"learning_curves/runs_surr_hpobench/{run_name}"
                     else:
-                        symb_dir = f"learning_curves/runs_symb_hpobench/{symb_dir_name}/surr/{run_name}"
-                    df_complexity = pd.read_csv(f"{symb_dir}/complexity.csv")
-                    df_complexity.insert(0, "Experiment", f"{sampling_type}")
-                    df_complexity_all = pd.concat((df_complexity_all, df_complexity))
-                    df_complexity_all = df_complexity_all[df_complexity_all["program_operations"] != -1]
+                        if sampling_type == "SR (BO)":
+                            symb_dir = f"learning_curves/runs_symb_hpobench/{symb_dir_name}/smac/{run_name}"
+                        elif sampling_type == "SR (Random)":
+                            symb_dir = f"learning_curves/runs_symb_hpobench/{symb_dir_name}/rand/{run_name}"
+                        else:
+                            symb_dir = f"learning_curves/runs_symb_hpobench/{symb_dir_name}/surr/{run_name}"
+                        df_complexity = pd.read_csv(f"{symb_dir}/complexity.csv")
+                        df_complexity.insert(0, "Experiment", f"{sampling_type}")
+                        df_complexity_all = pd.concat((df_complexity_all, df_complexity))
+                        df_complexity_all = df_complexity_all[df_complexity_all["program_operations"] != -1]
 
-                df_error_metrics = pd.read_csv(f"{symb_dir}/error_metrics.csv")
-                df_error_metrics["rmse_test"] = np.sqrt(df_error_metrics["mse_test"])
-                df_error_metrics["rmse_train"] = np.sqrt(df_error_metrics["mse_train"])
-                df_error_metrics.insert(0, "Experiment", f"{sampling_type}")
-                df_error_metrics_all = pd.concat((df_error_metrics_all, df_error_metrics))
+                    df_error_metrics = pd.read_csv(f"{symb_dir}/error_metrics.csv")
+                    df_error_metrics["rmse_test"] = np.sqrt(df_error_metrics["mse_test"])
+                    df_error_metrics["rmse_train"] = np.sqrt(df_error_metrics["mse_train"])
+                    df_error_metrics.insert(0, "Experiment", f"{sampling_type}")
+                    df_error_metrics_all = pd.concat((df_error_metrics_all, df_error_metrics))
+                except Exception as e:
+                    logger.warning(f"Could not process {sampling_type} for {run_name}: \n{e}")
 
                 if include_surr_diff:
                     df_error_metrics = pd.read_csv(
