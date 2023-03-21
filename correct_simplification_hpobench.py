@@ -16,7 +16,7 @@ if __name__ == "__main__":
 
     logger.info(f"Run simplification correction for symb dir {symb_dir_name}.")
 
-    for run_conf in run_configs[:1]:
+    for run_conf in run_configs[1:]:
 
         task_dict = get_task_dict()
         data_set = f"{task_dict[run_conf['task_id']]}"
