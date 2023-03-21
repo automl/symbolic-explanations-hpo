@@ -84,16 +84,29 @@ def convert_symb(symb, n_dim: int = None, n_decimals: int = None) -> sympy.core.
     symb_conv: Converted mathematical expression.
     """
     if isinstance(symb, SymbolicRegressor):
+
         # sqrt is protected function in gplearn, always returning sqrt(abs(x))
         sqrt_pos = []
-        prev_inserts = 0
+        prev_sqrt_inserts = 0
         for i, f in enumerate(symb._program.program):
             if isinstance(f, functions._Function) and f.name == "sqrt":
                 sqrt_pos.append(i)
         for i in sqrt_pos:
-            symb._program.program.insert(i + prev_inserts + 1, functions.abs1)
-            prev_inserts += 1
+            symb._program.program.insert(i + prev_sqrt_inserts + 1, functions.abs1)
+            prev_sqrt_inserts += 1
+
+        # log is protected function in gplearn, always returning sqrt(abs(x))
+        log_pos = []
+        prev_log_inserts = 0
+        for i, f in enumerate(symb._program.program):
+            if isinstance(f, functions._Function) and f.name == "log":
+                log_pos.append(i)
+        for i in log_pos:
+            symb._program.program.insert(i + prev_log_inserts + 1, functions.abs1)
+            prev_log_inserts += 1
+
         symb_str = str(symb._program)
+
     elif isinstance(symb, SymbolicMetaModelWrapper) or isinstance(
         symb, SymbolicPursuitModelWrapper
     ):
@@ -110,9 +123,14 @@ def convert_symb(symb, n_dim: int = None, n_decimals: int = None) -> sympy.core.
         "pow": lambda x, y: x**y
     }
 
-    symb_conv = sympy.simplify(
-        sympy.sympify(symb_str.replace("[", "").replace("]", ""), locals=converter)
-    )
+    symb_conv = sympy.sympify(symb_str.replace("[", "").replace("]", ""), locals=converter)
+    if n_dim == 1:
+        x, X0 = sympy.symbols("x X0")
+        symb_conv = symb_conv.subs(X0, x)
+    if n_dim == 2:
+        X0, X1 = sympy.symbols("X0 X1", real=True)
+        symb_conv = symb_conv.subs(X0, X1)
+    symb_simpl = sympy.simplify(symb_conv)
 
     if len(symb_str) > 500:
         print(
@@ -120,22 +138,19 @@ def convert_symb(symb, n_dim: int = None, n_decimals: int = None) -> sympy.core.
         )
         return symb_str
 
-    if n_dim == 1:
-        x, X0 = sympy.symbols("x X0")
-        symb_conv = symb_conv.subs(X0, x)
     if isinstance(symb, SymbolicPursuitModelWrapper):
         proj = symb.metamodel.get_projections()
         for i, p in enumerate(proj):
-            for a in sympy.preorder_traversal(symb_conv):
+            for a in sympy.preorder_traversal(symb_simpl):
                 if isinstance(a, sympy.core.Symbol) and str(a) == f"P{i+1}":
-                    symb_conv = symb_conv.subs(a, p)
+                    symb_simpl = symb_simpl.subs(a, p)
     if n_decimals:
         # Make sure also floats deeper in the expression tree are rounded
-        for a in sympy.preorder_traversal(symb_conv):
+        for a in sympy.preorder_traversal(symb_simpl):
             if isinstance(a, sympy.core.numbers.Float):
-                symb_conv = symb_conv.subs(a, round(a, n_decimals))
+                symb_simpl = symb_simpl.subs(a, round(a, n_decimals))
 
-    return symb_conv
+    return symb_simpl
 
 
 def append_scores(
