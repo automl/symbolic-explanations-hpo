@@ -187,7 +187,7 @@ if __name__ == "__main__":
                             except:
                                 program_operations = -1
 
-                        df_expr = pd.DataFrame({"expr": [conv_expr]})
+                        df_expr = pd.DataFrame({"expr_simplified": [conv_expr], "expr": symb_model._program})
                         df_expr.insert(0, "n_samples", n_samples)
                         df_expr.insert(1, "sampling_seed", sampling_seed)
                         df_expr.insert(2, "symb_seed", symb_seed)
