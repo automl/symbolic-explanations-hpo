@@ -14,7 +14,7 @@ if __name__ == "__main__":
     #     0.001, 0.0025, 0.005, 0.0075,
     #     0.01, 0.025, 0.05, 0.075
     # ]
-    parsimony_coefficient_space = ["0005"]
+    parsimony_coefficient_space = ["00001"]
     n_optimized_params = 2
 
     run_configs = get_run_config(n_optimized_params=n_optimized_params)
@@ -94,3 +94,5 @@ if __name__ == "__main__":
     
                     df_all_expr.to_csv(f"{symb_dir}/expressions.csv", index=False)
                     df_all_complexity.to_csv(f"{symb_dir}/complexity.csv", index=False)
+
+    logger.info("Finished correction.")
