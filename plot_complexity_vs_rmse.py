@@ -16,9 +16,8 @@ if __name__ == "__main__":
         0.001, 0.0025, 0.005, 0.0075,
         0.01, 0.025, 0.05, 0.075
     ]
-    dir_with_test_data = "learning_curves/runs_surr_hpobench"
     n_optimized_params = 2
-    n_samples = 200
+    n_samples = 40
 
     labelsize = 12
     titlesize=14
@@ -29,6 +28,7 @@ if __name__ == "__main__":
     plot_dir = f"learning_curves/plots/complexity_vs_rmse_hpobench"
     if os.path.exists(plot_dir):
         shutil.rmtree(plot_dir)
+    os.makedirs(plot_dir)
 
     logger = get_logger(filename=f"{plot_dir}/plot_log.log")
 
