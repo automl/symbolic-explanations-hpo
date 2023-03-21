@@ -65,8 +65,8 @@ if __name__ == "__main__":
             df_error_metrics = df_error_metrics[df_error_metrics["n_samples"] == n_samples]
 
             df_joined = pd.DataFrame({
-                "rmse_test": df_error_metrics["rmse_test"].mean(axis=0),
-                "complexity": df_complexity["program_operations"].mean(axis=0)
+                "rmse_test": [df_error_metrics["rmse_test"].mean(axis=0)],
+                "complexity": [df_complexity["program_operations"].mean(axis=0)]
             })
             df_joined.insert(0, "Parsimony", parsimony)
             df_joined_all = pd.concat((df_joined_all, df_joined))
