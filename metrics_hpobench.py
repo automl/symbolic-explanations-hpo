@@ -84,25 +84,25 @@ if __name__ == "__main__":
                 n_samples_postfix = "_all_sample_sizes"
 
             df_run_count = pd.DataFrame(run_count, index=[run_name])
-            df_run_count["Model"] = model_name
-            df_run_count["Hyperparameters"] = ', '.join(optimized_parameters)
-            df_run_count["Dataset"] = data_set
+            df_run_count.insert(0, "Model", model_name)
+            df_run_count.insert(0, "Hyperparameters", ', '.join(optimized_parameters))
+            df_run_count.insert(0, "Dataset", data_set)
             df_run_count_all = pd.concat((df_run_count_all, df_run_count))
             df_run_count_all.to_csv(f"{metric_dir}/count{n_samples_postfix}.csv")
 
             #run_rmse_mean["Test Mean"] = avg_cost
             df_run_rmse_mean = pd.DataFrame(run_rmse_mean, index=[run_name])
-            df_run_rmse_mean["Model"] = model_name
-            df_run_rmse_mean["Hyperparameters"] = ', '.join(optimized_parameters)
-            df_run_rmse_mean["Dataset"] = data_set
+            df_run_rmse_mean.insert(0, "Model", model_name)
+            df_run_rmse_mean.insert(0, "Hyperparameters", ', '.join(optimized_parameters))
+            df_run_rmse_mean.insert(0, "Dataset", data_set)
             df_run_rmse_mean_all = pd.concat((df_run_rmse_mean_all, df_run_rmse_mean))
             df_run_rmse_mean_all.to_csv(f"{metric_dir}/rmse_mean{n_samples_postfix}.csv")
 
             #run_rmse_std["Test Std"] = std_cost
             df_run_rmse_std = pd.DataFrame(run_rmse_std, index=[run_name])
-            df_run_rmse_std["Model"] = model_name
-            df_run_rmse_std["Hyperparameters"] = ', '.join(optimized_parameters)
-            df_run_rmse_std["Dataset"] = data_set
+            df_run_rmse_std.insert(0, "Model", model_name)
+            df_run_rmse_std.insert(0, "Hyperparameters", ', '.join(optimized_parameters))
+            df_run_rmse_std.insert(0, "Dataset", data_set)
             df_run_rmse_std_all = pd.concat((df_run_rmse_std_all, df_run_rmse_std))
             df_run_rmse_std_all.to_csv(f"{metric_dir}/rmse_std{n_samples_postfix}.csv")
 
