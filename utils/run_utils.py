@@ -8,6 +8,7 @@ from scipy.stats import kendalltau
 import matplotlib.pyplot as plt
 from functools import partial
 from gplearn.genetic import SymbolicRegressor
+from gplearn import functions
 from symbolic_meta_model_wrapper import (
     SymbolicMetaModelWrapper,
     SymbolicPursuitModelWrapper,
@@ -36,6 +37,24 @@ def get_output_dirs() -> [str, str, str]:
     os.makedirs(res_dir)
     os.makedirs(plot_dir)
     return run_dir, res_dir, plot_dir
+
+
+# def get_run_config(job_id, n_optimized_params, toy_problems=False):
+#     run_configs = []
+#     if toy_problems:
+#         models = get_functions2d()
+#     else:
+#         models = get_models()
+#     for model in models:
+#         if isinstance(model, NamedFunction):
+#             run_configs.append({"model": model, "data_set_name": None})
+#         else:
+#             hyperparams = get_hyperparams(model_name=model)
+#             hp_comb = combinations(hyperparams, 2)
+#             for hp_conf in hp_comb:
+#                 for ds in data_sets:
+#                     run_configs.append({"model": model, hp_conf[0]: True, hp_conf[1]: True, "data_set_name": ds})
+#     return run_configs[int(job_id)]
 
 
 def sort(x: np.ndarray, y: np.ndarray) -> [np.ndarray, np.ndarray]:
@@ -79,8 +98,22 @@ def convert_symb(symb, n_dim: int = None, n_decimals: int = None) -> sympy.core.
         "mul": lambda x, y: x * y,
         "add": lambda x, y: x + y,
         "neg": lambda x: -x,
-        "pow": lambda x, y: x**y,
+        "pow": lambda x, y: x**y
     }
+
+    # sqrt is protected function in gplearn, always returning sqrt(abs(x))
+    sqrt_pos = []
+    prev_inserts = 0
+    for i, f in enumerate(symb._program.program):
+        if f == functions.sqrt1:
+            sqrt_pos.append(i)
+    for i in sqrt_pos:
+        prev_inserts += 1
+        symb._program.program.insert(i + prev_inserts + 1, functions.abs1)
+
+    symb_conv = sympy.simplify(
+        sympy.sympify(symb_str.replace("[", "").replace("]", ""), locals=converter)
+    )
 
     if len(symb_str) > 500:
         print(
@@ -88,9 +121,6 @@ def convert_symb(symb, n_dim: int = None, n_decimals: int = None) -> sympy.core.
         )
         return symb_str
 
-    symb_conv = sympy.simplify(
-        sympy.sympify(symb_str.replace("[", "").replace("]", ""), locals=converter)
-    )
     if n_dim == 1:
         x, X0 = sympy.symbols("x X0")
         symb_conv = symb_conv.subs(X0, x)
