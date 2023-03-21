@@ -73,7 +73,6 @@ if __name__ == "__main__":
 
             logger.info(f"Create plots.")
 
-        sns.pointplot(df_joined_all)
         sns.scatterplot(data=df_joined_all, x="complexity", y="rmse_test", hue="Parsimony",
                       linestyles="")
 
