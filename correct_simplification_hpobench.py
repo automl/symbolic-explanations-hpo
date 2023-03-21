@@ -16,7 +16,7 @@ if __name__ == "__main__":
 
     logger.info(f"Run simplification correction for symb dir {symb_dir_name}.")
 
-    for run_conf in run_configs:
+    for run_conf in run_configs[0]:
 
         task_dict = get_task_dict()
         data_set = f"{task_dict[run_conf['task_id']]}"
@@ -43,14 +43,14 @@ if __name__ == "__main__":
             df_complexity_old = pd.read_csv(f"{symb_dir}/complexity.csv")
 
             df_expr_old.to_csv(f"{symb_dir}/expressions_old.csv", index=False)
-            df_complexity_old.to_csv(f"{symb_dir}/complexity.csv", index=False)
+            df_complexity_old.to_csv(f"{symb_dir}/complexity_old.csv", index=False)
 
             df_all_expr = pd.DataFrame()
             df_all_complexity = pd.DataFrame()
 
             for index, row in df_expr_old.iterrows():
                 with open(
-                        f"{symb_dir}/n_samples{row['n_samples']}_sampling_seed{row['sampling_seed']}_symb_seed{row['symb_seed']}.pkl",
+                        f"{symb_dir}/symb_models/n_samples{row['n_samples']}_sampling_seed{row['sampling_seed']}_symb_seed{row['symb_seed']}.pkl",
                         "rb") as symb_model_file:
                     symb_model = pickle.load(symb_model_file)
 
