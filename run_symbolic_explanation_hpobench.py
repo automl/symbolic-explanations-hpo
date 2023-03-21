@@ -22,13 +22,14 @@ if __name__ == "__main__":
     use_random_samples = False
     evaluate_on_surrogate = True
 
-    parsimony_coefficient_space = [
-        0.000001, 0.0000025, 0.000005, 0.0000075,
-        0.00001, 0.000025, 0.00005, 0.000075,
-        0.0001, 0.00025, 0.0005, 0.00075,
-        0.001, 0.0025, 0.005, 0.0075,
-        0.01, 0.025, 0.05, 0.075
-    ]
+    parsimony_coefficient_space = [0.0005]
+    # parsimony_coefficient_space = [
+    #     0.000001, 0.0000025, 0.000005, 0.0000075,
+    #     0.00001, 0.000025, 0.00005, 0.000075,
+    #     0.0001, 0.00025, 0.0005, 0.00075,
+    #     0.001, 0.0025, 0.005, 0.0075,
+    #     0.01, 0.025, 0.05, 0.075
+    # ]
 
     sampling_dir_name = "runs_sampling_hpobench"
     dir_with_test_data = "learning_curves/runs_surr_hpobench"
@@ -41,7 +42,7 @@ if __name__ == "__main__":
     # allow fit of SR to run for at max 15 minutes
     max_seconds_per_fit = 900
 
-    run_conf = get_run_config(job_id=args.job_id, n_optimized_params=n_optimized_params, 
+    run_conf = get_run_config(job_id=args.job_id, n_optimized_params=n_optimized_params,
                               parsimony_coefficient_space=parsimony_coefficient_space)
 
     parsimony_coefficient = run_conf["parsimony"]

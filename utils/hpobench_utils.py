@@ -33,19 +33,23 @@ def get_benchmark_dict():
 
 
 def get_task_dict():
-    task_ids = [10101, 53] #, 146818, 146821, 9952, 146822, 31, 3917] #eval NN only on those 8 datasets
+    task_ids = [10101, 53, 146818, 146821, 9952, 146822, 31, 3917] #eval NN only on those 8 datasets
     #task_ids = [53, 146818]
     #task_ids = [168912, 3, 167119, 12, 146212, 168911, 9981, 167120, 14965, 146606, 7592, 9977] # 12 datasets
     task_dict = {tid: ALL_TASKS[tid]["name"] for tid in task_ids}
     return task_dict
 
 
-def get_run_config(n_optimized_params, job_id=None, parsimony_coefficient_space=None):
+def get_run_config(n_optimized_params, max_hp_comb=None, job_id=None, parsimony_coefficient_space=None):
     run_configs = []
     for benchmark in get_benchmark_dict().keys():
         hyperparams = benchmark.get_configuration_space().get_hyperparameter_names()
         hp_comb = combinations(hyperparams, n_optimized_params)
-        for hp_conf in list(hp_comb)[:1]:
+        if max_hp_comb:
+            hpc = list(hp_comb)[:max_hp_comb]
+        else:
+            hpc = hp_comb
+        for hp_conf in hpc:
             for task_id in get_task_dict().keys():
                 if parsimony_coefficient_space:
                     for parsimony in parsimony_coefficient_space:
