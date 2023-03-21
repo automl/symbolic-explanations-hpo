@@ -74,7 +74,7 @@ if __name__ == "__main__":
             logger.info(f"Create plots.")
 
         sns.pointplot(df_joined_all)
-        sns.scatterplot(data=df_joined_all, x="complexity", y="rmse_test", hue="parsimony",
+        sns.scatterplot(data=df_joined_all, x="complexity", y="rmse_test", hue="Parsimony",
                       linestyles="", capsize=0.2, errwidth=0.7, scale=0.7, dodge=0.4)
 
         plt.savefig(f"{plot_dir}/{run_name}_pointplot.png", dpi=400)
