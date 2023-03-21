@@ -14,7 +14,7 @@ if __name__ == "__main__":
     #     0.001, 0.0025, 0.005, 0.0075,
     #     0.01, 0.025, 0.05, 0.075
     # ]
-    parsimony_coefficient_space = ["00001"]
+    parsimony_coefficient_space = ["0001"]
     n_optimized_params = 2
 
     run_configs = get_run_config(n_optimized_params=n_optimized_params)
