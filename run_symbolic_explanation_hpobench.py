@@ -43,7 +43,8 @@ if __name__ == "__main__":
     max_seconds_per_fit = 900
 
     run_conf = get_run_config(job_id=args.job_id, n_optimized_params=n_optimized_params,
-                              parsimony_coefficient_space=parsimony_coefficient_space)
+                              parsimony_coefficient_space=parsimony_coefficient_space,
+                              max_hp_comb=1)
 
     parsimony_coefficient = run_conf["parsimony"]
     symb_dir_name = f"parsimony{parsimony_coefficient}"
