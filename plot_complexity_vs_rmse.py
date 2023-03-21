@@ -74,8 +74,7 @@ if __name__ == "__main__":
             df_joined_all = pd.concat((df_joined_all, df_joined))
 
         sns.scatterplot(data=df_joined_all, x="complexity", y="rmse_test", hue="Parsimony",
-                      linestyles="")
-        plt.close()
-
+                        linestyles="")
         plt.savefig(f"{plot_dir}/{run_name}_pointplot.png", dpi=400)
+        plt.close()
 
