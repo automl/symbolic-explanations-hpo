@@ -45,7 +45,7 @@ def get_run_config(n_optimized_params, job_id=None, parsimony_coefficient_space=
     for benchmark in get_benchmark_dict().keys():
         hyperparams = benchmark.get_configuration_space().get_hyperparameter_names()
         hp_comb = combinations(hyperparams, n_optimized_params)
-        for hp_conf in hp_comb[:1]:
+        for hp_conf in list(hp_comb)[:1]:
             for task_id in get_task_dict().keys():
                 if parsimony_coefficient_space:
                     for parsimony in parsimony_coefficient_space:
