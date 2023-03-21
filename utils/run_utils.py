@@ -84,6 +84,15 @@ def convert_symb(symb, n_dim: int = None, n_decimals: int = None) -> sympy.core.
     symb_conv: Converted mathematical expression.
     """
     if isinstance(symb, SymbolicRegressor):
+        # sqrt is protected function in gplearn, always returning sqrt(abs(x))
+        sqrt_pos = []
+        prev_inserts = 0
+        for i, f in enumerate(symb._program.program):
+            if f == functions.sqrt1:
+                sqrt_pos.append(i)
+        for i in sqrt_pos:
+            prev_inserts += 1
+            symb._program.program.insert(i + prev_inserts + 1, functions.abs1)
         symb_str = str(symb._program)
     elif isinstance(symb, SymbolicMetaModelWrapper) or isinstance(
         symb, SymbolicPursuitModelWrapper
@@ -100,16 +109,6 @@ def convert_symb(symb, n_dim: int = None, n_decimals: int = None) -> sympy.core.
         "neg": lambda x: -x,
         "pow": lambda x, y: x**y
     }
-
-    # sqrt is protected function in gplearn, always returning sqrt(abs(x))
-    sqrt_pos = []
-    prev_inserts = 0
-    for i, f in enumerate(symb._program.program):
-        if f == functions.sqrt1:
-            sqrt_pos.append(i)
-    for i in sqrt_pos:
-        prev_inserts += 1
-        symb._program.program.insert(i + prev_inserts + 1, functions.abs1)
 
     symb_conv = sympy.simplify(
         sympy.sympify(symb_str.replace("[", "").replace("]", ""), locals=converter)
