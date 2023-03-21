@@ -19,8 +19,8 @@ if __name__ == "__main__":
     parser.add_argument('--job_id')
     args = parser.parse_args()
 
-    use_random_samples = True
-    evaluate_on_surrogate = False
+    use_random_samples = False
+    evaluate_on_surrogate = True
 
     parsimony_coefficient_space = [
         0.000001, 0.0000025, 0.000005, 0.0000075,
