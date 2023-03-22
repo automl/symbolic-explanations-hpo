@@ -98,7 +98,7 @@ if __name__ == "__main__":
         ax = plt.subplot(2, 3, ind)
 
         if i == 2:
-            plt.figtext(0.5, 1., f"Datset: {data_set}", ha="center", va="top", fontsize=titlesize)
+            plt.figtext(0.5, 0.98, f"Datset: {data_set}", ha="center", va="top", fontsize=titlesize)
         if i == 3:
             plt.figtext(0.5, 0.50, f"Datset: {data_set}", ha="center", va="top", fontsize=titlesize)
 
@@ -106,11 +106,11 @@ if __name__ == "__main__":
                             linestyles="", s=80, ax=ax, palette="cividis")
         plt.title(f"{model_name} ({', '.join(optimized_parameters)})", fontsize=titlesize)
         if ind > 3:
-            plt.xlabel("Operation Count", fontsize=labelsize, labelpad=12)
+            plt.xlabel("Operation Count", fontsize=labelsize, labelpad=10)
         else:
             plt.xlabel("")
         if ind == 1 or ind == 4:
-            plt.ylabel("RMSE $(c, s)$", fontsize=labelsize, labelpad=15)
+            plt.ylabel("RMSE $(c, s)$", fontsize=labelsize, labelpad=14)
         else:
             plt.ylabel("")
         plt.xlim(-0.5, 20.5)
@@ -123,7 +123,7 @@ if __name__ == "__main__":
     legend.get_title().set_fontsize(titlesize)
     for handle in legend.legendHandles:
         handle.set_sizes([60])
-    plt.tight_layout(rect=(0, 0, 0.82, 0.93), h_pad=5)
+    plt.tight_layout(rect=(0, 0, 0.82, 0.95), h_pad=5)
     plt.savefig(f"{plot_dir}/pointplot.png", dpi=400)
     plt.close()
 
