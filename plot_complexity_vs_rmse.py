@@ -85,7 +85,7 @@ if __name__ == "__main__":
         df_joined_all['Parsimony'] = df_joined_all['Parsimony'].astype(str)
         df_joined_all.to_csv(f"{plot_dir}/df_joined_all_{run_name}")
 
-        ax = plt.subplot(2, 3, i)
+        ax = plt.subplot(2, 3, i+1)
 
         g = sns.scatterplot(data=df_joined_all, x="complexity", y="rmse_test", hue="Parsimony",
                             linestyles="", ax=ax)
