@@ -101,20 +101,20 @@ if __name__ == "__main__":
             plt.suptitle(f"Datset: {data_set}", fontsize=titlesize)
 
         if ind == 5:
-            plt.suptitle(f"Datset: {data_set}")
+            plt.suptitle(f"Datset: {data_set}", fontsize=titlesize)
 
         g = sns.scatterplot(data=df_joined_all, x="complexity", y="rmse_test", hue="Parsimony",
-                            linestyles="", ax=ax, cmap="summer")
+                            linestyles="", ax=ax, palette="summer")
         sns.move_legend(g, "upper right", title="Parsimony", frameon=False, fontsize=labelsize)
         plt.title(f"{model_name} ({', '.join(optimized_parameters)})", fontsize=titlesize)
-        plt.xlabel("Operation Count")
-        plt.ylabel("RMSE $(c, s)$")
+        plt.xlabel("Operation Count", fontsize=labelsize)
+        plt.ylabel("RMSE $(c, s)$", fontsize=labelsize)
         plt.xlim(-0.5, 20.5)
         plt.xticks(np.arange(0, 22, 2.0), fontsize=labelsize)
         handles, labels = ax.get_legend_handles_labels()
         if i == 0:
             fig.legend(handles, labels, loc='center right', title="Parsimony")
-        plt.legend([])
+        plt.legend([], [], frameon=False)
 
     plt.tight_layout(rect=(0, 0, 0.9, 1))
     plt.savefig(f"{plot_dir}/pointplot.png", dpi=400)
