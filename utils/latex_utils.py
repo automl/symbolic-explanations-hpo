@@ -42,7 +42,11 @@ def generate_result_table(df, stddev_df, stddev: bool = False, decimal_places: i
 
     df = df.reset_index()
     df.insert(0, "Dataset", df["index"].str.split(":").map(lambda x: x[1].replace('_', '\_')))
-    df.insert(0, "Model (HP)", df["index"].str.split(":").map(lambda x: x[0].replace('_', '\_')))
+    df["Dataset"] = df["Dataset"].str.replace('blood-transfusion-service-center', 'blood-transfusion')
+    #df.insert(0, "Model (HP)", df["index"].str.split(":").map(lambda x: x[0].replace('_', '\_')))
+    df.insert(0, "Model", df["index"].str.split(":").map(lambda x: x[0]))
+    df["Model"] = df["Model"].str.replace('_', '\_').str.split(" ").map(lambda x: x[0])
+
     df = df.drop(columns=["index"])
 
     # Set column header to bold title case
