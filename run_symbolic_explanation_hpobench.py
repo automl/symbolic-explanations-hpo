@@ -20,7 +20,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     use_random_samples = False
-    evaluate_on_surrogate = True
+    evaluate_on_surrogate = False
 
     max_hp_comb = 1
     # parsimony_coefficient_space = [0.0001]
@@ -37,7 +37,7 @@ if __name__ == "__main__":
     sampling_dir_name = "runs_sampling_hpobench"
     dir_with_test_data = "learning_curves/runs_surr_hpobench"
     n_optimized_params = 2
-    n_samples_spacing = [200] #np.linspace(20, 200, 10, dtype=int).tolist()
+    n_samples_spacing = np.linspace(20, 200, 10, dtype=int).tolist()
     n_seeds = 3
     n_test_samples = 100
     init_design_max_ratio = 0.25
