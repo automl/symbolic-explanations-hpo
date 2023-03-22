@@ -77,10 +77,8 @@ if __name__ == "__main__":
             df_joined.insert(0, "Parsimony", parsimony)
             df_joined_all = pd.concat((df_joined_all, df_joined))
 
-        logger.info(f"{df_joined_all}")
         df_joined_all['Parsimony'] = df_joined_all['Parsimony'].astype(str)
-
-        df_joined_all.to_csv(f"{plot_dir}/df_joined_all")
+        df_joined_all.to_csv(f"{plot_dir}/df_joined_all_{run_name}")
 
         sns.scatterplot(data=df_joined_all, x="complexity", y="rmse_test", hue="Parsimony",
                         linestyles="")
