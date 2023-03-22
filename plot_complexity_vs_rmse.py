@@ -35,7 +35,7 @@ if __name__ == "__main__":
 
     logger.info(f"Save plots to {plot_dir}.")
 
-    fig, axes = plt.figure(figsize=(15, 8))
+    fig = plt.figure(figsize=(15, 8))
 
     for i, run_conf in enumerate(run_configs):
 
