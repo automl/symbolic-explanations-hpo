@@ -21,6 +21,9 @@ def format_number(data, decimal_places: int = 2, maximum_length_before_comma: in
 def generate_result_table(df, stddev_df, stddev: bool = False, decimal_places: int = 3,
                           show_avg_and_median: bool = True):
 
+    df_no_format = df.copy()
+    df = df.drop(columns=["GP (BP)", "Model", "Dataset"])
+
     if show_avg_and_median:
         df_avg = df.mean()
         df_median = df.median()
@@ -40,16 +43,11 @@ def generate_result_table(df, stddev_df, stddev: bool = False, decimal_places: i
         df.loc['avg'] = df_avg
         df.loc['median'] = df_median
 
-    df = df.reset_index()
-    df.insert(0, "Dataset", df["index"].str.split(":").map(lambda x: x[1].replace('_', '\_')))
+    df.insert(0, "Model", df_no_format["Model"])
+    df.insert(1, "Dataset", df_no_format["Dataset"])
     df["Dataset"] = df["Dataset"].str.replace('blood-transfusion-service-center', 'blood-transf.')
-    #df.insert(0, "Model (HP)", df["index"].str.split(":").map(lambda x: x[0].replace('_', '\_')))
-    df.insert(0, "Model", df["index"].str.split(":").map(lambda x: x[0]))
-    df["Model"] = df["Model"].str.replace('_', '\_').str.split(" ").map(lambda x: x[0])
+    df.insert(-1, "GP (BP)", df_no_format["GP (BP)"])
     df["Model"] = df["Model"].str.replace('XGBoost', 'XGB')
-
-
-    df = df.drop(columns=["index"])
 
     # Set column header to bold title case
     df.columns = (df.columns.to_series()

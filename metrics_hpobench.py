@@ -103,6 +103,8 @@ if __name__ == "__main__":
     
                 #run_rmse_mean["Test Mean"] = avg_cost
                 df_run_rmse_mean = pd.DataFrame(run_rmse_mean, index=[f"{model_name} ({', '.join(optimized_parameters)}):{data_set}"])
+                df_run_rmse_mean.insert(0, "Model", model_name)
+                df_run_rmse_mean.insert(1, "Dataset", data_set)
                 df_run_rmse_mean_all = pd.concat((df_run_rmse_mean_all, df_run_rmse_mean))
                 df_run_rmse_mean_all.to_csv(f"{metric_dir}/rmse_mean{n_samples_postfix}.csv")
     
