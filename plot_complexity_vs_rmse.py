@@ -106,11 +106,11 @@ if __name__ == "__main__":
                             linestyles="",  s=50, ax=ax, palette="cividis")
         plt.title(f"{model_name} ({', '.join(optimized_parameters)})", fontsize=titlesize)
         if ind > 3:
-            plt.xlabel("Operation Count", fontsize=labelsize)
+            plt.xlabel("Operation Count", fontsize=labelsize, labelpad=2)
         else:
             plt.xlabel("")
         if ind == 1 or ind == 4:
-            plt.ylabel("RMSE $(c, s)$", fontsize=labelsize)
+            plt.ylabel("RMSE $(c, s)$", fontsize=labelsize, labelpad=2)
         else:
             plt.ylabel("")
         plt.xlim(-0.5, 20.5)
@@ -119,10 +119,10 @@ if __name__ == "__main__":
         plt.legend([], [], frameon=False)
 
     handles, labels = ax.get_legend_handles_labels()
-    for handle in handles:
-        handle._legmarker.set_markersize(50)
     legend = fig.legend(handles, labels, s=50, loc='center right', title="Parsimony", frameon=False, fontsize=titlesize)
     legend.get_title().set_fontsize(titlesize)
+    for handle in legend.legendHandles:
+        handle.set_sizes([50])
     plt.tight_layout(rect=(0, 0, 0.82, 0.93), h_pad=4)
     plt.savefig(f"{plot_dir}/pointplot.png", dpi=400)
     plt.close()
