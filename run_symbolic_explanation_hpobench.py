@@ -22,8 +22,8 @@ if __name__ == "__main__":
     use_random_samples = False
     evaluate_on_surrogate = True
 
-    max_hp_comb = 1
-    parsimony_coefficient_space = [0.0005]
+    max_hp_comb = None
+    parsimony_coefficient_space = [0.0001]
     # parsimony_coefficient_space = [
     #     0.000001, 0.0000025, 0.000005, 0.0000075,
     #     0.00001, 0.000025, 0.00005, 0.000075,

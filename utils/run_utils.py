@@ -123,11 +123,11 @@ def convert_symb(symb, n_dim: int = None, n_decimals: int = None) -> sympy.core.
         "pow": lambda x, y: x**y
     }
 
-    # if symb._program._length > 500:
-    #     print(
-    #         f"Expression of length {symb._program._length} too long to convert, return raw string."
-    #     )
-    #     return symb_str
+    if symb._program._length > 300:
+        print(
+            f"Expression of length {symb._program._length} too long to convert, return raw string."
+        )
+        return symb_str
 
     symb_conv = sympy.sympify(symb_str.replace("[", "").replace("]", ""), locals=converter)
     if n_dim == 1:
