@@ -20,7 +20,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     use_random_samples = False
-    evaluate_on_surrogate = False
+    evaluate_on_surrogate = True
 
     max_hp_comb = 1
     parsimony_coefficient_space = [0.0001]
