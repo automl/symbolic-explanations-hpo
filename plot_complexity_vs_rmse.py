@@ -20,8 +20,8 @@ if __name__ == "__main__":
     n_optimized_params = 2
     n_samples = 200
 
-    labelsize = 12
-    titlesize=14
+    labelsize = 14
+    titlesize=16
 
     run_configs = get_run_config(n_optimized_params=n_optimized_params, max_hp_comb=1)
 
@@ -97,10 +97,16 @@ if __name__ == "__main__":
             ind = i + 1
         ax = plt.subplot(2, 3, ind)
 
+        if ind == 2:
+            plt.suptitle(f"Datset: {data_set}", fontsize=titlesize)
+
+        if ind == 5:
+            plt.suptitle(f"Datset: {data_set}")
+
         g = sns.scatterplot(data=df_joined_all, x="complexity", y="rmse_test", hue="Parsimony",
                             linestyles="", ax=ax, cmap="summer")
-        sns.move_legend(g, "upper right", title="Parsimony")
-        plt.title(f"{model_name} ({', '.join(optimized_parameters)}) on {data_set}")
+        sns.move_legend(g, "upper right", title="Parsimony", frameon=False, fontsize=labelsize)
+        plt.title(f"{model_name} ({', '.join(optimized_parameters)})", fontsize=titlesize)
         plt.xlabel("Operation Count")
         plt.ylabel("RMSE $(c, s)$")
         plt.xlim(-0.5, 20.5)
@@ -110,7 +116,7 @@ if __name__ == "__main__":
             fig.legend(handles, labels, loc='center right', title="Parsimony")
         plt.legend([])
 
-    plt.tight_layout(rect=(0, 0, 0.95, 1))
+    plt.tight_layout(rect=(0, 0, 0.9, 1))
     plt.savefig(f"{plot_dir}/pointplot.png", dpi=400)
     plt.close()
 
