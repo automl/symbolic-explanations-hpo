@@ -98,18 +98,19 @@ if __name__ == "__main__":
         ax = plt.subplot(2, 3, ind)
 
         g = sns.scatterplot(data=df_joined_all, x="complexity", y="rmse_test", hue="Parsimony",
-                            linestyles="", ax=ax)
+                            linestyles="", ax=ax, cmap="summer")
         sns.move_legend(g, "upper right", title="Parsimony")
         plt.title(f"{model_name} ({', '.join(optimized_parameters)}) on {data_set}")
         plt.xlabel("Operation Count")
-        plt.ylabel("RMSE $(\mathcal{L}, \hat{\mathcal{L}})$")
+        plt.ylabel("RMSE $(c, s)$")
         plt.xlim(-0.5, 20.5)
         plt.xticks(np.arange(0, 22, 2.0), fontsize=labelsize)
         handles, labels = ax.get_legend_handles_labels()
         if i == 0:
-            fig.legend(handles, labels, loc='center right')
+            fig.legend(handles, labels, loc='center right', title="Parsimony")
+        plt.legend([])
 
-    plt.tight_layout()
+    plt.tight_layout(rect=(0, 0, 0.95, 1))
     plt.savefig(f"{plot_dir}/pointplot.png", dpi=400)
     plt.close()
 
