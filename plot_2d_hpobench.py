@@ -99,11 +99,11 @@ if __name__ == "__main__":
                     symb_pred_surr = symb_surr.predict(
                             X_test.T.reshape(X_test.shape[1] * X_test.shape[2], X_test.shape[0])
                         ).reshape(X_test.shape[2], X_test.shape[1]).T
-                    surr_conv = convert_symb(symb_surr, n_decimals=3)
-                    if len(str(surr_conv)) < 80:
-                        predictions_test[f"SR (BO-GP): {surr_conv}"] = symb_pred_surr
-                    else:
-                        predictions_test[f"SR (BO-GP)"] = symb_pred_surr
+                    # surr_conv = convert_symb(symb_surr, n_decimals=3)
+                    # if len(str(surr_conv)) < 80:
+                    #     predictions_test[f"SR (BO-GP): {surr_conv}"] = symb_pred_surr
+                    # else:
+                    predictions_test[f"SR (BO-GP)"] = symb_pred_surr
 
                     surr_dir = f"learning_curves/runs_surr/{run_name}"
                     with open(
