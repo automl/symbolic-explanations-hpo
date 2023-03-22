@@ -18,7 +18,7 @@ def format_number(data, decimal_places: int = 2, maximum_length_before_comma: in
     return formated_string
 
 
-def generate_result_table(df, stddev_df, stddev: bool = False, decimal_places: int = 2, 
+def generate_result_table(df, stddev_df, stddev: bool = False, decimal_places: int = 4, 
                           show_avg_and_median: bool = True):
 
     if show_avg_and_median:
@@ -41,8 +41,8 @@ def generate_result_table(df, stddev_df, stddev: bool = False, decimal_places: i
         df.loc['median'] = df_median
 
     df = df.reset_index()
-    df.insert(0, "Dataset", df["index"].str.split(":").map(lambda x: x[1]))
-    df.insert(0, "Model (HP)", df["index"].str.split(":").map(lambda x: x[0]))
+    df.insert(0, "Dataset", df["index"].str.split(":").map(lambda x: x[1].replace('_', '\_')))
+    df.insert(0, "Model (HP)", df["index"].str.split(":").map(lambda x: x[0].replace('_', '\_')))
     df = df.drop(columns=["index"])
 
     # Set column header to bold title case
