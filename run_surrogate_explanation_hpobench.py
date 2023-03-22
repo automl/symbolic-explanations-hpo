@@ -15,7 +15,7 @@ if __name__ == "__main__":
     parser.add_argument('--job_id')
     args = parser.parse_args()
 
-    max_hp_comb = 1
+    max_hp_comb = None
     parsimony_coefficient_space = [0.0001]
     # parsimony_coefficient_space = [
     #     0.000001, 0.0000025, 0.000005, 0.0000075,
