@@ -7,21 +7,21 @@ from utils.logging_utils import get_logger
 from utils.hpobench_utils import get_run_config, get_benchmark_dict, get_task_dict
 
 if __name__ == "__main__":
-    parsimony_coefficient_space = [
-        0.000001, 0.0000025, 0.000005, 0.0000075,
-        0.00001, 0.000025, 0.00005, 0.000075,
-        0.0001, 0.00025, 0.00075, 0.0005,
-        0.001, 0.0025, 0.005, 0.0075,
-        0.01, 0.025, 0.05, 0.075
-    ]
-    #parsimony_coefficient_space = [0.0005]
+    # parsimony_coefficient_space = [
+    #     0.000001, 0.0000025, 0.000005, 0.0000075,
+    #     0.00001, 0.000025, 0.00005, 0.000075,
+    #     0.0001, 0.00025, 0.00075, 0.0005,
+    #     0.001, 0.0025, 0.005, 0.0075,
+    #     0.01, 0.025, 0.05, 0.075
+    # ]
+    parsimony_coefficient_space = [0.0001]
 
     dir_with_test_data = "learning_curves/runs_surr_hpobench"
     n_optimized_params = 2
     # if None, average metrics over all sample sizes
-    eval_at_n_samples = 200 # None
+    eval_at_n_samples = None
     max_hp_comb = 1
-    
+
     run_configs = get_run_config(n_optimized_params=n_optimized_params, max_hp_comb=max_hp_comb)
 
     for parsimony in parsimony_coefficient_space:
