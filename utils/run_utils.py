@@ -479,6 +479,7 @@ def plot_symb2d(
     """
 
     LABEL_SIZE = 9
+    TITLE_SIZE = 11
     X0_name = (
         "X0"
         if parameters[0].name == "X0"
@@ -559,9 +560,9 @@ def plot_symb2d(
         vmax=vmax,
     )
     if function_expression:
-        axes[0].set_title(f"True: {function_expression}", fontsize=LABEL_SIZE)
+        axes[0].set_title(f"True: {function_expression}", fontsize=TITLE_SIZE)
     else:
-        axes[0].set_title(f"{function_name} Validation Loss", fontsize=LABEL_SIZE)
+        axes[0].set_title(f"Ground Truth", fontsize=TITLE_SIZE)
     axes[0].set_xlabel(X0_name, fontsize=LABEL_SIZE)
     axes[0].set_ylabel(X1_name, fontsize=LABEL_SIZE)
     axes[0].set_xticks(dim_x)
@@ -587,7 +588,7 @@ def plot_symb2d(
             vmin=vmin,
             vmax=vmax,
         )
-        axes[i + 1].set_title(f"{label}", fontsize=LABEL_SIZE)
+        axes[i + 1].set_title(f"Prediction: {label}", fontsize=LABEL_SIZE)
         axes[i + 1].set_xlabel(X0_name, fontsize=LABEL_SIZE)
         axes[i + 1].set_ylabel(X1_name, fontsize=LABEL_SIZE)
         axes[i + 1].set_xticks(dim_x)
@@ -609,27 +610,27 @@ def plot_symb2d(
                 zorder=2,
                 marker=".",
                 s=40,
-                label="Train points",
+                label="SR Train Points",
             )
     if not use_same_scale:
         cbar = fig.colorbar(im, ax=axes[1:], shrink=0.4)
         if metric_name:
-            cbar.set_label(metric_name, fontsize=LABEL_SIZE, rotation=270, labelpad=15)
+            cbar.set_label(metric_name, fontsize=TITLE_SIZE, rotation=270, labelpad=15)
         else:
-            cbar.set_label("f(X0, X1)", fontsize=LABEL_SIZE, rotation=270, labelpad=15)
+            cbar.set_label("f(X0, X1)", fontsize=TITLE_SIZE, rotation=270, labelpad=15)
         cbar.ax.tick_params(labelsize=LABEL_SIZE)
 
     handles, labels = axes[-1].get_legend_handles_labels()
     leg = fig.legend(
-        handles, labels, loc="lower right", fontsize=LABEL_SIZE, framealpha=0.0
+        handles, labels, loc="lower right", fontsize=TITLE_SIZE, framealpha=0.0
     )
     leg.get_frame().set_linewidth(0.0)
     if use_same_scale:
         cbar = fig.colorbar(im, ax=axes, shrink=0.4)
         if metric_name:
-            cbar.set_label(metric_name, fontsize=LABEL_SIZE, rotation=270, labelpad=15)
+            cbar.set_label(metric_name, fontsize=TITLE_SIZE, rotation=270, labelpad=15)
         else:
-            cbar.set_label("f(X0, X1)", fontsize=LABEL_SIZE, rotation=270, labelpad=15)
+            cbar.set_label("f(X0, X1)", fontsize=TITLE_SIZE, rotation=270, labelpad=15)
         cbar.ax.tick_params(labelsize=LABEL_SIZE)
     if plot_dir:
         if filename:
