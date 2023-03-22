@@ -20,8 +20,8 @@ if __name__ == "__main__":
     n_optimized_params = 2
     n_samples = 200
 
-    labelsize = 14
-    titlesize=16
+    labelsize = 16
+    titlesize=18
 
     run_configs = get_run_config(n_optimized_params=n_optimized_params, max_hp_comb=1)
 
@@ -102,8 +102,6 @@ if __name__ == "__main__":
         if i == 3:
             plt.figtext(0.5, 0.5, f"Datset: {data_set}", ha="center", va="top", fontsize=titlesize)
 
-        plt.suptitle(f"Datset: {data_set}", fontsize=titlesize)
-
         g = sns.scatterplot(data=df_joined_all, x="complexity", y="rmse_test", hue="Parsimony",
                             linestyles="", ax=ax, palette="cividis")
         plt.title(f"{model_name} ({', '.join(optimized_parameters)})", fontsize=titlesize)
@@ -115,9 +113,9 @@ if __name__ == "__main__":
         plt.legend([], [], frameon=False)
 
     handles, labels = ax.get_legend_handles_labels()
-    legend = fig.legend(handles, labels, loc='center right', title="Parsimony", frameon=False, fontsize=labelsize)
-    legend.get_title().set_fontsize('14')
-    plt.tight_layout(rect=(0, 0, 0.87, 1), h_pad=10)
+    legend = fig.legend(handles, labels, loc='center right', title="Parsimony", frameon=False, fontsize=titlesize)
+    legend.get_title().set_fontsize(titlesize)
+    plt.tight_layout(rect=(0, 0, 0.87, 1), h_pad=3)
     plt.savefig(f"{plot_dir}/pointplot.png", dpi=400)
     plt.close()
 
