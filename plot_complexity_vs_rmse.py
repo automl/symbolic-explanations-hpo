@@ -103,7 +103,7 @@ if __name__ == "__main__":
             plt.figtext(0.5, 0.5, f"Datset: {data_set}", ha="center", va="top", fontsize=titlesize)
 
         g = sns.scatterplot(data=df_joined_all, x="complexity", y="rmse_test", hue="Parsimony",
-                            linestyles="", ax=ax, palette="cividis")
+                            linestyles="",  s=10, ax=ax, palette="cividis")
         plt.title(f"{model_name} ({', '.join(optimized_parameters)})", fontsize=titlesize)
         plt.xlabel("Operation Count", fontsize=labelsize)
         plt.ylabel("RMSE $(c, s)$", fontsize=labelsize)
