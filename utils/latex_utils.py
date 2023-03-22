@@ -18,7 +18,7 @@ def format_number(data, decimal_places: int = 2, maximum_length_before_comma: in
     return formated_string
 
 
-def generate_result_table(df, stddev_df, stddev: bool = False, decimal_places: int = 4, 
+def generate_result_table(df, stddev_df, stddev: bool = False, decimal_places: int = 3,
                           show_avg_and_median: bool = True):
 
     if show_avg_and_median:
@@ -42,10 +42,12 @@ def generate_result_table(df, stddev_df, stddev: bool = False, decimal_places: i
 
     df = df.reset_index()
     df.insert(0, "Dataset", df["index"].str.split(":").map(lambda x: x[1].replace('_', '\_')))
-    df["Dataset"] = df["Dataset"].str.replace('blood-transfusion-service-center', 'blood-transfusion')
+    df["Dataset"] = df["Dataset"].str.replace('blood-transfusion-service-center', 'blood-transf.')
     #df.insert(0, "Model (HP)", df["index"].str.split(":").map(lambda x: x[0].replace('_', '\_')))
     df.insert(0, "Model", df["index"].str.split(":").map(lambda x: x[0]))
     df["Model"] = df["Model"].str.replace('_', '\_').str.split(" ").map(lambda x: x[0])
+    df["Model"] = df["Model"].str.replace('XGBoost', 'XGB')
+
 
     df = df.drop(columns=["index"])
 
