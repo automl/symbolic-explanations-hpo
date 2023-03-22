@@ -119,7 +119,7 @@ if __name__ == "__main__":
         plt.legend([], [], frameon=False)
 
     handles, labels = ax.get_legend_handles_labels()
-    legend = fig.legend(handles, labels, s=50, loc='center right', title="Parsimony", frameon=False, fontsize=titlesize)
+    legend = fig.legend(handles, labels, loc='center right', title="Parsimony", frameon=False, fontsize=titlesize)
     legend.get_title().set_fontsize(titlesize)
     for handle in legend.legendHandles:
         handle.set_sizes([50])
