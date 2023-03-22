@@ -482,16 +482,16 @@ def plot_symb2d(
     X0_name = (
         "X0"
         if parameters[0].name == "X0"
-        else f"X0: log({parameters[0].name})"
+        else f"log({parameters[0].name})"
         if parameters[0].log
-        else f"X0: {parameters[0].name}"
+        else f"{parameters[0].name}"
     )
     X1_name = (
         "X1"
         if parameters[1].name == "X1"
-        else f"X1: log({parameters[1].name})"
+        else f"log({parameters[1].name})"
         if parameters[1].log
-        else f"X1: {parameters[1].name}"
+        else f"{parameters[1].name}"
     )
     if parameters[0].log:
         X0_upper = np.log(parameters[0].upper)

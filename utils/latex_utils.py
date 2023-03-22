@@ -45,9 +45,9 @@ def generate_result_table(df, stddev_df, stddev: bool = False, decimal_places: i
 
     df.insert(0, "Model", df_no_format["Model"])
     df.insert(1, "Dataset", df_no_format["Dataset"])
-    df["Dataset"] = df["Dataset"].str.replace('blood-transfusion-service-center', 'blood-transf.')
-    df.insert(-1, "GP Baseline", df_no_format["GP Baseline"])
+    df["GP Baseline"] = df_no_format["GP Baseline"]
     df["Model"] = df["Model"].str.replace('XGBoost', 'XGB')
+    df["Dataset"] = df["Dataset"].str.replace('blood-transfusion-service-center', 'blood-transf.')
 
     # Set column header to bold title case
     df.columns = (df.columns.to_series()
