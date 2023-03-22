@@ -98,9 +98,9 @@ if __name__ == "__main__":
         ax = plt.subplot(2, 3, ind)
 
         if i == 2:
-            plt.figtext(0.5, 0.98, f"Datset: {data_set}", ha="center", va="top", fontsize=titlesize)
+            plt.figtext(0.5, 0.98, f"Dataset: {data_set}", ha="center", va="top", fontsize=titlesize)
         if i == 3:
-            plt.figtext(0.5, 0.50, f"Datset: {data_set}", ha="center", va="top", fontsize=titlesize)
+            plt.figtext(0.5, 0.50, f"Dataset: {data_set}", ha="center", va="top", fontsize=titlesize)
 
         g = sns.scatterplot(data=df_joined_all, x="complexity", y="rmse_test", hue="Parsimony",
                             linestyles="", s=80, ax=ax, palette="cividis")
