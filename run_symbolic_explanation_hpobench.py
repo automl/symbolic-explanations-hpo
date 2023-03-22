@@ -20,9 +20,9 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     use_random_samples = False
-    evaluate_on_surrogate = True
+    evaluate_on_surrogate = False
 
-    max_hp_comb = None
+    max_hp_comb = 1
     parsimony_coefficient_space = [0.0001]
     # parsimony_coefficient_space = [
     #     0.000001, 0.0000025, 0.000005, 0.0000075,
