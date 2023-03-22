@@ -155,7 +155,7 @@ if __name__ == "__main__":
                                 function_name=model_name,
                                 metric_name=r'$\mathcal{L}$_{Test}',
                                 predictions_test=predictions_test,
-                                parameters=optimized_parameters,
+                                parameters=cs.get_hyperparameters(),
                                 plot_dir=viz_plot_dir,
                                 filename=filename
                             )
