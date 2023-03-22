@@ -50,4 +50,4 @@ def generate_result_table(df, stddev_df, stddev: bool = False, decimal_places: i
                   .apply(lambda r:
                          '\\multicolumn{1}{c}{{' + r.replace('_', '\_') + '}}'))
 
-    print(df.to_latex(index=False, escape=False))
+    return df.to_latex(index=False, escape=False)
