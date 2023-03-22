@@ -561,7 +561,7 @@ def plot_symb2d(
     if function_expression:
         axes[0].set_title(f"True: {function_expression}", fontsize=LABEL_SIZE)
     else:
-        axes[0].set_title(f"{function_name}", fontsize=LABEL_SIZE)
+        axes[0].set_title(f"{function_name} Validation Loss", fontsize=LABEL_SIZE)
     axes[0].set_xlabel(X0_name, fontsize=LABEL_SIZE)
     axes[0].set_ylabel(X1_name, fontsize=LABEL_SIZE)
     axes[0].set_xticks(dim_x)
