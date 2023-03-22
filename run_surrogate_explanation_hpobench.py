@@ -16,6 +16,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     max_hp_comb = None
+    parsimony_coefficient_space = [0.0001]
 
     sampling_dir_name = "runs_sampling_hpobench"
     # only for loading test data
@@ -27,6 +28,7 @@ if __name__ == "__main__":
     init_design_n_configs_per_hyperparamter = 8
 
     run_conf = get_run_config(job_id=args.job_id, n_optimized_params=n_optimized_params,
+                              parsimony_coefficient_space=parsimony_coefficient_space,
                               max_hp_comb=max_hp_comb)
 
     parsimony_coefficient = run_conf["parsimony"]
