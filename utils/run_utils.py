@@ -478,8 +478,8 @@ def plot_symb2d(
     function and the functions fitted by symbolic models evaluated on a 2D grid.
     """
 
-    LABEL_SIZE = 12
-    TITLE_SIZE = 14
+    LABEL_SIZE = 10
+    TITLE_SIZE = 12
     X0_name = (
         "X0"
         if parameters[0].name == "X0"
@@ -588,7 +588,7 @@ def plot_symb2d(
             vmin=vmin,
             vmax=vmax,
         )
-        axes[i + 1].set_title(f"Prediction: {label}", fontsize=LABEL_SIZE)
+        axes[i + 1].set_title(f"Prediction: {label}", fontsize=TITLE_SIZE)
         axes[i + 1].set_xlabel(X0_name, fontsize=TITLE_SIZE)
         axes[i + 1].set_ylabel(X1_name, fontsize=TITLE_SIZE)
         axes[i + 1].set_xticks(dim_x)
@@ -619,7 +619,7 @@ def plot_symb2d(
         else:
             cbar.set_label("f(X0, X1)", fontsize=TITLE_SIZE, rotation=270, labelpad=15)
         cbar.ax.tick_params(labelsize=LABEL_SIZE)
-
+    plt.subplots_adjust(bottom=0.1)
     handles, labels = axes[-1].get_legend_handles_labels()
     leg = fig.legend(
         handles, labels, loc="lower right", fontsize=TITLE_SIZE, framealpha=0.0
