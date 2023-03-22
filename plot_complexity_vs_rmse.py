@@ -107,7 +107,7 @@ if __name__ == "__main__":
         plt.xticks(np.arange(0, 22, 2.0), fontsize=labelsize)
         handles, labels = ax.get_legend_handles_labels()
         if i == 0:
-            fig.legend(handles, labels, loc='middle center')
+            fig.legend(handles, labels, loc='center right')
 
     plt.tight_layout()
     plt.savefig(f"{plot_dir}/pointplot.png", dpi=400)
