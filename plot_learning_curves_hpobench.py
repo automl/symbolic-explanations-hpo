@@ -15,7 +15,7 @@ if __name__ == "__main__":
     n_optimized_params = 2
 
     labelsize = 12
-    titlesize=14
+    titlesize=13
 
     run_configs = get_run_config(n_optimized_params=n_optimized_params)
 
@@ -106,14 +106,14 @@ if __name__ == "__main__":
                 # Plot RMSE
                 plt.figure()
                 _, ax = plt.subplots(figsize=(8, 5))
-                line = plt.axhline(y=std_cost, color='darkred', linestyle='--', linewidth=0.5, label="Test Std.")
+                #line = plt.axhline(y=std_cost, color='darkred', linestyle='--', linewidth=0.5, label="Std.")
                 sns.boxplot(data=df_error_metrics_all, x="n_samples", y="rmse_test", hue="Experiment",
-                            dodge=0.4, showfliers=False)
+                            dodge=0.4, showfliers=False, palette="civids")
                 #sns.pointplot(data=df_error_metrics_all, x="n_samples", y="rmse_test", hue="Experiment", errorbar="sd",
                 #              linestyles="", capsize=0.2, errwidth=0.7, scale=0.7, dodge=0.4)#, showfliers=False)
-                plt.title(f"{classifier_title}, Dataset: {data_set}\nOptimize: {param0}, {param1}", fontsize=titlesize)
+                plt.title(f"Dataset: {data_set}\n{classifier_title} ({param0}, {param1})", fontsize=titlesize)
                 #plt.title(f"Test Mean: {avg_cost:.3f}, Test Std.: {std_cost:.3f}", fontsize=10),
-                plt.ylabel("Test RMSE", fontsize=titlesize)
+                plt.ylabel(f"RMSE $(c, s)$", fontsize=titlesize)
                 plt.yticks(fontsize=labelsize)
                 plt.xlabel("Number of Samples", fontsize=titlesize)
                 plt.xticks(fontsize=labelsize)
@@ -122,7 +122,7 @@ if __name__ == "__main__":
                 sns.move_legend(
                     ax, "lower center",
                     bbox_to_anchor=(0.45, -0.27),
-                    ncol=5,
+                    ncol=4,
                     title=None, frameon=False,
                     fontsize=labelsize
                 )
