@@ -563,7 +563,7 @@ def plot_symb2d(
         axes[0].set_title(f"True: {function_expression}", fontsize=TITLE_SIZE)
     else:
         axes[0].set_title(f"Ground Truth", fontsize=TITLE_SIZE)
-    axes[0].set_xlabel(X0_name, fontsize=TITLE_SIZE)
+    #axes[0].set_xlabel(X0_name, fontsize=TITLE_SIZE)
     axes[0].set_ylabel(X1_name, fontsize=TITLE_SIZE)
     axes[0].set_xticks(dim_x)
     axes[0].set_yticks(dim_y)
@@ -589,7 +589,8 @@ def plot_symb2d(
             vmax=vmax,
         )
         axes[i + 1].set_title(f"Prediction: {label}", fontsize=TITLE_SIZE)
-        axes[i + 1].set_xlabel(X0_name, fontsize=TITLE_SIZE)
+        if i == len(predictions_test) - 1:
+            axes[i + 1].set_xlabel(X0_name, fontsize=TITLE_SIZE)
         axes[i + 1].set_ylabel(X1_name, fontsize=TITLE_SIZE)
         axes[i + 1].set_xticks(dim_x)
         axes[i + 1].set_yticks(dim_y)
@@ -621,7 +622,7 @@ def plot_symb2d(
         cbar.ax.tick_params(labelsize=LABEL_SIZE)
     handles, labels = axes[-1].get_legend_handles_labels()
     leg = fig.legend(
-        handles, labels, loc="lower right", fontsize=LABEL_SIZE, framealpha=0.0
+        handles, labels, loc="lower right", fontsize=TITLE_SIZE, framealpha=0.0
     )
     leg.get_frame().set_linewidth(0.0)
     if use_same_scale:
