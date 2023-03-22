@@ -106,11 +106,11 @@ if __name__ == "__main__":
                             linestyles="", s=80, ax=ax, palette="cividis")
         plt.title(f"{model_name} ({', '.join(optimized_parameters)})", fontsize=titlesize)
         if ind > 3:
-            plt.xlabel("Operation Count", fontsize=labelsize, labelpad=20)
+            plt.xlabel("Operation Count", fontsize=labelsize, labelpad=12)
         else:
             plt.xlabel("")
         if ind == 1 or ind == 4:
-            plt.ylabel("RMSE $(c, s)$", fontsize=labelsize, labelpad=20)
+            plt.ylabel("RMSE $(c, s)$", fontsize=labelsize, labelpad=15)
         else:
             plt.ylabel("")
         plt.xlim(-0.5, 20.5)
