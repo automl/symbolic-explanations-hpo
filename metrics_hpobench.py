@@ -20,8 +20,9 @@ if __name__ == "__main__":
     n_optimized_params = 2
     # if None, average metrics over all sample sizes
     eval_at_n_samples = 200 # None
-
-    run_configs = get_run_config(n_optimized_params=n_optimized_params)
+    max_hp_comb = 1
+    
+    run_configs = get_run_config(n_optimized_params=n_optimized_params, max_hp_comb=max_hp_comb)
 
     for parsimony in parsimony_coefficient_space:
         symb_dir_name = f"parsimony{parsimony}"
