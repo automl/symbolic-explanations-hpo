@@ -17,7 +17,7 @@ if __name__ == "__main__":
         0.01, 0.025, 0.05, 0.075
     ]
     n_optimized_params = 2
-    n_samples = 40
+    n_samples = 200
 
     labelsize = 12
     titlesize=14
@@ -57,14 +57,17 @@ if __name__ == "__main__":
 
             symb_dir = f"learning_curves/runs_symb_hpobench/parsimony{parsimony}/surr/{run_name}"
 
-            df_complexity = pd.read_csv(f"{symb_dir}/complexity.csv")
-            df_complexity = df_complexity[df_complexity["program_operations"] != -1]
-            df_complexity = df_complexity[df_complexity["n_samples"] == n_samples]
-
             df_error_metrics = pd.read_csv(f"{symb_dir}/error_metrics.csv")
             df_error_metrics["rmse_test"] = np.sqrt(df_error_metrics["mse_test"])
             df_error_metrics["rmse_train"] = np.sqrt(df_error_metrics["mse_train"])
             df_error_metrics = df_error_metrics[df_error_metrics["n_samples"] == n_samples]
+
+            logger.info(f"Number of SR evaluations found: {len(df_error_metrics)}")
+
+            df_complexity = pd.read_csv(f"{symb_dir}/complexity.csv")
+            logger.info(f"Number of times complexity == -1: {len(df_complexity[df_complexity['program_operations'] == -1])}")
+            df_complexity = df_complexity[df_complexity["program_operations"] != -1]
+            df_complexity = df_complexity[df_complexity["n_samples"] == n_samples]
 
             df_joined = pd.DataFrame({
                 "rmse_test": [df_error_metrics["rmse_test"].mean(axis=0)],
