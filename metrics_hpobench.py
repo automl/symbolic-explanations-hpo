@@ -20,7 +20,7 @@ if __name__ == "__main__":
     dir_with_test_data = "learning_curves/runs_surr_hpobench"
     n_optimized_params = 2
     # if None, average metrics over all sample sizes
-    eval_at_n_samples = 180
+    eval_at_n_samples = 160
     max_hp_comb = 1
     to_latex = True
 
