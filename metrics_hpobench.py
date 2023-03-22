@@ -19,7 +19,7 @@ if __name__ == "__main__":
     dir_with_test_data = "learning_curves/runs_surr_hpobench"
     n_optimized_params = 2
     # if None, average metrics over all sample sizes
-    eval_at_n_samples = 200 # None
+    eval_at_n_samples = None # None
 
     run_configs = get_run_config(n_optimized_params=n_optimized_params)
 
