@@ -123,6 +123,12 @@ def convert_symb(symb, n_dim: int = None, n_decimals: int = None) -> sympy.core.
         "pow": lambda x, y: x**y
     }
 
+    # if symb._program._length > 500:
+    #     print(
+    #         f"Expression of length {symb._program._length} too long to convert, return raw string."
+    #     )
+    #     return symb_str
+
     symb_conv = sympy.sympify(symb_str.replace("[", "").replace("]", ""), locals=converter)
     if n_dim == 1:
         x, X0 = sympy.symbols("x X0")
@@ -131,12 +137,6 @@ def convert_symb(symb, n_dim: int = None, n_decimals: int = None) -> sympy.core.
         X0, X1 = sympy.symbols("X0 X1", real=True)
         symb_conv = symb_conv.subs(X0, X1)
     symb_simpl = sympy.simplify(symb_conv)
-
-    if len(symb_str) > 500:
-        print(
-            f"Expression of length {len(symb_str)} too long to convert, return raw string."
-        )
-        return symb_str
 
     if isinstance(symb, SymbolicPursuitModelWrapper):
         proj = symb.metamodel.get_projections()

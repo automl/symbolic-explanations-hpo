@@ -53,7 +53,7 @@ if __name__ == "__main__":
 
         for parsimony in parsimony_coefficient_space:
 
-            logger.info(f"Evaluate parsimony {parsimony}")
+            logger.info(f"################# Evaluate parsimony {parsimony}")
 
             symb_dir = f"learning_curves/runs_symb_hpobench/parsimony{parsimony}/surr/{run_name}"
 
