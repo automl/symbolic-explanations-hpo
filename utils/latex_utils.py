@@ -22,6 +22,7 @@ def generate_result_table(df, stddev_df, stddev: bool = False, decimal_places: i
                           show_avg_and_median: bool = True):
 
     df_no_format = df.copy()
+    df_decimal_format = df["GP Baseline"].copy()
     df = df.drop(columns=["GP Baseline", "Model", "Dataset"])
 
     if show_avg_and_median:
@@ -32,7 +33,10 @@ def generate_result_table(df, stddev_df, stddev: bool = False, decimal_places: i
         df.iloc[k] = df.iloc[k].apply(
             lambda data: bold_extreme_values(data, best=df.iloc[k].min(), second_best=np.partition(df.iloc[k].array.to_numpy(), 1)[1], decimal_places=decimal_places))
 
-    df.insert(len(df.columns), "GP Baseline", df_no_format["GP Baseline"])
+    for k in range(len(df_decimal_format.index)):
+        df_decimal_format.iloc[k] = df_decimal_format.iloc[k].apply(lambda data: format_number(data, decimal_places=decimal_places))
+
+    df.insert(len(df.columns), "GP Baseline", df_decimal_format["GP Baseline"])
 
     if stddev:
         for k in range(len(stddev_df.index)):
