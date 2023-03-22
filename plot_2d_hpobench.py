@@ -3,7 +3,7 @@ import os
 import numpy as np
 import dill as pickle
 
-from utils.run_utils import plot_symb2d, get_surrogate_predictions, convert_symb
+from utils.run_utils import plot_symb2d, get_surrogate_predictions, convert_symb, get_hpo_test_data
 from utils.logging_utils import get_logger
 
 from utils.hpobench_utils import get_run_config, get_benchmark_dict, get_task_dict
@@ -69,8 +69,14 @@ if __name__ == "__main__":
 
         # Load test data
         logger.info(f"Get test data for {run_name}.")
-        X_test = np.array(pd.read_csv(f"{dir_with_test_data}/{run_name}/x_test.csv"))
-        y_test = np.array(pd.read_csv(f"{dir_with_test_data}/{run_name}/y_test.csv"))
+        if dir_with_test_data:
+            X_test = get_hpo_test_data(b, cs.get_hyperparameters(), n_test_samples, return_x=True)
+            y_test = np.array(
+                pd.read_csv(f"{dir_with_test_data}/{run_name}/y_test.csv", header=None))
+            y_test = y_test.reshape(X_test.shape[1], X_test.shape[2])
+        else:
+            logger.info(f"No previous test data dir provided, create test data for {run_name}.")
+            X_test, y_test = get_hpo_test_data(b, cs.get_hyperparameters(), n_test_samples)
 
         for sampling_seed in [0]: #df_samples_smac.seed.unique():
             logger.info(f"Considering sampling seed {sampling_seed}.")
