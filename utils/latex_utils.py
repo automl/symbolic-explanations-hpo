@@ -22,7 +22,7 @@ def generate_result_table(df, stddev_df, stddev: bool = False, decimal_places: i
                           show_avg_and_median: bool = True):
 
     df_no_format = df.copy()
-    df = df.drop(columns=["GP (BP)", "Model", "Dataset"])
+    df = df.drop(columns=["GP (BO)", "Model", "Dataset"])
 
     if show_avg_and_median:
         df_avg = df.mean()
