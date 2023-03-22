@@ -11,7 +11,7 @@ from utils.hpobench_utils import get_run_config, get_benchmark_dict, get_task_di
 if __name__ == "__main__":
     parsimony_coefficient_space = [
         0.000001, 0.0000025, 0.000005, 0.0000075,
-        0.00001, 0.000025, 0.00005, 
+        0.00001, 0.000025, 0.00005,
         0.000075,
         0.0001, 0.00025, 0.0005, 0.00075,
         0.001, 0.0025, 0.005, 0.0075,
@@ -70,7 +70,7 @@ if __name__ == "__main__":
             logger.info(f"Number of times complexity == -1: {len(df_complexity[df_complexity['program_operations'] == -1])}")
             if len(df_complexity[df_complexity['program_operations'] == -1]) > 2:
                 logger.info(f"Leave out {parsimony}, as complexity for more than 2 seeds could not be evaluated.")
-                break
+                continue
             df_complexity = df_complexity[df_complexity["program_operations"] != -1]
 
             df_joined = pd.DataFrame({
