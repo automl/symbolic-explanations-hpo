@@ -622,7 +622,7 @@ def plot_symb2d(
         cbar.ax.tick_params(labelsize=LABEL_SIZE)
     handles, labels = axes[-1].get_legend_handles_labels()
     leg = fig.legend(
-        handles, labels, loc="lower right", fontsize=TITLE_SIZE, framealpha=0.0
+        handles, labels, loc="lower right", bbox_to_anchor=(0.1, 0.9), fontsize=TITLE_SIZE, framealpha=0.0
     )
     leg.get_frame().set_linewidth(0.0)
     if use_same_scale:
@@ -632,6 +632,7 @@ def plot_symb2d(
         else:
             cbar.set_label("f(X0, X1)", fontsize=TITLE_SIZE, rotation=270, labelpad=15)
         cbar.ax.tick_params(labelsize=LABEL_SIZE)
+    plt.tight_layout(w_pad=10)
     if plot_dir:
         if filename:
             plt.savefig(f"{plot_dir}/{filename}", dpi=800)
