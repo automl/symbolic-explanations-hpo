@@ -67,7 +67,7 @@ if __name__ == "__main__":
     
                 run_count, run_rmse_mean, run_rmse_std = {}, {}, {}
     
-                for sampling_type in ["GP Baseline", "SR (BO)", "SR (Random)", "SR (BO-GP)"]:
+                for sampling_type in ["SR (BO)", "SR (Random)", "SR (BO-GP)", "GP Baseline"]:
                     try:
                         if sampling_type == "GP Baseline":
                             symb_dir = f"learning_curves/runs_surr_hpobench/{run_name}"

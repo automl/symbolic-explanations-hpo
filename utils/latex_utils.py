@@ -38,7 +38,7 @@ def generate_result_table(df, stddev_df, stddev: bool = False, decimal_places: i
     for k in range(len(df_decimal_format.index)):
         df_decimal_format.iloc[k] = df_decimal_format.iloc[k].apply(lambda data: format_number(data, decimal_places=decimal_places))
 
-    df.insert(len(df.columns), "GP Baseline", df_decimal_format["GP Baseline"])
+    df["GP Baseline"] = df_decimal_format["GP Baseline"]
 
     if stddev:
         for k in range(len(stddev_df.index)):
