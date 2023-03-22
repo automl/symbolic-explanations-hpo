@@ -479,7 +479,7 @@ def plot_symb2d(
     """
 
     LABEL_SIZE = 9
-    TITLE_SIZE = 10
+    TITLE_SIZE = 11
     X0_name = (
         "X0"
         if parameters[0].name == "X0"
@@ -639,7 +639,7 @@ def plot_symb2d(
             plt.savefig(f"{plot_dir}/{function_name}", dpi=800)
     else:
         plt.show()
-    plt.tight_layout(0, 0.05, 1, 1)
+    plt.tight_layout(0, -0.05, 1, 1)
     plt.close()
 
     return fig
