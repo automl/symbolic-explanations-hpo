@@ -103,20 +103,23 @@ if __name__ == "__main__":
             plt.figtext(0.5, 0.5, f"Datset: {data_set}", ha="center", va="top", fontsize=titlesize)
 
         g = sns.scatterplot(data=df_joined_all, x="complexity", y="rmse_test", hue="Parsimony",
-                            linestyles="",  s=20, ax=ax, palette="cividis")
+                            linestyles="",  s=100, ax=ax, palette="cividis")
         plt.title(f"{model_name} ({', '.join(optimized_parameters)})", fontsize=titlesize)
         if ind > 3:
             plt.xlabel("Operation Count", fontsize=labelsize)
-
+        else:
+            plt.xlabel("")
         if ind == 1 or ind == 4:
             plt.ylabel("RMSE $(c, s)$", fontsize=labelsize)
+        else:
+            plt.ylabel("")
         plt.xlim(-0.5, 20.5)
         plt.yticks(fontsize=labelsize-2)
         plt.xticks(np.arange(0, 22, 2.0), fontsize=labelsize-2)
         plt.legend([], [], frameon=False)
 
     handles, labels = ax.get_legend_handles_labels()
-    legend = fig.legend(handles, labels, markerscale=20, loc='center right', title="Parsimony", frameon=False, fontsize=titlesize)
+    legend = fig.legend(handles, labels, markerscale=1, loc='center right', title="Parsimony", frameon=False, fontsize=titlesize)
     legend.get_title().set_fontsize(titlesize)
     plt.tight_layout(rect=(0, 0, 0.82, 0.9), h_pad=4)
     plt.savefig(f"{plot_dir}/pointplot.png", dpi=400)
