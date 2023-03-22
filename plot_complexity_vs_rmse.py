@@ -95,7 +95,8 @@ if __name__ == "__main__":
         plt.ylabel("RMSE $(\mathcal{L}, \hat{\mathcal{L}})$")
         plt.xlim(-0.5, 20.5)
         plt.xticks(np.arange(0, 22, 2.0), fontsize=labelsize)
-        plt.tight_layout()
-        plt.savefig(f"{plot_dir}/{run_name}_pointplot.png", dpi=400)
-        plt.close()
+
+    plt.savefig(f"{plot_dir}/pointplot.png", dpi=400)
+    plt.tight_layout()
+    plt.close()
 
