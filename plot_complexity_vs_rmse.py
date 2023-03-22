@@ -83,11 +83,14 @@ if __name__ == "__main__":
         df_joined_all['Parsimony Coefficient'] = df_joined_all['Parsimony Coefficient'].astype(str)
         df_joined_all.to_csv(f"{plot_dir}/df_joined_all_{run_name}")
 
-        sns.scatterplot(data=df_joined_all, x="complexity", y="rmse_test", hue="Parsimony Coefficient",
-                        linestyles="")
-        plt.legend(loc='upper right')
+        g = sns.scatterplot(data=df_joined_all, x="complexity", y="rmse_test", hue="Parsimony Coefficient",
+                            linestyles="")
+        sns.move_legend(g, "upper right", title="Parsimony Coefficient")
+        plt.title(f"{model_name} ({','.join(optimized_parameters)}), {data_set}")
         plt.xlabel("Operation Count")
-        plt.ylabel("RMSE $(\mathcal{L}, \hat{\mathcal{L}})$")
+        plt.ylabel("RMSE $(\mathcal{L}, \hat{\mathcal{L}}_{Symbolic})$")
+        plt.xlim(0, 20.5)
+        plt.xticks(np.arange(0, 22, 2.0), fontsize=labelsize)
         plt.tight_layout()
         plt.savefig(f"{plot_dir}/{run_name}_pointplot.png", dpi=400)
         plt.close()
