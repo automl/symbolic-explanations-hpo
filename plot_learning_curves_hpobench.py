@@ -107,8 +107,10 @@ if __name__ == "__main__":
                 plt.figure()
                 _, ax = plt.subplots(figsize=(8, 5))
                 line = plt.axhline(y=std_cost, color='darkred', linestyle='--', linewidth=0.5, label="Test Std.")
-                sns.pointplot(data=df_error_metrics_all, x="n_samples", y="rmse_test", hue="Experiment", errorbar="sd",
-                              linestyles="", capsize=0.2, errwidth=0.7, scale=0.7, dodge=0.4)#, showfliers=False)
+                sns.boxplot(data=df_error_metrics_all, x="n_samples", y="rmse_test", hue="Experiment",
+                              capsize=0.2, errwidth=0.7, scale=0.7, dodge=0.4, showfliers=False)
+                #sns.pointplot(data=df_error_metrics_all, x="n_samples", y="rmse_test", hue="Experiment", errorbar="sd",
+                #              linestyles="", capsize=0.2, errwidth=0.7, scale=0.7, dodge=0.4)#, showfliers=False)
                 plt.title(f"{classifier_title}, Dataset: {data_set}\nOptimize: {param0}, {param1}", fontsize=titlesize)
                 #plt.title(f"Test Mean: {avg_cost:.3f}, Test Std.: {std_cost:.3f}", fontsize=10),
                 plt.ylabel("Test RMSE", fontsize=titlesize)
