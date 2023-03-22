@@ -116,7 +116,8 @@ if __name__ == "__main__":
         plt.legend([], [], frameon=False)
 
     handles, labels = ax.get_legend_handles_labels()
-    fig.legend(handles, labels, loc='center right', title="Parsimony", frameon=False, fontsize=labelsize)
+    legend = fig.legend(handles, labels, loc='center right', title="Parsimony", frameon=False, fontsize=labelsize)
+    legend.get_title().set_fontsize('14')
     plt.tight_layout(rect=(0, 0, 0.87, 1), h_pad=10)
     plt.savefig(f"{plot_dir}/pointplot.png", dpi=400)
     plt.close()
