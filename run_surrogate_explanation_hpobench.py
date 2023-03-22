@@ -15,7 +15,7 @@ if __name__ == "__main__":
     parser.add_argument('--job_id')
     args = parser.parse_args()
 
-    max_hp_comb = None
+    max_hp_comb = 1
     parsimony_coefficient_space = [0.0001]
 
     sampling_dir_name = "runs_sampling_hpobench"
