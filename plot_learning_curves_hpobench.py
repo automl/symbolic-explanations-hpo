@@ -108,7 +108,7 @@ if __name__ == "__main__":
                 _, ax = plt.subplots(figsize=(8, 5))
                 #line = plt.axhline(y=std_cost, color='darkred', linestyle='--', linewidth=0.5, label="Std.")
                 sns.boxplot(data=df_error_metrics_all, x="n_samples", y="rmse_test", hue="Experiment",
-                            dodge=0.4, showfliers=False, palette="civids")
+                            dodge=0.4, showfliers=False, palette="cividis")
                 #sns.pointplot(data=df_error_metrics_all, x="n_samples", y="rmse_test", hue="Experiment", errorbar="sd",
                 #              linestyles="", capsize=0.2, errwidth=0.7, scale=0.7, dodge=0.4)#, showfliers=False)
                 plt.title(f"Dataset: {data_set}\n{classifier_title} ({param0}, {param1})", fontsize=titlesize)
