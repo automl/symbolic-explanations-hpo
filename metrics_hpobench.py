@@ -21,6 +21,7 @@ if __name__ == "__main__":
     # if None, average metrics over all sample sizes
     eval_at_n_samples = 200
     max_hp_comb = 1
+    to_latex = True
 
     run_configs = get_run_config(n_optimized_params=n_optimized_params, max_hp_comb=max_hp_comb)
 
