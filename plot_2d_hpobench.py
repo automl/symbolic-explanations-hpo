@@ -122,11 +122,11 @@ if __name__ == "__main__":
                     symb_pred_smac = symb_smac.predict(
                             X_test.T.reshape(X_test.shape[1] * X_test.shape[2], X_test.shape[0])
                         ).reshape(X_test.shape[2], X_test.shape[1]).T
-                    smac_conv = convert_symb(symb_smac, n_decimals=3)
-                    if len(str(smac_conv)) < 80:
-                        predictions_test[f"SR (BO): {smac_conv}"] = symb_pred_smac
-                    else:
-                        predictions_test[f"SR (BO)"] = symb_pred_smac
+                    # smac_conv = convert_symb(symb_smac, n_decimals=3)
+                    # if len(str(smac_conv)) < 80:
+                    #     predictions_test[f"SR (BO): {smac_conv}"] = symb_pred_smac
+                    # else:
+                    predictions_test[f"SR (BO)"] = symb_pred_smac
 
                     with open(
                             f"{symb_dir_rand}/n_samples{n_samples}_sampling_seed{sampling_seed}_symb_seed{symb_seed}.pkl",
