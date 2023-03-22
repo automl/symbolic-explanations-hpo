@@ -32,6 +32,8 @@ def generate_result_table(df, stddev_df, stddev: bool = False, decimal_places: i
         df.iloc[k] = df.iloc[k].apply(
             lambda data: bold_extreme_values(data, best=df.iloc[k].min(), second_best=np.partition(df.iloc[k].array.to_numpy(), 1)[1], decimal_places=decimal_places))
 
+    df.insert(len(df.columns), "GP Baseline", df_no_format["GP Baseline"])
+
     if stddev:
         for k in range(len(stddev_df.index)):
             stddev_df.iloc[k] = stddev_df.iloc[k].apply(
@@ -45,7 +47,6 @@ def generate_result_table(df, stddev_df, stddev: bool = False, decimal_places: i
 
     df.insert(0, "Model", df_no_format["Model"])
     df.insert(1, "Dataset", df_no_format["Dataset"])
-    df["GP Baseline"] = df_no_format["GP Baseline"]
     df["Model"] = df["Model"].str.replace('XGBoost', 'XGB')
     df["Dataset"] = df["Dataset"].str.replace('blood-transfusion-service-center', 'blood-transf.')
 
