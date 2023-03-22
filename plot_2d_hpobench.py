@@ -20,7 +20,7 @@ if __name__ == "__main__":
     n_samples_spacing = np.linspace(20, 200, 10, dtype=int).tolist()
     n_test_samples = 100
     symb_seeds = [0] #, 3, 6]
-    evaluate_on_surrogate = True
+    evaluate_on_surrogate = False
 
     init_design_max_ratio = 0.25
     init_design_n_configs_per_hyperparamter = 8
@@ -137,11 +137,11 @@ if __name__ == "__main__":
                         symb_prad_rand = symb_rand.predict(
                                 X_test.T.reshape(X_test.shape[1] * X_test.shape[2], X_test.shape[0])
                             ).reshape(X_test.shape[2], X_test.shape[1]).T
-                        rand_conv = convert_symb(symb_rand, n_decimals=3)
-                        if len(str(rand_conv)) < 80:
-                            predictions_test[f"SR (Random): {rand_conv}"] = symb_prad_rand
-                        else:
-                            predictions_test[f"SR (Random)"] = symb_prad_rand
+                        # rand_conv = convert_symb(symb_rand, n_decimals=3)
+                        # if len(str(rand_conv)) < 80:
+                        #     predictions_test[f"SR (Random): {rand_conv}"] = symb_prad_rand
+                        # else:
+                        predictions_test[f"SR (Random)"] = symb_prad_rand
     
                         X_train_list = [X_train_smac.T, X_train_rand.T]
     
