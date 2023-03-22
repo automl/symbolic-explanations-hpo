@@ -35,7 +35,7 @@ if __name__ == "__main__":
 
     logger.info(f"Save plots to {plot_dir}.")
 
-    plt.figure(figsize=(16, 12))
+    fig, axes = plt.figure(figsize=(15, 8))
 
     for i, run_conf in enumerate(run_configs):
 
@@ -85,7 +85,17 @@ if __name__ == "__main__":
         df_joined_all['Parsimony'] = df_joined_all['Parsimony'].astype(str)
         df_joined_all.to_csv(f"{plot_dir}/df_joined_all_{run_name}")
 
-        ax = plt.subplot(2, 3, i+1)
+        if i == 1:
+            ind = 4
+        elif i == 2:
+            ind = 2
+        elif i == 3:
+            ind = 5
+        elif i == 4:
+            ind = 3
+        else:
+            ind = i + 1
+        ax = plt.subplot(2, 3, ind)
 
         g = sns.scatterplot(data=df_joined_all, x="complexity", y="rmse_test", hue="Parsimony",
                             linestyles="", ax=ax)
@@ -95,8 +105,11 @@ if __name__ == "__main__":
         plt.ylabel("RMSE $(\mathcal{L}, \hat{\mathcal{L}})$")
         plt.xlim(-0.5, 20.5)
         plt.xticks(np.arange(0, 22, 2.0), fontsize=labelsize)
+        handles, labels = ax.get_legend_handles_labels()
+        if i == 0:
+            fig.legend(handles, labels, loc='middle center')
 
-    plt.savefig(f"{plot_dir}/pointplot.png", dpi=400)
     plt.tight_layout()
+    plt.savefig(f"{plot_dir}/pointplot.png", dpi=400)
     plt.close()
 
