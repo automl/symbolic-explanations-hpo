@@ -10,8 +10,9 @@ from utils.hpobench_utils import get_run_config, get_benchmark_dict, get_task_di
 
 if __name__ == "__main__":
     parsimony_coefficient_space = [
-        0.000001, 0.0000025, 0.000005, 0.0000075,
-        0.00001, 0.000025, 0.00005, 0.000075,
+        #0.000001, 0.0000025, 0.000005, 0.0000075,
+        #0.00001, 0.000025, 0.00005, 
+        0.000075,
         0.0001, 0.00025, 0.0005, 0.00075,
         0.001, 0.0025, 0.005, 0.0075,
         0.01, 0.025, 0.05, 0.075
@@ -77,6 +78,8 @@ if __name__ == "__main__":
             df_joined_all = pd.concat((df_joined_all, df_joined))
 
         logger.info(f"{df_joined_all}")
+        df_joined_all['Parsimony'] = df_joined_all['Parsimony'].astype(str)
+
         df_joined_all.to_csv(f"{plot_dir}/df_joined_all")
 
         sns.scatterplot(data=df_joined_all, x="complexity", y="rmse_test", hue="Parsimony",
