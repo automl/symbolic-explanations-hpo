@@ -119,6 +119,8 @@ if __name__ == "__main__":
         plt.legend([], [], frameon=False)
 
     handles, labels = ax.get_legend_handles_labels()
+    for handle in handles:
+        handle._legmarker.set_markersize(50)
     legend = fig.legend(handles, labels, s=50, loc='center right', title="Parsimony", frameon=False, fontsize=titlesize)
     legend.get_title().set_fontsize(titlesize)
     plt.tight_layout(rect=(0, 0, 0.82, 0.93), h_pad=4)
