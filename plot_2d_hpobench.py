@@ -153,7 +153,7 @@ if __name__ == "__main__":
                                 X_test=X_test,
                                 y_test=y_test,
                                 function_name=model_name,
-                                metric_name=r'$\mathcal{L}$_{Test}',
+                                metric_name=r'$\mathcal{L}_{Test}$',
                                 predictions_test=predictions_test,
                                 parameters=cs.get_hyperparameters(),
                                 plot_dir=viz_plot_dir,
