@@ -1,4 +1,6 @@
 import numpy as np
+import pandas as pd
+
 
 def bold_extreme_values(data, best=-1, second_best=-1, decimal_places:int  = 2):
     if data == best:
@@ -22,7 +24,7 @@ def generate_result_table(df, stddev_df, stddev: bool = False, decimal_places: i
                           show_avg_and_median: bool = True):
 
     df_no_format = df.copy()
-    df_decimal_format = df["GP Baseline"].copy()
+    df_decimal_format = df.copy()[["GP Baseline"]]
     df = df.drop(columns=["GP Baseline", "Model", "Dataset"])
 
     if show_avg_and_median:
