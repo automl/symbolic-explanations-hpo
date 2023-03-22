@@ -27,7 +27,7 @@ def get_benchmark_dict():
         SVMBenchmarkBBDefaultHP: "SVM",
         RandomForestBenchmarkBBDefaultHP: "RF",
         XGBoostBenchmarkBBDefaultHP: "XGBoost",
-        # NNBenchmarkBBDefaultHP: "NN",
+        NNBenchmarkBBDefaultHP: "NN",
     }
     return benchmark_dict
 
