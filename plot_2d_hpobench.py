@@ -113,7 +113,7 @@ if __name__ == "__main__":
                     predictions_test["GP Baseline"] = np.array(get_surrogate_predictions(
                         X_test.reshape(len(optimized_parameters), -1).T, cs, surrogate_model)).reshape(
                         X_test.shape[1], X_test.shape[2])
-                    X_train_list = [X_train_smac.T, None]
+                    X_train_list = [None, None]
                 else:
                     with open(
                             f"{symb_dir_smac}/n_samples{n_samples}_sampling_seed{sampling_seed}_symb_seed{symb_seed}.pkl",
@@ -153,7 +153,7 @@ if __name__ == "__main__":
                                 X_test=X_test,
                                 y_test=y_test,
                                 function_name=model_name,
-                                metric_name=r'Cost Function',
+                                metric_name=r'Validation Loss',
                                 predictions_test=predictions_test,
                                 parameters=cs.get_hyperparameters(),
                                 plot_dir=viz_plot_dir,
