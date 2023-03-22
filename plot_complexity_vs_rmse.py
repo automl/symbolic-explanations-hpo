@@ -48,13 +48,13 @@ if __name__ == "__main__":
 
         run_name = f"{model_name.replace(' ', '_')}_{'_'.join(optimized_parameters)}_{data_set}"
 
-        logger.info(f"Create plot for {run_name}.")
+        logger.info(f"############################# Create plot for {run_name}.")
 
         df_joined_all = pd.DataFrame()
 
         for parsimony in parsimony_coefficient_space:
 
-            logger.info(f"################# Evaluate parsimony {parsimony}")
+            logger.info(f"########## Evaluate parsimony {parsimony}")
 
             symb_dir = f"learning_curves/runs_symb_hpobench/parsimony{parsimony}/surr/{run_name}"
 
@@ -68,6 +68,9 @@ if __name__ == "__main__":
             df_complexity = pd.read_csv(f"{symb_dir}/complexity.csv")
             df_complexity = df_complexity[df_complexity["n_samples"] == n_samples]
             logger.info(f"Number of times complexity == -1: {len(df_complexity[df_complexity['program_operations'] == -1])}")
+            if len(df_complexity[df_complexity['program_operations'] == -1]) > 2:
+                logger.info(f"Leave out {parsimony}, as complexity for more than 2 seeds could not be evaluated.")
+                break
             df_complexity = df_complexity[df_complexity["program_operations"] != -1]
 
             df_joined = pd.DataFrame({
