@@ -479,7 +479,7 @@ def plot_symb2d(
     """
 
     LABEL_SIZE = 9
-    TITLE_SIZE = 11
+    TITLE_SIZE = 10
     X0_name = (
         "X0"
         if parameters[0].name == "X0"
@@ -563,8 +563,8 @@ def plot_symb2d(
         axes[0].set_title(f"True: {function_expression}", fontsize=TITLE_SIZE)
     else:
         axes[0].set_title(f"Ground Truth", fontsize=TITLE_SIZE)
-    axes[0].set_xlabel(X0_name, fontsize=LABEL_SIZE)
-    axes[0].set_ylabel(X1_name, fontsize=LABEL_SIZE)
+    axes[0].set_xlabel(X0_name, fontsize=TITLE_SIZE)
+    axes[0].set_ylabel(X1_name, fontsize=TITLE_SIZE)
     axes[0].set_xticks(dim_x)
     axes[0].set_yticks(dim_y)
     axes[0].set_xlim(X0_lower, X0_upper)
@@ -574,7 +574,7 @@ def plot_symb2d(
 
     if not use_same_scale:
         cbar = fig.colorbar(im, ax=axes[0])
-        cbar.set_label(r'True $\mathcal{L}$', fontsize=LABEL_SIZE, rotation=270, labelpad=10)
+        cbar.set_label(r'True $\mathcal{L}$', fontsize=TITLE_SIZE, rotation=270, labelpad=10)
         cbar.ax.tick_params(labelsize=LABEL_SIZE)
 
     for i, model_name in enumerate(predictions_test):
@@ -589,8 +589,8 @@ def plot_symb2d(
             vmax=vmax,
         )
         axes[i + 1].set_title(f"Prediction: {label}", fontsize=LABEL_SIZE)
-        axes[i + 1].set_xlabel(X0_name, fontsize=LABEL_SIZE)
-        axes[i + 1].set_ylabel(X1_name, fontsize=LABEL_SIZE)
+        axes[i + 1].set_xlabel(X0_name, fontsize=TITLE_SIZE)
+        axes[i + 1].set_ylabel(X1_name, fontsize=TITLE_SIZE)
         axes[i + 1].set_xticks(dim_x)
         axes[i + 1].set_yticks(dim_y)
         axes[i + 1].set_xlim(X0_lower, X0_upper)
@@ -639,6 +639,7 @@ def plot_symb2d(
             plt.savefig(f"{plot_dir}/{function_name}", dpi=800)
     else:
         plt.show()
+    plt.tight_layout(0, 0.05, 1, 1)
     plt.close()
 
     return fig
