@@ -622,7 +622,7 @@ def plot_symb2d(
         cbar.ax.tick_params(labelsize=LABEL_SIZE)
     handles, labels = axes[-1].get_legend_handles_labels()
     leg = fig.legend(
-        handles, labels, loc="lower right", bbox_to_anchor=(0.95, 0.02), fontsize=TITLE_SIZE, framealpha=0.0
+        handles, labels, loc="lower right", bbox_to_anchor=(1, -0.1), fontsize=TITLE_SIZE, framealpha=0.0
     )
     leg.get_frame().set_linewidth(0.0)
     if use_same_scale:
