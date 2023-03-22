@@ -15,9 +15,18 @@ if __name__ == "__main__":
     parser.add_argument('--job_id')
     args = parser.parse_args()
 
+    max_hp_comb = 1
+    parsimony_coefficient_space = [0.0001]
+    # parsimony_coefficient_space = [
+    #     0.000001, 0.0000025, 0.000005, 0.0000075,
+    #     0.00001, 0.000025, 0.00005, 0.000075,
+    #     0.0001, 0.00025, 0.00075, #0.0005
+    #     0.001, 0.0025, 0.005, 0.0075,
+    #     0.01, 0.025, 0.05, 0.075
+    # ]
+
     sampling_dir_name = "runs_sampling_hpobench"
     # only for loading test data
-    symb_dir_name = "parsimony0005"
     dir_with_test_data = ""
     n_optimized_params = 2
     n_samples_spacing = np.linspace(20, 200, 10, dtype=int).tolist()
@@ -25,7 +34,12 @@ if __name__ == "__main__":
     init_design_max_ratio = 0.25
     init_design_n_configs_per_hyperparamter = 8
 
-    run_conf = get_run_config(job_id=args.job_id, n_optimized_params=n_optimized_params)
+    run_conf = get_run_config(job_id=args.job_id, n_optimized_params=n_optimized_params,
+                              parsimony_coefficient_space=parsimony_coefficient_space,
+                              max_hp_comb=max_hp_comb)
+
+    parsimony_coefficient = run_conf["parsimony"]
+    symb_dir_name = f"parsimony{parsimony_coefficient}"
 
     task_dict = get_task_dict()
     data_set_postfix = f"_{task_dict[run_conf['task_id']]}"
