@@ -10,7 +10,7 @@ from utils.hpobench_utils import get_run_config, get_benchmark_dict, get_task_di
 
 if __name__ == "__main__":
     include_surr_diff = False
-    symb_dir_name = "parsimony0005"
+    symb_dir_name = "parsimony0.0001"
     dir_with_test_data = "learning_curves/runs_surr_hpobench"
     n_optimized_params = 2
 
@@ -63,10 +63,10 @@ if __name__ == "__main__":
             df_error_metrics_all = pd.DataFrame()
             df_complexity_all = pd.DataFrame()
 
-            for sampling_type in ["SR (BO)", "SR (Random)", "SR (BO-GP)", "GP (BO)"]:
+            for sampling_type in ["SR (BO)", "SR (Random)", "SR (BO-GP)", "GP Baseline"]:
 
                 try:
-                    if sampling_type == "GP (BO)":
+                    if sampling_type == "GP Baseline":
                         symb_dir = f"learning_curves/runs_surr_hpobench/{run_name}"
                     else:
                         if sampling_type == "SR (BO)":
@@ -93,7 +93,7 @@ if __name__ == "__main__":
                         f"learning_curves/runs_symb_hpobench/{symb_dir_name}/surr/{run_name}/error_metrics_compare_surr.csv")
                     df_error_metrics["rmse_test"] = np.sqrt(df_error_metrics["mse_test"])
                     df_error_metrics["rmse_train"] = np.sqrt(df_error_metrics["mse_train"])
-                    df_error_metrics.insert(0, "Experiment", f"RMSE(SR (BO-GP), GP (BO))")
+                    df_error_metrics.insert(0, "Experiment", f"RMSE $(c, s)$")
                     df_error_metrics_all = pd.concat((df_error_metrics_all, df_error_metrics))
 
                 logger.info(f"Create plots.")
