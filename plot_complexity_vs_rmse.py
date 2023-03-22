@@ -35,7 +35,9 @@ if __name__ == "__main__":
 
     logger.info(f"Save plots to {plot_dir}.")
 
-    for run_conf in run_configs:
+    plt.figure(figsize=(16, 12))
+
+    for i, run_conf in enumerate(run_configs):
 
         task_dict = get_task_dict()
         data_set = f"{task_dict[run_conf['task_id']]}"
@@ -77,19 +79,21 @@ if __name__ == "__main__":
                 "rmse_test": [df_error_metrics["rmse_test"].mean(axis=0)],
                 "complexity": [df_complexity["program_operations"].mean(axis=0)]
             })
-            df_joined.insert(0, "Parsimony Coefficient", parsimony)
+            df_joined.insert(0, "Parsimony", parsimony)
             df_joined_all = pd.concat((df_joined_all, df_joined))
 
-        df_joined_all['Parsimony Coefficient'] = df_joined_all['Parsimony Coefficient'].astype(str)
+        df_joined_all['Parsimony'] = df_joined_all['Parsimony'].astype(str)
         df_joined_all.to_csv(f"{plot_dir}/df_joined_all_{run_name}")
 
-        g = sns.scatterplot(data=df_joined_all, x="complexity", y="rmse_test", hue="Parsimony Coefficient",
-                            linestyles="")
-        sns.move_legend(g, "upper right", title="Parsimony Coefficient")
-        plt.title(f"{model_name} ({','.join(optimized_parameters)}), {data_set}")
+        ax = plt.subplot(2, 3, i)
+
+        g = sns.scatterplot(data=df_joined_all, x="complexity", y="rmse_test", hue="Parsimony",
+                            linestyles="", ax=ax)
+        sns.move_legend(g, "upper right", title="Parsimony")
+        plt.title(f"{model_name} ({', '.join(optimized_parameters)}) on {data_set}")
         plt.xlabel("Operation Count")
-        plt.ylabel("RMSE $(\mathcal{L}, \hat{\mathcal{L}}_{Symbolic})$")
-        plt.xlim(0, 20.5)
+        plt.ylabel("RMSE $(\mathcal{L}, \hat{\mathcal{L}})$")
+        plt.xlim(-0.5, 20.5)
         plt.xticks(np.arange(0, 22, 2.0), fontsize=labelsize)
         plt.tight_layout()
         plt.savefig(f"{plot_dir}/{run_name}_pointplot.png", dpi=400)
