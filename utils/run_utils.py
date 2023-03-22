@@ -632,6 +632,7 @@ def plot_symb2d(
         else:
             cbar.set_label("f(X0, X1)", fontsize=TITLE_SIZE, rotation=270, labelpad=15)
         cbar.ax.tick_params(labelsize=LABEL_SIZE)
+    plt.tight_layout(0, -0.05, 1, 1)
     if plot_dir:
         if filename:
             plt.savefig(f"{plot_dir}/{filename}", dpi=800)
@@ -639,7 +640,6 @@ def plot_symb2d(
             plt.savefig(f"{plot_dir}/{function_name}", dpi=800)
     else:
         plt.show()
-    plt.tight_layout(0, -0.05, 1, 1)
     plt.close()
 
     return fig
