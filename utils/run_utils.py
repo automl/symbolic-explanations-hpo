@@ -478,8 +478,8 @@ def plot_symb2d(
     function and the functions fitted by symbolic models evaluated on a 2D grid.
     """
 
-    LABEL_SIZE = 9
-    TITLE_SIZE = 11
+    LABEL_SIZE = 12
+    TITLE_SIZE = 14
     X0_name = (
         "X0"
         if parameters[0].name == "X0"
