@@ -479,7 +479,7 @@ def plot_symb2d(
     """
 
     LABEL_SIZE = 10
-    TITLE_SIZE = 12
+    TITLE_SIZE = 11
     X0_name = (
         "X0"
         if parameters[0].name == "X0"
@@ -619,10 +619,9 @@ def plot_symb2d(
         else:
             cbar.set_label("f(X0, X1)", fontsize=TITLE_SIZE, rotation=270, labelpad=15)
         cbar.ax.tick_params(labelsize=LABEL_SIZE)
-    plt.subplots_adjust(bottom=0.1)
     handles, labels = axes[-1].get_legend_handles_labels()
     leg = fig.legend(
-        handles, labels, loc="lower right", fontsize=TITLE_SIZE, framealpha=0.0
+        handles, labels, loc="lower right", fontsize=LABEL_SIZE, framealpha=0.0
     )
     leg.get_frame().set_linewidth(0.0)
     if use_same_scale:
