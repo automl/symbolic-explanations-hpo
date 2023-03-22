@@ -97,11 +97,10 @@ if __name__ == "__main__":
             ind = i + 1
         ax = plt.subplot(2, 3, ind)
 
-        # if i == 2:
-        #     plt.suptitle(f"Datset: {data_set}", fontsize=titlesize)
-        # 
-        # if i == 3:
-        #     plt.suptitle(f"Datset: {data_set}", fontsize=titlesize)
+        if i == 2:
+            plt.figtext(0.5, 0.95, f"Datset: {data_set}", ha="center", va="top", fontsize=titlesize)
+        if i == 3:
+            plt.figtext(0.5, 0.5, f"Datset: {data_set}", ha="center", va="top", fontsize=titlesize)
 
         plt.suptitle(f"Datset: {data_set}", fontsize=titlesize)
 
