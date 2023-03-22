@@ -14,7 +14,7 @@ if __name__ == "__main__":
     dir_with_test_data = "learning_curves/runs_surr_hpobench"
     n_optimized_params = 2
     # if None, average metrics over all sample sizes
-    n_samples = 100
+    n_samples = 200
     max_hp_comb = 1
 
     n_samples_spacing = np.linspace(20, 200, 10, dtype=int).tolist()
@@ -29,7 +29,7 @@ if __name__ == "__main__":
 
     # set up directories
     plot_dir = f"learning_curves/plots"
-    viz_plot_dir = f"{plot_dir}/visualization"
+    viz_plot_dir = f"{plot_dir}/visualization_hpobench"
     if not os.path.exists(viz_plot_dir):
         os.makedirs(viz_plot_dir)
 
@@ -78,7 +78,7 @@ if __name__ == "__main__":
             logger.info(f"No previous test data dir provided, create test data for {run_name}.")
             X_test, y_test = get_hpo_test_data(b, cs.get_hyperparameters(), n_test_samples)
 
-        for sampling_seed in [0]: #df_samples_smac.seed.unique():
+        for sampling_seed in df_samples_smac.seed.unique():
             logger.info(f"Considering sampling seed {sampling_seed}.")
             df_sampling_seed_smac = df_samples_smac.copy()[df_samples_smac["seed"] == sampling_seed]
             df_sampling_seed_rand = df_samples_rand.copy()[df_samples_rand["seed"] == sampling_seed]
