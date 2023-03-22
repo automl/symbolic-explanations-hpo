@@ -32,7 +32,6 @@ if __name__ == "__main__":
                               max_hp_comb=max_hp_comb)
 
     parsimony_coefficient = run_conf["parsimony"]
-    symb_dir_name = f"parsimony{parsimony_coefficient}"
 
     task_dict = get_task_dict()
     data_set_postfix = f"_{task_dict[run_conf['task_id']]}"
