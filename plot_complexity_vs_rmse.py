@@ -65,9 +65,9 @@ if __name__ == "__main__":
             logger.info(f"Number of SR evaluations found: {len(df_error_metrics)}")
 
             df_complexity = pd.read_csv(f"{symb_dir}/complexity.csv")
+            df_complexity = df_complexity[df_complexity["n_samples"] == n_samples]
             logger.info(f"Number of times complexity == -1: {len(df_complexity[df_complexity['program_operations'] == -1])}")
             df_complexity = df_complexity[df_complexity["program_operations"] != -1]
-            df_complexity = df_complexity[df_complexity["n_samples"] == n_samples]
 
             df_joined = pd.DataFrame({
                 "rmse_test": [df_error_metrics["rmse_test"].mean(axis=0)],
