@@ -85,7 +85,7 @@ if __name__ == "__main__":
     
                         if eval_at_n_samples:
                             df_error_metrics = df_error_metrics[df_error_metrics["n_samples"] == eval_at_n_samples]
-                            if run_name == "RF_max_depth_max_features_kc1":
+                            if run_name == "RF_max_depth_max_features_credit-g":
                                 logger.info(f"{sampling_type}: {len(df_error_metrics)}")
     
                         run_count[sampling_type] = df_error_metrics["rmse_test"].count()
