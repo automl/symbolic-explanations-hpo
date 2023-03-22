@@ -77,14 +77,18 @@ if __name__ == "__main__":
                 "rmse_test": [df_error_metrics["rmse_test"].mean(axis=0)],
                 "complexity": [df_complexity["program_operations"].mean(axis=0)]
             })
-            df_joined.insert(0, "Parsimony", parsimony)
+            df_joined.insert(0, "Parsimony Coefficient", parsimony)
             df_joined_all = pd.concat((df_joined_all, df_joined))
 
-        df_joined_all['Parsimony'] = df_joined_all['Parsimony'].astype(str)
+        df_joined_all['Parsimony Coefficient'] = df_joined_all['Parsimony Coefficient'].astype(str)
         df_joined_all.to_csv(f"{plot_dir}/df_joined_all_{run_name}")
 
-        sns.scatterplot(data=df_joined_all, x="complexity", y="rmse_test", hue="Parsimony",
+        sns.scatterplot(data=df_joined_all, x="complexity", y="rmse_test", hue="Parsimony Coefficient",
                         linestyles="")
+        plt.legend(loc='upper right')
+        plt.xlabel("Operation Count")
+        plt.ylabel("RMSE $(\mathcal{L}, \hat{\mathcal{L}})$")
+        plt.tight_layout()
         plt.savefig(f"{plot_dir}/{run_name}_pointplot.png", dpi=400)
         plt.close()
 
