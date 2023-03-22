@@ -33,9 +33,9 @@ def get_benchmark_dict():
 
 
 def get_task_dict():
-    task_ids = [10101, 53, 146818, 146821, 9952, 146822, 31, 3917] #eval NN only on those 8 datasets
+    #task_ids = [10101, 53, 146818, 146821, 9952, 146822, 31, 3917] #eval NN only on those 8 datasets
     #task_ids = [10101, 146818] # Datasets for Parsimony study
-    #task_ids = [168912, 3, 167119, 12, 146212, 168911, 9981, 167120, 14965, 146606, 7592, 9977] # 12 datasets
+    task_ids = [168912, 3, 167119, 12, 146212, 168911, 9981, 167120, 14965, 146606, 7592, 9977] # 12 datasets
     task_dict = {tid: ALL_TASKS[tid]["name"] for tid in task_ids}
     return task_dict
 
