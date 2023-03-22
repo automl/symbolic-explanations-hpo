@@ -110,7 +110,7 @@ if __name__ == "__main__":
                             f"{sampling_dir_smac}/surrogates/n_eval{n_eval}_samples{n_samples}_seed{sampling_seed}.pkl",
                             "rb") as surrogate_file:
                         surrogate_model = pickle.load(surrogate_file)
-                    predictions_test["GP (BO)"] = np.array(get_surrogate_predictions(
+                    predictions_test["GP Baseline"] = np.array(get_surrogate_predictions(
                         X_test.reshape(len(optimized_parameters), -1).T, cs, surrogate_model)).reshape(
                         X_test.shape[1], X_test.shape[2])
                     X_train_list = [X_train_smac.T, None]
@@ -153,7 +153,7 @@ if __name__ == "__main__":
                                 X_test=X_test,
                                 y_test=y_test,
                                 function_name=model_name,
-                                metric_name=r'$\mathcal{L}_{Test}$',
+                                metric_name=r'Cost Function',
                                 predictions_test=predictions_test,
                                 parameters=cs.get_hyperparameters(),
                                 plot_dir=viz_plot_dir,
