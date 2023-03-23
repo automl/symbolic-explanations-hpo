@@ -21,15 +21,14 @@ def format_number(data, decimal_places: int = 2, maximum_length_before_comma: in
 
 
 def generate_result_table(df, stddev_df, stddev: bool = False, decimal_places: int = 3,
-                          show_avg_and_median: bool = True):
+                          show_avg: bool = True):
 
     df_no_format = df.copy()
     df_decimal_format = df.copy()[["GP Baseline"]]
     df = df.drop(columns=["GP Baseline", "Model", "Hyperparameters", "Dataset"])
 
-    if show_avg_and_median:
+    if show_avg:
         df_avg = df.mean()
-        df_median = df.median()
 
     for k in range(len(df.index)):
         df.iloc[k] = df.iloc[k].apply(
@@ -47,9 +46,8 @@ def generate_result_table(df, stddev_df, stddev: bool = False, decimal_places: i
 
         df = df.astype(str) + " $\\pm$ " + stddev_df.astype(str)
 
-    if show_avg_and_median:
-        df.loc['avg'] = df_avg
-        df.loc['median'] = df_median
+    if show_avg:
+        df.loc['Average'] = df_avg
 
     df.insert(0, "Model", df_no_format["Model"])
     df.insert(1, "Hyperparameters", df_no_format["Hyperparameters"])
