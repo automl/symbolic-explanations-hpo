@@ -124,6 +124,10 @@ if __name__ == "__main__":
             #plt.title(f"Test Mean: {avg_cost:.3f}, Test Std.: {std_cost:.3f}", fontsize=10),
             plt.ylabel(f"RMSE $(c, s)$", fontsize=titlesize)
             plt.yticks(fontsize=labelsize)
+            if ind == 4:
+                plt.xlim(0, 0.205)
+            else:
+                plt.xlim(0, 0.072)
             if ind == 3 or ind == 4:
                 plt.xlabel("Number of Samples", fontsize=titlesize)
             else:
