@@ -193,7 +193,7 @@ if __name__ == "__main__":
     handles, labels = ax.get_legend_handles_labels()
     legend = fig.legend(handles, labels, ncol=4, loc='lower center', frameon=False, fontsize=titlesize)
     legend.get_title().set_fontsize(titlesize)
-    plt.tight_layout(rect=(0, 0.08, 1, 0.92), w_pad=20)
+    plt.tight_layout(rect=(0, 0.08, 1, 0.92), h_pad=10)
     
     plt.savefig(f"{rmse_plot_dir}/boxplot.png", dpi=400)
     plt.close()
