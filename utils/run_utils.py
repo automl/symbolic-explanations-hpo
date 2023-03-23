@@ -774,7 +774,7 @@ def plot_symb2d_subplots(
         if i == 3 or i == 6:
             ax.set_xlabel(X0_name, fontsize=TITLE_SIZE)
         if i == 3:
-            ax.set_ylabel(X1_name, fontsize=TITLE_SIZE)
+            ax.set_ylabel(X1_name, fontsize=TITLE_SIZE, labelpad=5)
         ax.set_xticks(dim_x)
         ax.set_yticks(dim_y)
         ax.set_xlim(X0_lower, X0_upper)
@@ -798,12 +798,12 @@ def plot_symb2d_subplots(
             )
     handles, labels = ax.get_legend_handles_labels()
     leg = fig.legend(
-        handles, labels, loc="lower right", bbox_to_anchor=(0.1, 0.2), fontsize=TITLE_SIZE, framealpha=0.0
+        handles, labels, loc="lower right", bbox_to_anchor=(0.4, 0.2), fontsize=TITLE_SIZE, framealpha=0.0
     )
     leg.get_frame().set_linewidth(0.0)
-    cbar_ax = fig.add_axes([0.05, 0.25, 0.3, 0.04])
+    cbar_ax = fig.add_axes([0.1, 0.23, 0.3, 0.04])
     cbar = fig.colorbar(im, ax=ax, cax=cbar_ax, shrink=0.4, orientation="horizontal")
-    cbar.set_label(metric_name, fontsize=TITLE_SIZE, labelpad=15)
+    cbar.set_label(metric_name, fontsize=TITLE_SIZE, labelpad=8)
     cbar.ax.tick_params(labelsize=LABEL_SIZE)
     plt.tight_layout()
     if plot_dir:
