@@ -178,7 +178,7 @@ if __name__ == "__main__":
             logger.warning(f"Could not process {run_name}: \n{e}")
 
     handles, labels = ax.get_legend_handles_labels()
-    legend = fig.legend(handles, labels, loc='lower center', frameon=False, fontsize=titlesize)
+    legend = fig.legend(handles, labels, ncol=4, loc='lower center', frameon=False, fontsize=titlesize)
     legend.get_title().set_fontsize(titlesize)
     plt.tight_layout(rect=(0, 0, 0.82, 0.95), h_pad=5)
     
