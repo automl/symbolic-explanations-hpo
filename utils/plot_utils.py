@@ -398,7 +398,6 @@ def plot_symb2d_subplots(
         vmax=vmax,
     )
     ax.set_title(f"Ground Truth", fontsize=TITLE_SIZE)
-    ax.set_xticks(dim_x)
     ax.set_yticks(dim_y)
     ax.set_xlim(X0_lower, X0_upper)
     ax.set_ylim(X1_lower, X1_upper)
@@ -429,10 +428,10 @@ def plot_symb2d_subplots(
         ax.set_title(f"Prediction: {label}", fontsize=TITLE_SIZE)
         if i == 3 or i == 6:
             ax.set_xlabel(X0_name, fontsize=TITLE_SIZE)
+            ax.set_xticks(dim_x)
         if i == 3:
             ax.set_ylabel(X1_name, fontsize=TITLE_SIZE, labelpad=5)
-        ax.set_xticks(dim_x)
-        ax.set_yticks(dim_y)
+            ax.set_yticks(dim_y)
         ax.set_xlim(X0_lower, X0_upper)
         ax.set_ylim(X1_lower, X1_upper)
         ax.tick_params(axis="both", which="major", labelsize=LABEL_SIZE)
@@ -457,7 +456,7 @@ def plot_symb2d_subplots(
         handles, labels, loc="lower right", bbox_to_anchor=(0.32, 0.03), fontsize=TITLE_SIZE, framealpha=0.0, handletextpad=0.05
     )
     for handle in leg.legendHandles:
-        handle.set_sizes([70])
+        handle.set_sizes([100])
     leg.get_frame().set_linewidth(0.0)
     cbar_ax = fig.add_axes([0.12, 0.24, 0.3, 0.04])
     cbar = fig.colorbar(im, ax=ax, cax=cbar_ax, shrink=0.4, orientation="horizontal")
