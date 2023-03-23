@@ -127,9 +127,7 @@ if __name__ == "__main__":
             else:
                 plt.ylabel("")
             plt.yticks(fontsize=labelsize)
-            if ind == 4:
-                plt.ylim(0, 0.0205)
-            else:
+            if ind == 1 or ind == 3:
                 plt.ylim(0, 0.072)
             if ind == 3 or ind == 4:
                 plt.xlabel("Number of Samples", fontsize=titlesize)
@@ -201,6 +199,6 @@ if __name__ == "__main__":
     legend = fig.legend(handles, labels, ncol=4, loc='lower center', bbox_to_anchor=(0.5, -0.02), frameon=False, fontsize=titlesize)
     legend.get_title().set_fontsize(titlesize)
     plt.tight_layout(rect=(0, 0.05, 1, 0.95), h_pad=4, w_pad=1)
-    
+
     plt.savefig(f"{rmse_plot_dir}/boxplot.png", dpi=400)
     plt.close()
