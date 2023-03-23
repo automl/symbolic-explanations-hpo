@@ -20,7 +20,7 @@ if __name__ == "__main__":
     n_samples_spacing = np.linspace(20, 200, 10, dtype=int).tolist()
     n_test_samples = 100
     symb_seeds = [0] #, 3, 6]
-    evaluate_on_surrogate = False
+    evaluate_on_surrogate = True
 
     init_design_max_ratio = 0.25
     init_design_n_configs_per_hyperparamter = 8
