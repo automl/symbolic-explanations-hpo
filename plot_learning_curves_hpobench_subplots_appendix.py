@@ -37,9 +37,9 @@ if __name__ == "__main__":
 
     logger.info(f"Save plots to {plot_dir}.")
 
-    fig = plt.figure(figsize=(15, 25))
+    fig = plt.figure(figsize=(18, 25))
 
-    for i, run_conf in enumerate(run_configs[:17]):
+    for i, run_conf in enumerate(run_configs[:18]):
 
         task_dict = get_task_dict()
         data_set = f"{task_dict[run_conf['task_id']]}"
