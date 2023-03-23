@@ -39,7 +39,7 @@ if __name__ == "__main__":
 
     fig = plt.figure(figsize=(15, 25))
 
-    for i, run_conf in enumerate(run_configs[:48]):
+    for i, run_conf in enumerate(run_configs[:17]):
 
         task_dict = get_task_dict()
         data_set = f"{task_dict[run_conf['task_id']]}"
@@ -102,7 +102,7 @@ if __name__ == "__main__":
             ind = i + 1
 
             # Plot RMSE
-            ax = plt.subplot(6, 4, ind)
+            ax = plt.subplot(6, 3, ind)
             sns.boxplot(data=df_error_metrics_all, x="n_samples", y="rmse_test", hue="Experiment",
                         dodge=0.4, showfliers=False)
             plt.title(f"{classifier_title} ({param0}, {param1})\nDataset: {data_set}", fontsize=titlesize)
