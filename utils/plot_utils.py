@@ -454,7 +454,7 @@ def plot_symb2d_subplots(
             )
     handles, labels = ax.get_legend_handles_labels()
     leg = fig.legend(
-        handles, labels, loc="lower right", bbox_to_anchor=(0.33, 0.03), fontsize=TITLE_SIZE, framealpha=0.0
+        handles, labels, loc="lower right", bbox_to_anchor=(0.33, 0.03), fontsize=TITLE_SIZE, framealpha=0.0, labelpad=-2
     )
     leg.get_frame().set_linewidth(0.0)
     cbar_ax = fig.add_axes([0.12, 0.24, 0.3, 0.04])
