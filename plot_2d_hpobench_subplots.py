@@ -124,7 +124,7 @@ if __name__ == "__main__":
                     ).reshape(X_test.shape[2], X_test.shape[1]).T
                 predictions_test[f"SR (Random)"] = symb_prad_rand
 
-                X_train_list = [X_train_smac.T, X_train_rand.T]
+                X_train_list = [None, None, X_train_smac.T, X_train_rand.T]
 
                 filename = f"{run_name}_n_samples{n_samples}_" \
                            f"sampling_seed{sampling_seed}_symb_seed{symb_seed}"
