@@ -652,7 +652,6 @@ def plot_symb2d_subplots(
     function_name,
     use_same_scale=True,
     metric_name=None,
-    function_expression=None,
     plot_dir=None,
     filename=None,
 ):
@@ -704,9 +703,6 @@ def plot_symb2d_subplots(
         step_y = 1 / 2 * (np.max(X_test[1]) - np.min(X_test[1]))
         dim_y = np.arange(np.min(X_test[1]), np.max(X_test[1]) + step_y / 2, step_y)
 
-
-    fig = plt.figure(figsize=(15, 8))
-
     pred_test = []
     for i, model_name in enumerate(predictions_test):
         pred_test.append(predictions_test[model_name])
@@ -733,8 +729,9 @@ def plot_symb2d_subplots(
     else:
         X1_test = X_test[1]
 
-    ax = plt.subplot(2, 3, 1)
+    fig = plt.figure(figsize=(15, 8))
 
+    ax = plt.subplot(3, 2, 1)
     im = ax.pcolormesh(
         X0_test,
         X1_test,
@@ -745,8 +742,6 @@ def plot_symb2d_subplots(
         vmax=vmax,
     )
     ax.set_title(f"Ground Truth", fontsize=TITLE_SIZE)
-    #ax.set_xlabel(X0_name, fontsize=TITLE_SIZE)
-    #ax.set_ylabel(X1_name, fontsize=TITLE_SIZE)
     ax.set_xticks(dim_x)
     ax.set_yticks(dim_y)
     ax.set_xlim(X0_lower, X0_upper)
@@ -809,6 +804,7 @@ def plot_symb2d_subplots(
     cbar = fig.colorbar(im, ax=ax, shrink=0.4)
     cbar.set_label(metric_name, fontsize=TITLE_SIZE, rotation=270, labelpad=15)
     cbar.ax.tick_params(labelsize=LABEL_SIZE)
+    plt.tight_layout(h_pad=5)
     if plot_dir:
         if filename:
             plt.savefig(f"{plot_dir}/{filename}", dpi=800)
