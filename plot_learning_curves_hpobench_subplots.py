@@ -99,30 +99,30 @@ if __name__ == "__main__":
                     df_error_metrics.insert(0, "Experiment", f"RMSE $(c, s)$")
                     df_error_metrics_all = pd.concat((df_error_metrics_all, df_error_metrics))
 
-                logger.info(f"Create plots.")
+            logger.info(f"Create plots.")
 
-                classifier_title = model_name
+            classifier_title = model_name
 
-                param0 = f"log({optimized_parameters[0]})" if cs.get_hyperparameters()[0].log else optimized_parameters[0]
-                param1 = f"log({optimized_parameters[1]})" if cs.get_hyperparameters()[1].log else optimized_parameters[1]
+            param0 = f"log({optimized_parameters[0]})" if cs.get_hyperparameters()[0].log else optimized_parameters[0]
+            param1 = f"log({optimized_parameters[1]})" if cs.get_hyperparameters()[1].log else optimized_parameters[1]
 
-                # Plot RMSE
-                ax = plt.subplot(2, 2, i)
-                #line = plt.axhline(y=std_cost, color='darkred', linestyle='--', linewidth=0.5, label="Std.")
-                sns.boxplot(data=df_error_metrics_all, x="n_samples", y="rmse_test", hue="Experiment",
-                            dodge=0.4, showfliers=False)
-                #sns.pointplot(data=df_error_metrics_all, x="n_samples", y="rmse_test", hue="Experiment", errorbar="sd",
-                #              linestyles="", capsize=0.2, errwidth=0.7, scale=0.7, dodge=0.4)#, showfliers=False)
-                plt.title(f"Dataset: {data_set}\n{classifier_title} ({param0}, {param1})", fontsize=titlesize)
-                #plt.title(f"Test Mean: {avg_cost:.3f}, Test Std.: {std_cost:.3f}", fontsize=10),
-                plt.ylabel(f"RMSE $(c, s)$", fontsize=titlesize)
-                plt.yticks(fontsize=labelsize)
-                if i == 2 or i == 3:
-                    plt.xlabel("Number of Samples", fontsize=titlesize)
-                plt.xticks(fontsize=labelsize)
-                #plt.ylim(0., 0.4)
-                #plt.tight_layout(rect=(0, 0.05, 1, 1))
-                plt.legend([], [], frameon=False)
+            # Plot RMSE
+            ax = plt.subplot(2, 2, i)
+            #line = plt.axhline(y=std_cost, color='darkred', linestyle='--', linewidth=0.5, label="Std.")
+            sns.boxplot(data=df_error_metrics_all, x="n_samples", y="rmse_test", hue="Experiment",
+                        dodge=0.4, showfliers=False)
+            #sns.pointplot(data=df_error_metrics_all, x="n_samples", y="rmse_test", hue="Experiment", errorbar="sd",
+            #              linestyles="", capsize=0.2, errwidth=0.7, scale=0.7, dodge=0.4)#, showfliers=False)
+            plt.title(f"Dataset: {data_set}\n{classifier_title} ({param0}, {param1})", fontsize=titlesize)
+            #plt.title(f"Test Mean: {avg_cost:.3f}, Test Std.: {std_cost:.3f}", fontsize=10),
+            plt.ylabel(f"RMSE $(c, s)$", fontsize=titlesize)
+            plt.yticks(fontsize=labelsize)
+            if i == 2 or i == 3:
+                plt.xlabel("Number of Samples", fontsize=titlesize)
+            plt.xticks(fontsize=labelsize)
+            #plt.ylim(0., 0.4)
+            #plt.tight_layout(rect=(0, 0.05, 1, 1))
+            plt.legend([], [], frameon=False)
 
                 # # Plot Kendall
                 # plt.figure()
