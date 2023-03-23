@@ -794,7 +794,7 @@ def plot_symb2d_subplots(
         ax.set_ylim(X1_lower, X1_upper)
         ax.tick_params(axis="both", which="major", labelsize=LABEL_SIZE)
         ax.grid(alpha=0)
-        X_train = X_train_list[i]
+        X_train = X_train_list[ind]
         if X_train is not None:
             if parameters[0].log:
                 X_train[0] = np.log(X_train[0])
