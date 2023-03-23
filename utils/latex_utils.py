@@ -55,6 +55,7 @@ def generate_result_table(df, stddev_df, stddev: bool = False, decimal_places: i
     df.insert(1, "Hyperparameters", df_no_format["Hyperparameters"])
     df.insert(2, "Dataset", df_no_format["Dataset"])
     df["Model"] = df["Model"].str.replace('XGBoost', 'XGB')
+    df["Model"] = df["Hyperparameters"].str.replace('_', '\_')
     df["Dataset"] = df["Dataset"].str.replace('blood-transfusion-service-center', 'blood-transfusion')
 
     # Set column header to bold title case
