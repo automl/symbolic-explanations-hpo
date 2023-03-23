@@ -25,7 +25,7 @@ def generate_result_table(df, stddev_df, stddev: bool = False, decimal_places: i
 
     df_no_format = df.copy()
     df_decimal_format = df.copy()[["GP Baseline"]]
-    df = df.drop(columns=["GP Baseline", "Model", "Dataset"])
+    df = df.drop(columns=["GP Baseline", "Model", "Hyperparameters", "Dataset"])
 
     if show_avg_and_median:
         df_avg = df.mean()
@@ -52,7 +52,8 @@ def generate_result_table(df, stddev_df, stddev: bool = False, decimal_places: i
         df.loc['median'] = df_median
 
     df.insert(0, "Model", df_no_format["Model"])
-    df.insert(1, "Dataset", df_no_format["Dataset"])
+    df.insert(1, "Hyperparameters", df_no_format["Hyperparameters"])
+    df.insert(2, "Dataset", df_no_format["Dataset"])
     df["Model"] = df["Model"].str.replace('XGBoost', 'XGB')
     df["Dataset"] = df["Dataset"].str.replace('blood-transfusion-service-center', 'blood-transfusion')
 

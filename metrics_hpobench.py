@@ -102,14 +102,15 @@ if __name__ == "__main__":
                 df_run_count = pd.DataFrame(run_count, index=[f"{model_name}:({', '.join(optimized_parameters)}):{data_set}"])
                 df_run_count_all = pd.concat((df_run_count_all, df_run_count))
                 df_run_count_all.to_csv(f"{metric_dir}/count{n_samples_postfix}.csv")
-    
+
                 #run_rmse_mean["Test Mean"] = avg_cost
                 df_run_rmse_mean = pd.DataFrame(run_rmse_mean, index=[f"{model_name} ({', '.join(optimized_parameters)}):{data_set}"])
                 df_run_rmse_mean.insert(0, "Model", model_name)
-                df_run_rmse_mean.insert(1, "Dataset", data_set)
+                df_run_rmse_mean.insert(1, "Hyperparameters", ', '.join(optimized_parameters))
+                df_run_rmse_mean.insert(2, "Dataset", data_set)
                 df_run_rmse_mean_all = pd.concat((df_run_rmse_mean_all, df_run_rmse_mean))
                 df_run_rmse_mean_all.to_csv(f"{metric_dir}/rmse_mean{n_samples_postfix}.csv")
-    
+
                 #run_rmse_std["Test Std"] = std_cost
                 df_run_rmse_std = pd.DataFrame(run_rmse_std, index=[f"{model_name} ({', '.join(optimized_parameters)}):{data_set}"])
                 df_run_rmse_std_all = pd.concat((df_run_rmse_std_all, df_run_rmse_std))
