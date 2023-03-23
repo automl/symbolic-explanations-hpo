@@ -37,7 +37,7 @@ if __name__ == "__main__":
 
     logger.info(f"Save plots to {plot_dir}.")
 
-    fig = plt.figure(figsize=(15, 8))
+    fig = plt.figure(figsize=(15, 25))
 
     for i, run_conf in enumerate(run_configs[:48]):
 
@@ -91,13 +91,6 @@ if __name__ == "__main__":
                 except Exception as e:
                     logger.warning(f"Could not process {sampling_type} for {run_name}: \n{e}")
 
-                if include_surr_diff:
-                    df_error_metrics = pd.read_csv(
-                        f"learning_curves/runs_symb_hpobench/{symb_dir_name}/surr/{run_name}/error_metrics_compare_surr.csv")
-                    df_error_metrics["rmse_test"] = np.sqrt(df_error_metrics["mse_test"])
-                    df_error_metrics["rmse_train"] = np.sqrt(df_error_metrics["mse_train"])
-                    df_error_metrics.insert(0, "Experiment", f"RMSE $(c, s)$")
-                    df_error_metrics_all = pd.concat((df_error_metrics_all, df_error_metrics))
 
             logger.info(f"Create plots.")
 
@@ -112,16 +105,12 @@ if __name__ == "__main__":
             ax = plt.subplot(6, 4, ind)
             sns.boxplot(data=df_error_metrics_all, x="n_samples", y="rmse_test", hue="Experiment",
                         dodge=0.4, showfliers=False)
-            plt.title(f"{classifier_title} ({param0}, {param1})", fontsize=titlesize)
+            plt.title(f"{classifier_title} ({param0}, {param1})\nDataset: {data_set}", fontsize=titlesize)
             plt.ylabel(f"RMSE $(c, s)$", fontsize=titlesize)
             plt.yticks(fontsize=labelsize)
             plt.xlabel("Number of Samples", fontsize=titlesize)
             plt.xticks(fontsize=labelsize)
             plt.legend([], [], frameon=False)
-            if ind == 1:
-                plt.figtext(0.5, 0.98, f"Dataset: {data_set}", ha="center", va="top", fontsize=titlesize)
-            if ind == 3:
-                plt.figtext(0.5, 0.53, f"Dataset: {data_set}", ha="center", va="top", fontsize=titlesize)
 
         except Exception as e:
             logger.warning(f"Could not process {run_name}: \n{e}")
@@ -129,7 +118,7 @@ if __name__ == "__main__":
     handles, labels = ax.get_legend_handles_labels()
     legend = fig.legend(handles, labels, ncol=4, loc='lower center', bbox_to_anchor=(0.5, -0.02), frameon=False, fontsize=titlesize)
     legend.get_title().set_fontsize(titlesize)
-    plt.tight_layout(rect=(0, 0.05, 1, 0.95), h_pad=4, w_pad=1)
+    plt.tight_layout()
 
     plt.savefig(f"{rmse_plot_dir}/boxplot.png", dpi=400)
     plt.close()
