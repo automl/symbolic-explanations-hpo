@@ -523,7 +523,7 @@ def plot_symb2d(
 
 
     fig, axes = plt.subplots(
-        ncols=1, nrows=len(predictions_test) + 1, constrained_layout=True, figsize=(8, 5)
+        ncols=2, nrows=3, constrained_layout=True, figsize=(8, 5)
     )
 
     pred_test = []
@@ -534,6 +534,8 @@ def plot_symb2d(
             y_test.reshape(-1, 1),
             pred_test[0].reshape(-1, 1),
             pred_test[1].reshape(-1, 1),
+            pred_test[2].reshape(-1, 1),
+            pred_test[3].reshape(-1, 1),
         )
     )
     if use_same_scale:
@@ -577,12 +579,20 @@ def plot_symb2d(
         cbar.set_label(r'True $\mathcal{L}$', fontsize=TITLE_SIZE, rotation=270, labelpad=10)
         cbar.ax.tick_params(labelsize=LABEL_SIZE)
 
-    for i, model_name in enumerate(predictions_test):
+    for ind, model_name in enumerate(predictions_test):
         label = model_name
+        if model_name == "GP Baseline":
+            i = 1
+        elif model_name == "SR (BO)":
+            i = 2
+        elif model_name == "SR (Random)":
+            i = 3
+        elif model_name == "SR (GP-BO)":
+            i = 4
         im = axes[i + 1].pcolormesh(
             X0_test,
             X1_test,
-            pred_test[i],
+            pred_test[ind],
             cmap="summer",
             shading="auto",
             vmin=vmin,
