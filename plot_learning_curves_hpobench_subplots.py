@@ -15,8 +15,8 @@ if __name__ == "__main__":
     n_optimized_params = 2
     max_hp_comb = 1
 
-    labelsize = 13
-    titlesize=14
+    labelsize = 16
+    titlesize=18
 
     run_configs = get_run_config(n_optimized_params=n_optimized_params, max_hp_comb=max_hp_comb)
 
@@ -193,7 +193,7 @@ if __name__ == "__main__":
     handles, labels = ax.get_legend_handles_labels()
     legend = fig.legend(handles, labels, ncol=4, loc='lower center', frameon=False, fontsize=titlesize)
     legend.get_title().set_fontsize(titlesize)
-    plt.tight_layout(rect=(0, 0.05, 1, 1), w_pad=5)
+    plt.tight_layout(rect=(0, 0.05, 1, 1), w_pad=10)
     
     plt.savefig(f"{rmse_plot_dir}/boxplot.png", dpi=400)
     plt.close()
