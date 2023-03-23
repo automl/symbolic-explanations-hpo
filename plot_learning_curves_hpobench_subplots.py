@@ -135,7 +135,7 @@ if __name__ == "__main__":
             if ind == 1:
                 plt.figtext(0.5, 0.98, f"Dataset: {data_set}", ha="center", va="top", fontsize=titlesize)
             if ind == 3:
-                plt.figtext(0.5, 0.50, f"Dataset: {data_set}", ha="center", va="top", fontsize=titlesize)
+                plt.figtext(0.5, 0.53, f"Dataset: {data_set}", ha="center", va="top", fontsize=titlesize)
 
                 # # Plot Kendall
                 # plt.figure()
@@ -193,7 +193,7 @@ if __name__ == "__main__":
     handles, labels = ax.get_legend_handles_labels()
     legend = fig.legend(handles, labels, ncol=4, loc='lower center', frameon=False, fontsize=titlesize)
     legend.get_title().set_fontsize(titlesize)
-    plt.tight_layout(rect=(0, 0.06, 1, 0.94), h_pad=3)
+    plt.tight_layout(rect=(0, 0.05, 1, 0.95), h_pad=5, w_pad=5)
     
     plt.savefig(f"{rmse_plot_dir}/boxplot.png", dpi=400)
     plt.close()
