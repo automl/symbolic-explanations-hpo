@@ -135,7 +135,7 @@ if __name__ == "__main__":
             if ind == 1:
                 plt.figtext(0.5, 0.98, f"Dataset: {data_set}", ha="center", va="top", fontsize=titlesize)
             if ind == 3:
-                plt.figtext(0.5, 0.51, f"Dataset: {data_set}", ha="center", va="top", fontsize=titlesize)
+                plt.figtext(0.5, 0.53, f"Dataset: {data_set}", ha="center", va="top", fontsize=titlesize)
 
                 # # Plot Kendall
                 # plt.figure()
@@ -191,7 +191,7 @@ if __name__ == "__main__":
             logger.warning(f"Could not process {run_name}: \n{e}")
 
     handles, labels = ax.get_legend_handles_labels()
-    legend = fig.legend(handles, labels, ncol=4, loc='lower center', bbox_to_anchor=(0.5, 0.), frameon=False, fontsize=titlesize)
+    legend = fig.legend(handles, labels, ncol=4, loc='lower center', bbox_to_anchor=(0.5, -0.02), frameon=False, fontsize=titlesize)
     legend.get_title().set_fontsize(titlesize)
     plt.tight_layout(rect=(0, 0.05, 1, 0.95), h_pad=4, w_pad=4)
     
