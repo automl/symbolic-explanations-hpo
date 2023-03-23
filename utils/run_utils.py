@@ -744,10 +744,7 @@ def plot_symb2d_subplots(
         vmin=vmin,
         vmax=vmax,
     )
-    if function_expression:
-        ax.set_title(f"True: {function_expression}", fontsize=TITLE_SIZE)
-    else:
-        ax.set_title(f"Ground Truth", fontsize=TITLE_SIZE)
+    ax.set_title(f"Ground Truth", fontsize=TITLE_SIZE)
     #ax.set_xlabel(X0_name, fontsize=TITLE_SIZE)
     #ax.set_ylabel(X1_name, fontsize=TITLE_SIZE)
     ax.set_xticks(dim_x)
@@ -757,21 +754,16 @@ def plot_symb2d_subplots(
     ax.tick_params(axis="both", which="major", labelsize=LABEL_SIZE)
     ax.grid(alpha=0)
 
-    if not use_same_scale:
-        cbar = fig.colorbar(im, ax=ax)
-        cbar.set_label(r'True $\mathcal{L}$', fontsize=TITLE_SIZE, rotation=270, labelpad=10)
-        cbar.ax.tick_params(labelsize=LABEL_SIZE)
-
     for ind, model_name in enumerate(predictions_test):
         label = model_name
         if model_name == "GP Baseline":
-            i = 2
-        elif model_name == "SR (BO)":
             i = 3
+        elif model_name == "SR (BO)":
+            i = 2
         elif model_name == "SR (Random)":
             i = 4
         elif model_name == "SR (BO-GP)":
-            i = 5
+            i = 6
         ax = plt.subplot(3, 2, i)
 
         im = ax.pcolormesh(
@@ -784,9 +776,9 @@ def plot_symb2d_subplots(
             vmax=vmax,
         )
         ax.set_title(f"Prediction: {label}", fontsize=TITLE_SIZE)
-        if i == len(predictions_test) - 1:
+        if i == 3 or i == 6:
             ax.set_xlabel(X0_name, fontsize=TITLE_SIZE)
-        if i == 0:
+        if i == 3:
             ax.set_ylabel(X1_name, fontsize=TITLE_SIZE)
         ax.set_xticks(dim_x)
         ax.set_yticks(dim_y)
@@ -809,25 +801,14 @@ def plot_symb2d_subplots(
                 s=40,
                 label="SR Train Points",
             )
-    if not use_same_scale:
-        cbar = fig.colorbar(im, ax=ax, shrink=0.4)
-        if metric_name:
-            cbar.set_label(metric_name, fontsize=TITLE_SIZE, rotation=270, labelpad=15)
-        else:
-            cbar.set_label("f(X0, X1)", fontsize=TITLE_SIZE, rotation=270, labelpad=15)
-        cbar.ax.tick_params(labelsize=LABEL_SIZE)
     handles, labels = ax.get_legend_handles_labels()
     leg = fig.legend(
         handles, labels, loc="lower right", bbox_to_anchor=(1., -0.022), fontsize=TITLE_SIZE, framealpha=0.0
     )
     leg.get_frame().set_linewidth(0.0)
-    if use_same_scale:
-        cbar = fig.colorbar(im, ax=ax, shrink=0.4)
-        if metric_name:
-            cbar.set_label(metric_name, fontsize=TITLE_SIZE, rotation=270, labelpad=15)
-        else:
-            cbar.set_label("f(X0, X1)", fontsize=TITLE_SIZE, rotation=270, labelpad=15)
-        cbar.ax.tick_params(labelsize=LABEL_SIZE)
+    cbar = fig.colorbar(im, ax=ax, shrink=0.4)
+    cbar.set_label(metric_name, fontsize=TITLE_SIZE, rotation=270, labelpad=15)
+    cbar.ax.tick_params(labelsize=LABEL_SIZE)
     if plot_dir:
         if filename:
             plt.savefig(f"{plot_dir}/{filename}", dpi=800)
