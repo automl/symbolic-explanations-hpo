@@ -564,7 +564,7 @@ def plot_symb2d(
     else:
         axes[0].set_title(f"Ground Truth", fontsize=TITLE_SIZE)
     #axes[0].set_xlabel(X0_name, fontsize=TITLE_SIZE)
-    axes[0].set_ylabel(X1_name, fontsize=TITLE_SIZE)
+    #axes[0].set_ylabel(X1_name, fontsize=TITLE_SIZE)
     axes[0].set_xticks(dim_x)
     axes[0].set_yticks(dim_y)
     axes[0].set_xlim(X0_lower, X0_upper)
@@ -591,7 +591,8 @@ def plot_symb2d(
         axes[i + 1].set_title(f"Prediction: {label}", fontsize=TITLE_SIZE)
         if i == len(predictions_test) - 1:
             axes[i + 1].set_xlabel(X0_name, fontsize=TITLE_SIZE)
-        axes[i + 1].set_ylabel(X1_name, fontsize=TITLE_SIZE)
+        if i == 0:
+            axes[i + 1].set_ylabel(X1_name, fontsize=TITLE_SIZE)
         axes[i + 1].set_xticks(dim_x)
         axes[i + 1].set_yticks(dim_y)
         axes[i + 1].set_xlim(X0_lower, X0_upper)
