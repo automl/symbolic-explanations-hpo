@@ -729,7 +729,7 @@ def plot_symb2d_subplots(
     else:
         X1_test = X_test[1]
 
-    fig = plt.figure(figsize=(15, 8))
+    fig = plt.figure(figsize=(16, 6))
 
     ax = plt.subplot(3, 2, 1)
     im = ax.pcolormesh(
@@ -798,10 +798,10 @@ def plot_symb2d_subplots(
             )
     handles, labels = ax.get_legend_handles_labels()
     leg = fig.legend(
-        handles, labels, loc="lower right", bbox_to_anchor=(1., -0.022), fontsize=TITLE_SIZE, framealpha=0.0
+        handles, labels, loc="lower right", bbox_to_anchor=(0.1, 0.2), fontsize=TITLE_SIZE, framealpha=0.0
     )
     leg.get_frame().set_linewidth(0.0)
-    cbar = fig.colorbar(im, ax=ax, shrink=0.4)
+    cbar = fig.colorbar(im, ax=ax, loc="lower right", bbox_to_anchor=(0.1, 0.2), shrink=0.4)
     cbar.set_label(metric_name, fontsize=TITLE_SIZE, rotation=270, labelpad=15)
     cbar.ax.tick_params(labelsize=LABEL_SIZE)
     plt.tight_layout(h_pad=5)
