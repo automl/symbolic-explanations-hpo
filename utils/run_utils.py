@@ -801,9 +801,9 @@ def plot_symb2d_subplots(
         handles, labels, loc="lower right", bbox_to_anchor=(0.1, 0.2), fontsize=TITLE_SIZE, framealpha=0.0
     )
     leg.get_frame().set_linewidth(0.0)
-    cbar_ax = fig.add_axes([0.15, 0.85, 0.7, 0.05])
+    cbar_ax = fig.add_axes([0.15, 0.02, 0.3, 0.04])
     cbar = fig.colorbar(im, ax=ax, cax=cbar_ax, shrink=0.4, orientation="horizontal")
-    cbar.set_label(metric_name, fontsize=TITLE_SIZE, rotation=270, labelpad=15)
+    cbar.set_label(metric_name, fontsize=TITLE_SIZE, labelpad=15)
     cbar.ax.tick_params(labelsize=LABEL_SIZE)
     plt.tight_layout(h_pad=5)
     if plot_dir:
