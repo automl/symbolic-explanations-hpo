@@ -107,7 +107,7 @@ if __name__ == "__main__":
             param1 = f"log({optimized_parameters[1]})" if cs.get_hyperparameters()[1].log else optimized_parameters[1]
 
             # Plot RMSE
-            ax = plt.subplot(2, 2, i)
+            ax = plt.subplot(2, 2, i+1)
             #line = plt.axhline(y=std_cost, color='darkred', linestyle='--', linewidth=0.5, label="Std.")
             sns.boxplot(data=df_error_metrics_all, x="n_samples", y="rmse_test", hue="Experiment",
                         dodge=0.4, showfliers=False)
