@@ -120,7 +120,7 @@ if __name__ == "__main__":
                         dodge=0.4, showfliers=False)
             #sns.pointplot(data=df_error_metrics_all, x="n_samples", y="rmse_test", hue="Experiment", errorbar="sd",
             #              linestyles="", capsize=0.2, errwidth=0.7, scale=0.7, dodge=0.4)#, showfliers=False)
-            plt.title(f"Dataset: {data_set}\n{classifier_title} ({param0}, {param1})", fontsize=titlesize)
+            plt.title(f"{classifier_title} ({param0}, {param1})", fontsize=titlesize)
             #plt.title(f"Test Mean: {avg_cost:.3f}, Test Std.: {std_cost:.3f}", fontsize=10),
             plt.ylabel(f"RMSE $(c, s)$", fontsize=titlesize)
             plt.yticks(fontsize=labelsize)
