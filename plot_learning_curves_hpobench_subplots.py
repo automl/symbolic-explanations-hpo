@@ -125,9 +125,9 @@ if __name__ == "__main__":
             plt.ylabel(f"RMSE $(c, s)$", fontsize=titlesize)
             plt.yticks(fontsize=labelsize)
             if ind == 4:
-                plt.xlim(0, 0.205)
+                plt.ylim(0, 0.205)
             else:
-                plt.xlim(0, 0.072)
+                plt.ylim(0, 0.072)
             if ind == 3 or ind == 4:
                 plt.xlabel("Number of Samples", fontsize=titlesize)
             else:
