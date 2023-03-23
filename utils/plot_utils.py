@@ -385,7 +385,7 @@ def plot_symb2d_subplots(
     else:
         X1_test = X_test[1]
 
-    fig = plt.figure(figsize=(15, 8))
+    fig = plt.figure(figsize=(15, 6))
 
     ax = plt.subplot(3, 2, 1)
     im = ax.pcolormesh(
@@ -449,7 +449,7 @@ def plot_symb2d_subplots(
                 color="midnightblue",
                 zorder=2,
                 marker=".",
-                s=50,
+                s=70,
                 label="SR Train Points",
             )
     handles, labels = ax.get_legend_handles_labels()
@@ -457,7 +457,7 @@ def plot_symb2d_subplots(
         handles, labels, loc="lower right", bbox_to_anchor=(0.32, 0.03), fontsize=TITLE_SIZE, framealpha=0.0, handletextpad=0.05
     )
     for handle in leg.legendHandles:
-        handle.set_sizes([50])
+        handle.set_sizes([70])
     leg.get_frame().set_linewidth(0.0)
     cbar_ax = fig.add_axes([0.12, 0.24, 0.3, 0.04])
     cbar = fig.colorbar(im, ax=ax, cax=cbar_ax, shrink=0.4, orientation="horizontal")
