@@ -121,7 +121,7 @@ if __name__ == "__main__":
 
         if to_latex:
             latex_out = generate_result_table(df_run_rmse_mean_all, df_run_rmse_std_all, stddev=True,
-                                              show_avg_and_median=False)
+                                              show_avg=True)
 
             with open(f"{metric_dir}/rmse_latex.txt", "w") as f:
                 f.write(latex_out)
