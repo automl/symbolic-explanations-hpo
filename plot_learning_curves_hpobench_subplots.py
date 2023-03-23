@@ -106,8 +106,15 @@ if __name__ == "__main__":
             param0 = f"log({optimized_parameters[0]})" if cs.get_hyperparameters()[0].log else optimized_parameters[0]
             param1 = f"log({optimized_parameters[1]})" if cs.get_hyperparameters()[1].log else optimized_parameters[1]
 
+            if i == 1:
+                ind = 3
+            elif i == 2:
+                ind = 2
+            else:
+                ind = i + 1
+
             # Plot RMSE
-            ax = plt.subplot(2, 2, i+1)
+            ax = plt.subplot(2, 2, ind)
             #line = plt.axhline(y=std_cost, color='darkred', linestyle='--', linewidth=0.5, label="Std.")
             sns.boxplot(data=df_error_metrics_all, x="n_samples", y="rmse_test", hue="Experiment",
                         dodge=0.4, showfliers=False)
@@ -117,7 +124,7 @@ if __name__ == "__main__":
             #plt.title(f"Test Mean: {avg_cost:.3f}, Test Std.: {std_cost:.3f}", fontsize=10),
             plt.ylabel(f"RMSE $(c, s)$", fontsize=titlesize)
             plt.yticks(fontsize=labelsize)
-            if i == 2 or i == 3:
+            if ind == 3 or i == 4:
                 plt.xlabel("Number of Samples", fontsize=titlesize)
             else:
                 plt.xlabel("")
@@ -125,6 +132,10 @@ if __name__ == "__main__":
             #plt.ylim(0., 0.4)
             #plt.tight_layout(rect=(0, 0.05, 1, 1))
             plt.legend([], [], frameon=False)
+            if ind == 1:
+                plt.figtext(0.5, 0.98, f"Dataset: {data_set}", ha="center", va="top", fontsize=titlesize)
+            if ind == 3:
+                plt.figtext(0.5, 0.50, f"Dataset: {data_set}", ha="center", va="top", fontsize=titlesize)
 
                 # # Plot Kendall
                 # plt.figure()
@@ -182,7 +193,7 @@ if __name__ == "__main__":
     handles, labels = ax.get_legend_handles_labels()
     legend = fig.legend(handles, labels, ncol=4, loc='lower center', frameon=False, fontsize=titlesize)
     legend.get_title().set_fontsize(titlesize)
-    plt.tight_layout(rect=(0, -0.15, 1, 1))
+    plt.tight_layout(rect=(0, 0.1, 1, 1))
     
     plt.savefig(f"{rmse_plot_dir}/boxplot.png", dpi=400)
     plt.close()
