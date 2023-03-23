@@ -119,6 +119,8 @@ if __name__ == "__main__":
             plt.yticks(fontsize=labelsize)
             if i == 2 or i == 3:
                 plt.xlabel("Number of Samples", fontsize=titlesize)
+            else:
+                plt.xlabel("")
             plt.xticks(fontsize=labelsize)
             #plt.ylim(0., 0.4)
             #plt.tight_layout(rect=(0, 0.05, 1, 1))
