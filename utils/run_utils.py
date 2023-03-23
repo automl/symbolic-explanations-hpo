@@ -660,8 +660,8 @@ def plot_symb2d_subplots(
     function and the functions fitted by symbolic models evaluated on a 2D grid.
     """
 
-    LABEL_SIZE = 10
-    TITLE_SIZE = 11
+    LABEL_SIZE = 12
+    TITLE_SIZE = 13
     X0_name = (
         "X0"
         if parameters[0].name == "X0"
@@ -798,12 +798,12 @@ def plot_symb2d_subplots(
             )
     handles, labels = ax.get_legend_handles_labels()
     leg = fig.legend(
-        handles, labels, loc="lower right", bbox_to_anchor=(0.4, 0.2), fontsize=TITLE_SIZE, framealpha=0.0
+        handles, labels, loc="lower right", bbox_to_anchor=(0.35, 0.1), fontsize=TITLE_SIZE, framealpha=0.0
     )
     leg.get_frame().set_linewidth(0.0)
-    cbar_ax = fig.add_axes([0.1, 0.23, 0.3, 0.04])
+    cbar_ax = fig.add_axes([0.15, 0.23, 0.3, 0.04])
     cbar = fig.colorbar(im, ax=ax, cax=cbar_ax, shrink=0.4, orientation="horizontal")
-    cbar.set_label(metric_name, fontsize=TITLE_SIZE, labelpad=8)
+    cbar.set_label(metric_name, fontsize=TITLE_SIZE, labelpad=6)
     cbar.ax.tick_params(labelsize=LABEL_SIZE)
     plt.tight_layout()
     if plot_dir:
