@@ -3,7 +3,8 @@ import os
 import numpy as np
 import dill as pickle
 
-from utils.run_utils import plot_symb2d_subplots, get_surrogate_predictions, convert_symb, get_hpo_test_data
+from utils.run_utils import get_surrogate_predictions, get_hpo_test_data
+from utils.plot_utils import plot_symb2d_subplots
 from utils.logging_utils import get_logger
 
 from utils.hpobench_utils import get_run_config, get_benchmark_dict, get_task_dict

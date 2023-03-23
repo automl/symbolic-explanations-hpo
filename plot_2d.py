@@ -5,7 +5,8 @@ import numpy as np
 import dill as pickle
 from itertools import combinations
 
-from utils.utils import get_hpo_test_data, plot_symb2d, get_surrogate_predictions, convert_symb
+from utils.run_utils import get_hpo_test_data, get_surrogate_predictions, convert_symb
+from utils.plot_utils import plot_symb2d
 from utils.functions_utils import get_functions2d, NamedFunction
 from utils.model_utils import get_hyperparams, get_classifier_from_run_conf
 from utils import functions_utils
