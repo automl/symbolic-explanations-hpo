@@ -770,9 +770,9 @@ def plot_symb2d_subplots(
             i = 3
         elif model_name == "SR (Random)":
             i = 4
-        elif model_name == "SR (GP-BO)":
+        elif model_name == "SR (BO-GP)":
             i = 5
-        ax = plt.subplot(2, 3, i)
+        ax = plt.subplot(3, 2, i)
 
         im = ax.pcolormesh(
             X0_test,
