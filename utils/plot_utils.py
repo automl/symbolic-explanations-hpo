@@ -449,13 +449,14 @@ def plot_symb2d_subplots(
                 color="midnightblue",
                 zorder=2,
                 marker=".",
-                s=40,
+                s=50,
                 label="SR Train Points",
             )
     handles, labels = ax.get_legend_handles_labels()
     leg = fig.legend(
-        handles, labels, loc="lower right", bbox_to_anchor=(0.33, 0.03), fontsize=TITLE_SIZE, framealpha=0.0, handletextpad=0.1
+        handles, labels, loc="lower right", bbox_to_anchor=(0.32, 0.03), fontsize=TITLE_SIZE, framealpha=0.0, handletextpad=0.05
     )
+    leg.legendHandles[0]._legmarker.set_markersize(6)
     leg.get_frame().set_linewidth(0.0)
     cbar_ax = fig.add_axes([0.12, 0.24, 0.3, 0.04])
     cbar = fig.colorbar(im, ax=ax, cax=cbar_ax, shrink=0.4, orientation="horizontal")
