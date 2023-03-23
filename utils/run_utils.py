@@ -733,7 +733,7 @@ def plot_symb2d_subplots(
     else:
         X1_test = X_test[1]
 
-    ax = plt.subplot(2, 3, 0)
+    ax = plt.subplot(2, 3, 1)
 
     im = ax.pcolormesh(
         X0_test,
@@ -765,13 +765,13 @@ def plot_symb2d_subplots(
     for ind, model_name in enumerate(predictions_test):
         label = model_name
         if model_name == "GP Baseline":
-            i = 1
-        elif model_name == "SR (BO)":
             i = 2
-        elif model_name == "SR (Random)":
+        elif model_name == "SR (BO)":
             i = 3
-        elif model_name == "SR (GP-BO)":
+        elif model_name == "SR (Random)":
             i = 4
+        elif model_name == "SR (GP-BO)":
+            i = 5
         ax = plt.subplot(2, 3, i)
 
         im = ax.pcolormesh(
