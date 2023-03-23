@@ -37,7 +37,7 @@ if __name__ == "__main__":
 
     logger.info(f"Save plots to {plot_dir}.")
 
-    fig = plt.figure(figsize=(18, 25))
+    fig = plt.figure(figsize=(20, 25))
 
     for i, run_conf in enumerate(run_configs[:18]):
 
@@ -94,8 +94,14 @@ if __name__ == "__main__":
 
             logger.info(f"Create plots.")
 
-            classifier_title = model_name
-
+            if model_name == "LR":
+                classifier_title = "Logistic Regression"
+            elif model_name == "RF":
+                classifier_title = "Random Forest"
+            elif model_name == "NN":
+                classifier_title = "Neural Network"
+            else:
+                classifier_title = model_name
             param0 = f"log({optimized_parameters[0]})" if cs.get_hyperparameters()[0].log else optimized_parameters[0]
             param1 = f"log({optimized_parameters[1]})" if cs.get_hyperparameters()[1].log else optimized_parameters[1]
 
