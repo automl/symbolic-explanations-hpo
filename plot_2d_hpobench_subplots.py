@@ -3,7 +3,7 @@ import os
 import numpy as np
 import dill as pickle
 
-from utils.run_utils import plot_symb2d, get_surrogate_predictions, convert_symb, get_hpo_test_data
+from utils.run_utils import plot_symb2d_subplots, get_surrogate_predictions, convert_symb, get_hpo_test_data
 from utils.logging_utils import get_logger
 
 from utils.hpobench_utils import get_run_config, get_benchmark_dict, get_task_dict
@@ -131,7 +131,7 @@ if __name__ == "__main__":
                 if evaluate_on_surrogate:
                     filename = "_".join([filename, "surrogate"])
 
-                plot = plot_symb2d(
+                plot = plot_symb2d_subplots(
                                 X_train_list=X_train_list,
                                 X_test=X_test,
                                 y_test=y_test,
