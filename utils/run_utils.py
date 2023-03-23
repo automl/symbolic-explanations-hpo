@@ -39,24 +39,6 @@ def get_output_dirs() -> [str, str, str]:
     return run_dir, res_dir, plot_dir
 
 
-# def get_run_config(job_id, n_optimized_params, toy_problems=False):
-#     run_configs = []
-#     if toy_problems:
-#         models = get_functions2d()
-#     else:
-#         models = get_models()
-#     for model in models:
-#         if isinstance(model, NamedFunction):
-#             run_configs.append({"model": model, "data_set_name": None})
-#         else:
-#             hyperparams = get_hyperparams(model_name=model)
-#             hp_comb = combinations(hyperparams, 2)
-#             for hp_conf in hp_comb:
-#                 for ds in data_sets:
-#                     run_configs.append({"model": model, hp_conf[0]: True, hp_conf[1]: True, "data_set_name": ds})
-#     return run_configs[int(job_id)]
-
-
 def sort(x: np.ndarray, y: np.ndarray) -> [np.ndarray, np.ndarray]:
     """
     Sort arrays according to values in x and reshape. Required for plotting.
@@ -798,10 +780,10 @@ def plot_symb2d_subplots(
             )
     handles, labels = ax.get_legend_handles_labels()
     leg = fig.legend(
-        handles, labels, loc="lower right", bbox_to_anchor=(0.35, 0.03), fontsize=TITLE_SIZE, framealpha=0.0
+        handles, labels, loc="lower right", bbox_to_anchor=(0.37, 0.03), fontsize=TITLE_SIZE, framealpha=0.0
     )
     leg.get_frame().set_linewidth(0.0)
-    cbar_ax = fig.add_axes([0.14, 0.23, 0.3, 0.04])
+    cbar_ax = fig.add_axes([0.12, 0.24, 0.3, 0.04])
     cbar = fig.colorbar(im, ax=ax, cax=cbar_ax, shrink=0.4, orientation="horizontal")
     cbar.set_label(metric_name, fontsize=TITLE_SIZE, labelpad=6)
     cbar.ax.tick_params(labelsize=LABEL_SIZE)
