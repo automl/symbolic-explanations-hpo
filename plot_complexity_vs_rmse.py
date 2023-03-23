@@ -104,7 +104,11 @@ if __name__ == "__main__":
 
         g = sns.scatterplot(data=df_joined_all, x="complexity", y="rmse_test", hue="Parsimony",
                             linestyles="", s=80, ax=ax, palette="cividis")
-        plt.title(f"{model_name} ({', '.join(optimized_parameters)})", fontsize=titlesize)
+        if model_name == "LR":
+            classifier_title = "Logistic Regression"
+        else:
+            classifier_title = model_name
+        plt.title(f"{classifier_title} ({', '.join(optimized_parameters)})", fontsize=titlesize)
         if ind > 3:
             plt.xlabel("Operation Count", fontsize=labelsize, labelpad=10)
         else:
