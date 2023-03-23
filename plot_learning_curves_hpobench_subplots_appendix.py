@@ -102,8 +102,8 @@ if __name__ == "__main__":
                 classifier_title = "Neural Network"
             else:
                 classifier_title = model_name
-            param0 = f"log({optimized_parameters[0]})" if cs.get_hyperparameters()[0].log else optimized_parameters[0]
-            param1 = f"log({optimized_parameters[1]})" if cs.get_hyperparameters()[1].log else optimized_parameters[1]
+            param0 = optimized_parameters[0]
+            param1 = optimized_parameters[1]
 
             ind = i + 1
 
