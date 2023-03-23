@@ -177,18 +177,10 @@ if __name__ == "__main__":
         except Exception as e:
             logger.warning(f"Could not process {run_name}: \n{e}")
 
-# sns.move_legend(
-#     ax, "lower center",
-#     bbox_to_anchor=(0.45, -0.27),
-#     ncol=4,
-#     title=None, frameon=False,
-#     fontsize=labelsize
-# )
-
-handles, labels = ax.get_legend_handles_labels()
-legend = fig.legend(handles, labels, loc='center right', title="Parsimony", frameon=False, fontsize=titlesize)
-legend.get_title().set_fontsize(titlesize)
-plt.tight_layout(rect=(0, 0, 0.82, 0.95), h_pad=5)
-
-plt.savefig(f"{rmse_plot_dir}/{run_name}_pointplot.png", dpi=400)
-plt.close()
+    handles, labels = ax.get_legend_handles_labels()
+    legend = fig.legend(handles, labels, loc='lower center', frameon=False, fontsize=titlesize)
+    legend.get_title().set_fontsize(titlesize)
+    plt.tight_layout(rect=(0, 0, 0.82, 0.95), h_pad=5)
+    
+    plt.savefig(f"{rmse_plot_dir}/boxplot.png", dpi=400)
+    plt.close()
