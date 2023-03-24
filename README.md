@@ -19,7 +19,36 @@ pip install .
 cd ..
 ```
 
-## Running Experiments
+
+## tl;dr: Summary of Commands to Reproduce the Results
+
+To run the experiments for reproducing the results shown in the paper, we suggest the following
+order of commands. To create the raw results, first run:
+```
+python run_sampling_hpobench.py --job_id 0 --run_type smac
+python run_sampling_hpobench.py --job_id 0 --run_type rand
+python run_sampling_hpobench.py --job_id 0 --run_type surr
+python run_symbolic_explanation_hpobench.py --job_id 0 smac
+python run_symbolic_explanation_hpobench.py --job_id 0 rand
+python run_symbolic_explanation_hpobench.py --job_id 0 surr
+python run_surrogate_explanation_hpobench.py --job_id 0
+```
+
+`job_id 0` will run the experiments for logistic regression with hyperparameters `alpha` and `eta0` on the 
+dataset blood-transfusion-service-center. To reproduce the raw results for all models, hyperparameter 
+combinations and datasets showed in the paper, those needs to be run for `job_id` between 0-39.
+
+After running the above commands, to calculate metrics and create plots, then run:
+```
+python metrics_hpobench.py
+python plot_learning_curves_hpobench.py
+python plot_complexity_vs_rmse.py
+python plot_2d_hpobench.py
+```
+
+To limit the number of models and datasets to create plots for, you can adapt those in `utils/hpobench_utils`.
+
+## Details on Running the Experiments
 
 In the following, we describe how to run the experiments. The overall process consists of the following steps: 
 1. Run the Bayesian optimization-powered hyperparameter optimization tool SMAC and collect (a) the meta-data consisting of the evaluated configurations
@@ -98,31 +127,3 @@ To create plots showing several representations of the HPO loss landscape, run
 ```
 python plot_2d_hpobench.py
 ```
-
-### Commands to Reproduce Results
-
-To run the experiments for reproducing the results shown in the paper, we suggest the following
-order of commands. To create the raw results, first run:
-```
-python run_sampling_hpobench.py --job_id 0 --run_type smac
-python run_sampling_hpobench.py --job_id 0 --run_type rand
-python run_sampling_hpobench.py --job_id 0 --run_type surr
-python run_symbolic_explanation_hpobench.py --job_id 0 smac
-python run_symbolic_explanation_hpobench.py --job_id 0 rand
-python run_symbolic_explanation_hpobench.py --job_id 0 surr
-python run_surrogate_explanation_hpobench.py --job_id 0
-```
-
-`job_id 0` will run the experiments for logistic regression with hyperparameters `alpha` and `eta0` on the 
-dataset blood-transfusion-service-center. To reproduce the raw results for all models, hyperparameter 
-combinations and datasets showed in the paper, those needs to be run for `job_id` between 0-39.
-
-After running the above commands, to calculate metrics and create plots, then run:
-```
-python metrics_hpobench.py
-python plot_learning_curves_hpobench.py
-python plot_complexity_vs_rmse.py
-python plot_2d_hpobench.py
-```
-
-To limit the number of models and datasets to create plots for, you can adapt those in `utils/hpobench_utils`.
