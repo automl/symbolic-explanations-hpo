@@ -101,7 +101,7 @@ class LRBenchmarkBBDefaultHP(LRBenchmarkBB):
         model = SGDClassifier(
             alpha=config["alpha"] if "alpha" in config else 1e-3,
             eta0=config["eta0"] if "eta0" in config else 1e-2,
-            loss="log",  # performs Logistic Regression
+            loss="log_loss",  # performs Logistic Regression
             max_iter=fidelity["iter"],
             learning_rate="adaptive",
             tol=None,
