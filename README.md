@@ -36,9 +36,9 @@ python run_surrogate_explanation_hpobench.py --job_id 0
 
 `job_id 0` will run the experiments for logistic regression with hyperparameters `alpha` and `eta0` on the 
 dataset blood-transfusion-service-center. To reproduce the raw results for all models, hyperparameter 
-combinations, and datasets showed in the paper, the above commands need to be run for `job_id` between 0-39.
+combinations, and datasets shown in the paper, the above commands need to be run for `job_id` between 0-39.
 
-After running the above commands, to calculate metrics and create plots, then run:
+After running the above commands, to calculate metrics and create plots, run:
 ```
 python metrics_hpobench.py
 python plot_learning_curves_hpobench.py
