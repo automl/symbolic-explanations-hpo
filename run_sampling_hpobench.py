@@ -29,8 +29,11 @@ if __name__ == "__main__":
     parser.add_argument('--job_id')
     args = parser.parse_args()
 
-    use_random_samples = False
-    evaluate_on_surrogate = False
+    # "smac": Collect samples via Bayesian optimization
+    # "rand": Collect randomly sampled configurations and evaluate their performance
+    # "surr" Collect random samples, but estimated their performance using the Gaussian process (Please note that,
+    # in the latter case, the BO sampling needs to be run beforehand to provide the Gaussian process models.)
+    run_type = "smac"
 
     # number of HPs to optimize
     n_optimized_params = 2
@@ -58,19 +61,16 @@ if __name__ == "__main__":
         result_dict = b.objective_function(cfg, rng=seed)
         return result_dict['function_value']
 
-    if use_random_samples:
-        run_type = "rand"
+    if run_type == "rand":
         n_samples_to_eval = [max(n_samples_spacing)]
     else:
         # SMAC uses at most scenario.n_trials * max_ratio number of configurations in the initial design
         # If we run SMAC only once with n_trials = max(n_samples_spacing), we would always use the maximum number of
         # initial designs, e.g. a run with 20 samples would have the same number of initial designs as a run with 200
         # Thus, we do separate runs for each sample size as long as the number of initial designs would differ
-        if evaluate_on_surrogate:
-            run_type = "surr"
+        if run_type == "surr":
             n_samples_to_eval = n_samples_spacing
         else:
-            run_type = "smac"
             n_samples_to_eval = [n for n in n_samples_spacing if
                                  init_design_max_ratio * n < n_optimized_params * init_design_n_configs_per_hyperparamter]
             if max(n_samples_spacing) not in n_samples_to_eval:
@@ -115,7 +115,7 @@ if __name__ == "__main__":
             logger.info(f"Run: {run_name}")
             logger.info(f"Sample configs and train {model_name} with seed {seed}.")
 
-            if use_random_samples:
+            if run_type == "rand":
                 configurations = cs.sample_configuration(size=n_samples)
                 performances = np.array(
                     [b.objective_function(config.get_dictionary(), seed=seed)["function_value"] for config in
@@ -124,7 +124,7 @@ if __name__ == "__main__":
                 configurations = np.array(
                     [list(i.get_dictionary().values()) for i in configurations]
                 ).T
-            elif evaluate_on_surrogate:
+            elif run_type == "surr":
                 configurations = cs.sample_configuration(size=surrogate_n_samples)
                 configurations = np.array(
                     [list(i.get_dictionary().values()) for i in configurations]

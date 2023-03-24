@@ -19,8 +19,10 @@ if __name__ == "__main__":
     parser.add_argument('--job_id')
     args = parser.parse_args()
 
-    use_random_samples = False
-    evaluate_on_surrogate = False
+    # "smac": Symbolic regression is fitted on samples collected via Bayesian optimization
+    # "rand": Symbolic regression is fitted on randomly sampled configurations and their performance
+    # "surr" Symbolic regression is fitted on random samples and their performance estimated using the Gaussian process
+    run_type = "smac"
 
     # number of HPs to optimize
     n_optimized_params = 2
@@ -62,13 +64,6 @@ if __name__ == "__main__":
 
     # add only parameters to be optimized to configspace
     cs = b.get_configuration_space(seed=0, hyperparameters=optimized_parameters)
-
-    if use_random_samples:
-        run_type = "rand"
-    elif evaluate_on_surrogate:
-        run_type = "surr"
-    else:
-        run_type = "smac"
 
     run_name = f"{model_name.replace(' ', '_')}_{'_'.join(optimized_parameters)}{data_set_postfix}"
 
@@ -132,7 +127,7 @@ if __name__ == "__main__":
             y_train_all_samples = df_train_samples.query(f"seed == {sampling_seed}")["cost"]
 
 
-            if evaluate_on_surrogate:
+            if run_type == "surr":
                 X_train = X_train_all_samples
                 y_train = y_train_all_samples
             else:
