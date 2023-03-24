@@ -78,6 +78,9 @@ python metrics_hpobench.py
 
 ### Plots
 
+Plots will be created for all specified models, hyperparameter-combinations, and datasets. Thus, the experiments
+described above need to be run for all of them before creating the plots.
+
 To create plots showing the RMSE between the cost predicted by the symbolic regression and the true cost for
 different numbers of samples, run
 ```
@@ -90,8 +93,7 @@ values of the parsimony coefficient, run
 python plot_complexity_vs_rmse.py
 ```
 
-To create plots showing the RMSE between the cost predicted by the symbolic regression and the true cost for different
-values of the parsimony coefficient, run
+To create plots showing several representations of the HPO loss landscape, run
 ```
-python plot_complexity_vs_rmse.py
+python plot_2d_hpobench.py
 ```

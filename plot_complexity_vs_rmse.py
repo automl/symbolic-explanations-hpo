@@ -70,9 +70,6 @@ if __name__ == "__main__":
             df_complexity = pd.read_csv(f"{symb_dir}/complexity.csv")
             df_complexity = df_complexity[df_complexity["n_samples"] == n_samples]
             logger.info(f"Number of times complexity == -1: {len(df_complexity[df_complexity['program_operations'] == -1])}")
-            # if len(df_complexity[df_complexity['program_operations'] == -1]) > 2:
-            #     logger.info(f"Leave out {parsimony}, as complexity for more than 2 seeds could not be evaluated.")
-            #     continue
             df_complexity = df_complexity[df_complexity["program_operations"] != -1]
 
             df_joined = pd.DataFrame({
