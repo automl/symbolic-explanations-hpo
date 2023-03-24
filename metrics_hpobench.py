@@ -4,6 +4,7 @@ import shutil
 import numpy as np
 
 from utils.logging_utils import get_logger
+from utils.run_utils import get_hpo_test_data
 from utils.hpobench_utils import get_run_config, get_benchmark_dict, get_task_dict
 
 if __name__ == "__main__":
@@ -13,6 +14,7 @@ if __name__ == "__main__":
     max_hp_comb = 1
 
     dir_with_test_data = "" #"learning_curves/runs_surr_hpobench"
+    n_test_samples = 100
     parsimony_coefficient_space = [0.0001]
     # if None, calculate metrics over all sample sizes
     eval_at_n_samples = 140
@@ -37,7 +39,6 @@ if __name__ == "__main__":
         df_run_count_all = pd.DataFrame()
 
         for run_conf in run_configs:
-
             task_dict = get_task_dict()
             data_set = f"{task_dict[run_conf['task_id']]}"
             optimized_parameters = list(run_conf["hp_conf"])
@@ -52,8 +53,12 @@ if __name__ == "__main__":
             try:
                 # Load test data
                 logger.info(f"Get test data.")
-                X_test = np.array(pd.read_csv(f"{dir_with_test_data}/{run_name}/x_test.csv"))
-                y_test = np.array(pd.read_csv(f"{dir_with_test_data}/{run_name}/y_test.csv"))
+                if dir_with_test_data:
+                    X_test = np.array(pd.read_csv(f"{dir_with_test_data}/{run_name}/x_test.csv"))
+                    y_test = np.array(pd.read_csv(f"{dir_with_test_data}/{run_name}/y_test.csv"))
+                else:
+                    logger.info(f"No previous test data dir provided, create test data for {run_name}.")
+                    X_test, y_test = get_hpo_test_data(b, cs.get_hyperparameters(), n_test_samples)
 
                 avg_cost = y_test.mean()
                 std_cost = y_test.std()
@@ -97,9 +102,6 @@ if __name__ == "__main__":
                 df_run_count_all.to_csv(f"{metric_dir}/count{n_samples_postfix}.csv")
 
                 df_run_rmse_mean = pd.DataFrame(run_rmse_mean, index=[f"{model_name} ({', '.join(optimized_parameters)}):{data_set}"])
-                df_run_rmse_mean.insert(0, "Model", model_name)
-                df_run_rmse_mean.insert(1, "Hyperparameters", ', '.join(optimized_parameters))
-                df_run_rmse_mean.insert(2, "Dataset", data_set)
                 df_run_rmse_mean_all = pd.concat((df_run_rmse_mean_all, df_run_rmse_mean))
                 df_run_rmse_mean_all.to_csv(f"{metric_dir}/rmse_mean{n_samples_postfix}.csv")
 

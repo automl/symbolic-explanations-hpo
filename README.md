@@ -24,7 +24,7 @@ In the following, we describe how to run the experiments. The overall process co
 1. Run the Bayesian Optimization-powered Hyperparameter Optimization tool SMAC and collect (a) the meta-data consisting of the evaluated configurations
 and their performance and (b) the final surrogate model.
 2. Learn a symbolic regression model on either (a) the collected meta-data, or (b) randomly sampled
-configurations, which are evaluated using the true cost function, or (c) randomly sampled
+configurations, which are evaluated using the `True` cost function, or (c) randomly sampled
 configurations, whose performance is estimated using the Gaussian process.
 
 ### Sample Collection
@@ -37,9 +37,13 @@ python run_sampling_hpobench.py --job_id 0
 ```
 
 where `job_id` is an index to iterate over a list containing all models, hyperparameter-combinations, and datasets.
-By setting the option `use_random_samples` in the script to True, the script furthermore allows to collect randomly 
+Which models and datasets should be included in the list can be defined in `utils/hpobench_utils`. By default,
+one hyperparameter-combination is evaluated per model and dataset. This can be adapted by modifying the parameter
+`max_hp_comb` inside the script.
+
+By setting the option `use_random_samples` in the script to `True`, the script furthermore allows to collect randomly 
 sampled configurations and evaluate their performance. When setting the option `evaluate_on_surrogate` in the script 
-to True, the script will collect random samples, but estimated their performance using the Gaussian process. Please
+to `True`, the script will collect random samples, but estimated their performance using the Gaussian process. Please
 note that the BO sampling needs to be run beforehand to provide the Gaussian process models.
 
 ### Symbolic Regression
@@ -48,12 +52,12 @@ Fitting the symbolic regression model as described in step 2 can be run for a si
 and dataset, by running
 
 ```
-python run_symbolic_explanation_hpobench.py.py --job_id 0
+python run_symbolic_explanation_hpobench.py --job_id 0
 ```
 
 By default, the symbolic regression will be fitted on the samples collected during Bayesian Optimization (a).
-By setting the option `use_random_samples` in the script to True, the symbolic regression will be fitted on the randomly 
-sampled configurations (b). When setting the option `evaluate_on_surrogate` in the script to True, the symbolic regression
+By setting the option `use_random_samples` in the script to `True`, the symbolic regression will be fitted on the randomly 
+sampled configurations (b). When setting the option `evaluate_on_surrogate` in the script to `True`, the symbolic regression
 will be fitted on the random samples with Gaussian process performance estimates (c). 
 
 ### Gaussian Process Baseline
@@ -61,5 +65,33 @@ will be fitted on the random samples with Gaussian process performance estimates
 Furthermore, the predictions of the Gaussian process model can be obtained by running:
 
 ```
-python run_surrogate_explanation_hpobench.py.py.py --job_id 0
+python run_surrogate_explanation_hpobench.py --job_id 0
+```
+
+### Metrics
+
+To average metrics over different seeds and combine them in a table for all specified models, 
+hyperparameter-combinations, and datasets, run
+```
+python metrics_hpobench.py
+```
+
+### Plots
+
+To create plots showing the RMSE between the cost predicted by the symbolic regression and the true cost for
+different numbers of samples, run
+```
+python plot_learning_curves_hpobench.py
+```
+
+To create plots showing the RMSE between the cost predicted by the symbolic regression and the true cost for different
+values of the parsimony coefficient, run
+```
+python plot_complexity_vs_rmse.py
+```
+
+To create plots showing the RMSE between the cost predicted by the symbolic regression and the true cost for different
+values of the parsimony coefficient, run
+```
+python plot_complexity_vs_rmse.py
 ```
