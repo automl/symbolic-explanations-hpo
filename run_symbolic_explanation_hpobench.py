@@ -17,12 +17,16 @@ from utils.hpobench_utils import get_run_config, get_benchmark_dict, get_task_di
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--job_id')
+    parser.add_argument('--run_type',
+                        description='"smac": Symbolic regression is fitted on samples collected via Bayesian '
+                                    'optimization, '
+                                    '"rand": Symbolic regression is fitted on randomly sampled configurations and '
+                                    'their performance'
+                                    '"surr" Symbolic regression is fitted on random samples and their performance '
+                                    'estimated using the Gaussian process'
+                        )
     args = parser.parse_args()
-
-    # "smac": Symbolic regression is fitted on samples collected via Bayesian optimization
-    # "rand": Symbolic regression is fitted on randomly sampled configurations and their performance
-    # "surr" Symbolic regression is fitted on random samples and their performance estimated using the Gaussian process
-    run_type = "smac"
+    run_type = args.run_type
 
     # number of HPs to optimize
     n_optimized_params = 2
