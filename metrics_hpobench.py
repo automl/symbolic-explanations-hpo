@@ -13,7 +13,7 @@ if __name__ == "__main__":
     # number of HP combinations to consider per model
     max_hp_comb = 1
 
-    dir_with_test_data = "" #"learning_curves/runs_surr_hpobench"
+    dir_with_test_data = "" #"results/runs_surr_hpobench"
     n_test_samples = 100
     parsimony_coefficient_space = [0.0001]
     # if None, calculate metrics over all sample sizes
@@ -25,7 +25,7 @@ if __name__ == "__main__":
         symb_dir_name = f"parsimony{parsimony}"
 
         # Set up plot directories
-        metric_dir = f"learning_curves/metrics/{symb_dir_name}"
+        metric_dir = f"results/metrics/{symb_dir_name}"
         if os.path.exists(metric_dir):
             shutil.rmtree(metric_dir)
         os.makedirs(metric_dir)
@@ -68,14 +68,14 @@ if __name__ == "__main__":
                 for sampling_type in ["SR (BO)", "SR (Random)", "SR (BO-GP)", "GP Baseline"]:
                     try:
                         if sampling_type == "GP Baseline":
-                            symb_dir = f"learning_curves/runs_surr_hpobench/{run_name}"
+                            symb_dir = f"results/runs_surr_hpobench/{run_name}"
                         else:
                             if sampling_type == "SR (BO)":
-                                symb_dir = f"learning_curves/runs_symb_hpobench/{symb_dir_name}/smac/{run_name}"
+                                symb_dir = f"results/runs_symb_hpobench/{symb_dir_name}/smac/{run_name}"
                             elif sampling_type == "SR (Random)":
-                                symb_dir = f"learning_curves/runs_symb_hpobench/{symb_dir_name}/rand/{run_name}"
+                                symb_dir = f"results/runs_symb_hpobench/{symb_dir_name}/rand/{run_name}"
                             else:
-                                symb_dir = f"learning_curves/runs_symb_hpobench/{symb_dir_name}/surr/{run_name}"
+                                symb_dir = f"results/runs_symb_hpobench/{symb_dir_name}/surr/{run_name}"
 
                         df_error_metrics = pd.read_csv(f"{symb_dir}/error_metrics.csv")
                         df_error_metrics["rmse_test"] = np.sqrt(df_error_metrics["mse_test"])
