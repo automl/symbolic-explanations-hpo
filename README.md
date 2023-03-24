@@ -28,9 +28,9 @@ order of commands. To create the raw results, first run:
 python run_sampling_hpobench.py --job_id 0 --run_type smac
 python run_sampling_hpobench.py --job_id 0 --run_type rand
 python run_sampling_hpobench.py --job_id 0 --run_type surr
-python run_symbolic_explanation_hpobench.py --job_id 0 smac
-python run_symbolic_explanation_hpobench.py --job_id 0 rand
-python run_symbolic_explanation_hpobench.py --job_id 0 surr
+python run_symbolic_explanation_hpobench.py --job_id 0 --run_type smac
+python run_symbolic_explanation_hpobench.py --job_id 0 --run_type rand
+python run_symbolic_explanation_hpobench.py --job_id 0 --run_type surr
 python run_surrogate_explanation_hpobench.py --job_id 0
 ```
 
