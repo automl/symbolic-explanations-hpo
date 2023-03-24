@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 from itertools import combinations
 
-from utils.utils import get_hpo_test_data, get_scores, get_surrogate_predictions
+from utils.run_utils import get_hpo_test_data, get_scores, get_surrogate_predictions
 from utils.functions_utils import get_functions2d, NamedFunction
 from utils.model_utils import get_hyperparams, get_classifier_from_run_conf
 from utils.logging_utils import get_logger
@@ -20,9 +20,9 @@ if __name__ == "__main__":
 
     n_samples_spacing = np.linspace(20, 200, 10, dtype=int).tolist()
     functions = get_functions2d()
-    models = ["MLP", "SVM", "BDT", "DT"]
+    models = ["LR", "MLP", "SVM", "BDT", "DT"]
     #models = functions
-    data_sets = ["digits", "iris"]
+    data_sets = ["credit-g", "digits", "iris"]
 
     init_design_max_ratio = 0.25
     init_design_n_configs_per_hyperparamter = 8
@@ -65,6 +65,7 @@ if __name__ == "__main__":
     if os.path.exists(surr_dir):
         shutil.rmtree(surr_dir)
     os.makedirs(surr_dir)
+    os.makedirs(f"{surr_dir}/surr_preds")
 
     # setup logging
     logger = get_logger(filename=f"{surr_dir}/surrogate_log.log")
@@ -81,6 +82,10 @@ if __name__ == "__main__":
     except:
         logger.info(f"No test data found, create test data for {run_name}.")
         X_test, y_test = get_hpo_test_data(classifier, optimized_parameters, n_test_samples)
+    X_test_reshaped = X_test.reshape(len(optimized_parameters), -1).T
+    y_test_reshaped = y_test.reshape(-1)
+    pd.DataFrame(X_test_reshaped, columns=parameter_names).to_csv(f"{surr_dir}/x_test.csv", index=False)
+    pd.DataFrame(y_test_reshaped).to_csv(f"{surr_dir}/y_test.csv", header=False, index=False)
 
     df_all_metrics = pd.DataFrame()
 
@@ -120,14 +125,18 @@ if __name__ == "__main__":
 
                 df_metrics = get_scores(
                     y_train,
-                    get_surrogate_predictions(np.array(X_train), classifier, surrogate_model),
+                    get_surrogate_predictions(np.array(X_train), classifier.configspace, surrogate_model),
                     y_test.reshape(-1),
-                    get_surrogate_predictions(X_test.reshape(len(optimized_parameters), -1).T, classifier, surrogate_model),
+                    get_surrogate_predictions(X_test.reshape(len(optimized_parameters), -1).T, classifier.configspace, surrogate_model),
                 )
 
                 df_metrics.insert(0, "n_samples", n_samples)
                 df_metrics.insert(0, "sampling_seed", sampling_seed)
                 df_all_metrics = pd.concat((df_all_metrics, df_metrics))
+
+                # Save surrogate test predictions
+                test_pred = get_surrogate_predictions(X_test.reshape(len(optimized_parameters), -1).T, classifier.configspace, surrogate_model)
+                pd.DataFrame(test_pred).to_csv(f"{surr_dir}/surr_preds/test_pred_samples{n_samples}_seed{sampling_seed}.csv", index=False)
             except:
                 logger.warning(f"File n_eval{n_eval}_samples{n_samples}_seed{sampling_seed}.pkl could not be loaded, "
                                f"skip.")

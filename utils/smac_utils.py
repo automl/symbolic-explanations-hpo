@@ -1,6 +1,7 @@
 import logging
 import numpy as np
 from pathlib import Path
+from typing import Union
 from ConfigSpace import ConfigurationSpace
 from typing import Type
 from smac import Scenario, Callback
@@ -17,7 +18,7 @@ def run_smac_optimization(
     seed: int,
     n_configs_per_hyperparamter: int = 8,
     max_ratio: float = 0.25,
-    callback: Callback | None = None
+    callback: Union[Callback, None] = None
 ) -> [np.ndarray, np.ndarray]:
     """Runs SMAC Hyperparameter Optimization on the given function within the hyperparameter space.
 
@@ -66,7 +67,7 @@ def run_smac_optimization(
     handler = logging.FileHandler(filename=f"{run_dir}/log.log", encoding="utf8")
     handler.setLevel("INFO")
     handler.setFormatter(
-        logging.Formatter("[%(levelname)s][%(filename)s:%(lineno)d] %(message)s")
+        logging.Formatter("[%(levelname)s][%(asctime)s;%(filename)s:%(lineno)d] %(message)s")
     )
     logger.root.addHandler(handler)
 

@@ -1,3 +1,5 @@
+import logging
+
 import pandas as pd
 import os
 import shutil
@@ -6,6 +8,7 @@ import seaborn as sns
 import numpy as np
 from itertools import combinations
 
+from utils.run_utils import get_hpo_test_data
 from utils.functions_utils import get_functions2d, NamedFunction
 from utils.model_utils import get_hyperparams, get_classifier_from_run_conf
 from utils.logging_utils import get_logger
@@ -16,10 +19,11 @@ if __name__ == "__main__":
     titlesize=14
     symb_dir_name = "mult_testeval_add_func"
     functions = get_functions2d()
-    models = ["MLP", "SVM", "BDT", "DT"]
+    models = ["LR", "MLP", "SVM", "BDT", "DT"]
     #models = functions
-    data_sets = ["digits", "iris"]
-    include_surr_diff = True
+    data_sets = ["credit-g", "digits", "iris"]
+    n_test_samples = 100
+    include_surr_diff = False
 
     run_configs = []
     for model in models:
@@ -45,7 +49,7 @@ if __name__ == "__main__":
     os.makedirs(rmse_plot_dir)
     os.makedirs(kt_plot_dir)
 
-    logger = get_logger(filename=f"{plot_dir}/plot_log.log")
+    logger = logging.getLogger(__name__) #get_logger(filename=f"{plot_dir}/plot_log.log")
 
     logger.info(f"Save plots to {plot_dir}.")
 
@@ -73,8 +77,8 @@ if __name__ == "__main__":
 
         # Load test data
         logger.info(f"Get test data.")
-        X_test = np.array(pd.read_csv(f"learning_curves/runs_symb/{symb_dir_name}/surr/{run_name}/x_test.csv"))
-        y_test = np.array(pd.read_csv(f"learning_curves/runs_symb/{symb_dir_name}/surr/{run_name}/y_test.csv"))
+        X_test = np.array(pd.read_csv(f"learning_curves/runs_surr/{symb_dir_name}/surr/{run_name}/x_test.csv"))
+        y_test = np.array(pd.read_csv(f"learning_curves/runs_surr/{symb_dir_name}/surr/{run_name}/y_test.csv"))
 
         avg_cost = y_test.mean()
         std_cost = y_test.std()
@@ -82,7 +86,7 @@ if __name__ == "__main__":
         df_error_metrics_all = pd.DataFrame()
         df_complexity_all = pd.DataFrame()
 
-        for sampling_type in ["SR (BO-GP)", "GP (BO)"]: #"SR (Random)", "SR (BO)", 
+        for sampling_type in ["GP (BO)"]: #"SR (BO-GP)", , "SR (Random)", "SR (BO)", 
 
             if sampling_type == "GP (BO)":
                 symb_dir = f"learning_curves/runs_surr/{run_name}"
@@ -97,7 +101,7 @@ if __name__ == "__main__":
                 df_complexity.insert(0, "Experiment", f"{sampling_type}")
                 df_complexity_all = pd.concat((df_complexity_all, df_complexity))
 
-            df_complexity_all = df_complexity_all[df_complexity_all["program_operations"] != -1]
+                df_complexity_all = df_complexity_all[df_complexity_all["program_operations"] != -1]
 
             df_error_metrics = pd.read_csv(f"{symb_dir}/error_metrics.csv")
             df_error_metrics["rmse_test"] = np.sqrt(df_error_metrics["mse_test"])
@@ -120,6 +124,7 @@ if __name__ == "__main__":
             "DT": "Decision Tree",
             "SVM": "Support Vector Machine",
             "MLP": "Neural Network",
+            "LR": "Logistic Regression"
         }
         if classifier.name in classifier_titles.keys():
             classifier_title = classifier_titles[classifier.name]

@@ -120,9 +120,9 @@ if __name__ == "__main__":
                             surrogate_model = pickle.load(surrogate_file)
 
                         df_metrics = get_scores(
-                            get_surrogate_predictions(np.array(X_train), classifier, surrogate_model),
+                            get_surrogate_predictions(np.array(X_train), classifier.configspace, surrogate_model),
                             symb_surr.predict(X_train),
-                            get_surrogate_predictions(X_test_reshaped, classifier, surrogate_model),
+                            get_surrogate_predictions(X_test_reshaped, classifier.configspace, surrogate_model),
                             symb_surr.predict(X_test_reshaped)
                         )
                         df_metrics.insert(0, "n_samples", n_samples)
