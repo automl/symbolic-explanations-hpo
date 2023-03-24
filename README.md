@@ -42,10 +42,10 @@ Which models and datasets should be included in the list can be defined in `util
 one hyperparameter-combination is evaluated per model and dataset. This can be adapted by modifying the parameter
 `max_hp_comb` inside the script.
 
-By setting the option `use_random_samples` in the script to `True`, the script furthermore allows to collect randomly 
-sampled configurations and evaluate their performance. When setting the option `evaluate_on_surrogate` in the script 
-to `True`, the script will collect random samples, but estimated their performance using the Gaussian process. Please
-note that the BO sampling needs to be run beforehand to provide the Gaussian process models.
+By setting `run_type` in the script to `rand`, the script furthermore allows to collect randomly 
+sampled configurations and evaluate their performance. When setting `run_type` in the script 
+to `surr`, the script will collect random samples, but estimated their performance using the Gaussian process. Please
+note that, in the latter case, the BO sampling needs to be run beforehand to provide the Gaussian process models.
 
 ### Symbolic Regression
 
@@ -57,8 +57,8 @@ python run_symbolic_explanation_hpobench.py --job_id 0
 ```
 
 By default, the symbolic regression will be fitted on the samples collected during Bayesian Optimization (a).
-By setting the option `use_random_samples` in the script to `True`, the symbolic regression will be fitted on the randomly 
-sampled configurations (b). When setting the option `evaluate_on_surrogate` in the script to `True`, the symbolic regression
+By setting `run_type` in the script to `rand`, the symbolic regression will be fitted on the randomly 
+sampled configurations (b). When setting `run_type` in the script to `surr`, the symbolic regression
 will be fitted on the random samples with Gaussian process performance estimates (c). 
 
 ### Gaussian Process Baseline
