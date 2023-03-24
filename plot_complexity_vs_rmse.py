@@ -26,7 +26,7 @@ if __name__ == "__main__":
     run_configs = get_run_config(n_optimized_params=n_optimized_params, max_hp_comb=1)
 
     # Set up plot directories
-    plot_dir = f"learning_curves/plots/complexity_vs_rmse_hpobench"
+    plot_dir = f"results/plots/complexity_vs_rmse_hpobench"
     if os.path.exists(plot_dir):
         shutil.rmtree(plot_dir)
     os.makedirs(plot_dir)
@@ -58,7 +58,7 @@ if __name__ == "__main__":
 
             logger.info(f"########## Evaluate parsimony {parsimony}")
 
-            symb_dir = f"learning_curves/runs_symb_hpobench/parsimony{parsimony}/surr/{run_name}"
+            symb_dir = f"results/runs_symb_hpobench/parsimony{parsimony}/surr/{run_name}"
 
             df_error_metrics = pd.read_csv(f"{symb_dir}/error_metrics.csv")
             df_error_metrics["rmse_test"] = np.sqrt(df_error_metrics["mse_test"])

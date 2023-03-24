@@ -46,9 +46,9 @@ if __name__ == "__main__":
 
     run_name = f"{model_name.replace(' ', '_')}_{'_'.join(optimized_parameters)}{data_set_postfix}"
 
-    sampling_dir = f"learning_curves/{sampling_dir_name}/smac"
+    sampling_dir = f"results/{sampling_dir_name}/smac"
     sampling_run_dir = f"{sampling_dir}/{run_name}"
-    surr_dir = f"learning_curves/runs_surr_hpobench/{run_name}"
+    surr_dir = f"results/runs_surr_hpobench/{run_name}"
     if os.path.exists(surr_dir):
         shutil.rmtree(surr_dir)
     os.makedirs(surr_dir)

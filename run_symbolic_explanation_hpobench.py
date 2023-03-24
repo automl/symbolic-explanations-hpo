@@ -32,7 +32,7 @@ if __name__ == "__main__":
     init_design_n_configs_per_hyperparamter = 8
 
     sampling_dir_name = "runs_sampling_hpobench"
-    dir_with_test_data = "" #"learning_curves/runs_surr_hpobench"
+    dir_with_test_data = "" #"results/runs_surr_hpobench"
     n_test_samples = 100
     n_seeds = 3
     # allow fit of SR to run for at max 15 minutes
@@ -72,10 +72,10 @@ if __name__ == "__main__":
 
     run_name = f"{model_name.replace(' ', '_')}_{'_'.join(optimized_parameters)}{data_set_postfix}"
 
-    sampling_dir = f"learning_curves/{sampling_dir_name}/{run_type}"
+    sampling_dir = f"results/{sampling_dir_name}/{run_type}"
     sampling_run_dir = f"{sampling_dir}/{run_name}"
 
-    symb_dir = f"learning_curves/runs_symb_hpobench/{symb_dir_name}/{run_type}/{run_name}"
+    symb_dir = f"results/runs_symb_hpobench/{symb_dir_name}/{run_type}/{run_name}"
     if os.path.exists(symb_dir):
         shutil.rmtree(symb_dir)
     os.makedirs(f"{symb_dir}/symb_models")

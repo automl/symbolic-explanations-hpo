@@ -78,7 +78,7 @@ if __name__ == "__main__":
 
     run_name = f"{model_name.replace(' ', '_')}_{'_'.join(optimized_parameters)}{data_set_postfix}"
 
-    sampling_dir = f"learning_curves/{sampling_dir_name}/{run_type}"
+    sampling_dir = f"results/{sampling_dir_name}/{run_type}"
     sampling_run_dir = f"{sampling_dir}/{run_name}"
     if os.path.exists(sampling_run_dir):
         shutil.rmtree(sampling_run_dir)
