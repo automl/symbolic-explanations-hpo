@@ -34,18 +34,18 @@ Collecting the samples as described in step 1 can be run for a single model, hyp
 by running
 
 ```
-python run_sampling_hpobench.py --job_id 0
+python run_sampling_hpobench.py --job_id 0 --run_type smac
 ```
 
 where `job_id` is an index to iterate over a list containing all models, hyperparameter-combinations, and datasets.
-Which models and datasets should be included in the list can be defined in `utils/hpobench_utils`. By default,
-one hyperparameter-combination is evaluated per model and dataset. This can be adapted by modifying the parameter
-`max_hp_comb` inside the script.
+Which models and datasets should be included in the list can be defined in `utils/hpobench_utils`. 
+By default, one hyperparameter-combination is evaluated per model and dataset. This can be adapted by modifying the 
+parameter `max_hp_comb` inside the script.
 
-By setting `run_type` in the script to `rand`, the script furthermore allows to collect randomly 
-sampled configurations and evaluate their performance. When setting `run_type` in the script 
-to `surr`, the script will collect random samples, but estimated their performance using the Gaussian process. Please
-note that, in the latter case, the BO sampling needs to be run beforehand to provide the Gaussian process models.
+By setting `run_type` to `rand`, the script furthermore allows to collect randomly sampled configurations and evaluate 
+their performance. When setting `run_type` to `surr`, the script will collect random samples, but estimated their 
+performance using the Gaussian process. Please  note that, in the latter case, the BO sampling needs to be run 
+beforehand to provide the Gaussian process models.
 
 ### Symbolic Regression
 
@@ -53,12 +53,12 @@ Fitting the symbolic regression model as described in step 2 can be run for a si
 and dataset, by running
 
 ```
-python run_symbolic_explanation_hpobench.py --job_id 0
+python run_symbolic_explanation_hpobench.py --job_id 0 --run_type smac
 ```
 
-By default, the symbolic regression will be fitted on the samples collected during Bayesian Optimization (a).
-By setting `run_type` in the script to `rand`, the symbolic regression will be fitted on the randomly 
-sampled configurations (b). When setting `run_type` in the script to `surr`, the symbolic regression
+This way, the symbolic regression will be fitted on the samples collected during Bayesian Optimization (a).
+By setting `run_type` to `rand`, the symbolic regression will be fitted on the randomly 
+sampled configurations (b). When setting `run_type` to `surr`, the symbolic regression
 will be fitted on the random samples with Gaussian process performance estimates (c). 
 
 ### Gaussian Process Baseline
@@ -98,3 +98,31 @@ To create plots showing several representations of the HPO loss landscape, run
 ```
 python plot_2d_hpobench.py
 ```
+
+### Commands to Reproduce Results
+
+To run the experiments for reproducing the results shown in the paper, we suggest the following
+order of commands. To create the raw results, first run:
+```
+python run_sampling_hpobench.py --job_id 0 --run_type smac
+python run_sampling_hpobench.py --job_id 0 --run_type rand
+python run_sampling_hpobench.py --job_id 0 --run_type surr
+python run_symbolic_explanation_hpobench.py --job_id 0 smac
+python run_symbolic_explanation_hpobench.py --job_id 0 rand
+python run_symbolic_explanation_hpobench.py --job_id 0 surr
+python run_surrogate_explanation_hpobench.py --job_id 0
+```
+
+`job_id 0` will run the experiments for logistic regression with hyperparameters `alpha` and `eta0` on the 
+dataset blood-transfusion-service-center. To reproduce the raw results for all models, hyperparameter 
+combinations and datasets showed in the paper, those needs to be run for `job_id` between 0-39.
+
+After running the above commands, to calculate metrics and create plots, then run:
+```
+python metrics_hpobench.py
+python plot_learning_curves_hpobench.py
+python plot_complexity_vs_rmse.py
+python plot_2d_hpobench.py
+```
+
+To limit the number of models and datasets to create plots for, you can adapt those in `utils/hpobench_utils`.

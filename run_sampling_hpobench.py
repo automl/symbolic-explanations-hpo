@@ -28,11 +28,13 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--job_id')
     parser.add_argument('--run_type',
-                        description='"smac": Collect samples via Bayesian optimization, '
-                                    '"rand": Collect randomly sampled configurations and evaluate their performance,'
-                                    '"surr" Collect random samples, but estimated their performance using the Gaussian '
-                                    'process (Please note that, in the latter case, the BO sampling needs to be run '
-                                    'beforehand to provide the Gaussian process models.)'
+                        choices=["smac", "rand", "surr"],
+                        help=
+                        '"smac": Collect samples via Bayesian optimization, '
+                        '"rand": Collect randomly sampled configurations and evaluate their performance,'
+                        '"surr" Collect random samples, but estimated their performance using the Gaussian process '
+                        '(Please note that, in the latter case, the BO sampling needs to be run beforehand to '
+                        'provide the Gaussian process models.)'
                         )
     args = parser.parse_args()
     run_type = args.run_type

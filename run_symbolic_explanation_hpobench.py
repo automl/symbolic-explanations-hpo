@@ -18,12 +18,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--job_id')
     parser.add_argument('--run_type',
-                        description='"smac": Symbolic regression is fitted on samples collected via Bayesian '
-                                    'optimization, '
-                                    '"rand": Symbolic regression is fitted on randomly sampled configurations and '
-                                    'their performance'
-                                    '"surr" Symbolic regression is fitted on random samples and their performance '
-                                    'estimated using the Gaussian process'
+                        choices=["smac", "rand", "surr"],
+                        help=
+                        '"smac": Symbolic regression is fitted on samples collected via Bayesian optimization, '
+                        '"rand": Symbolic regression is fitted on randomly sampled configurations and their performance'
+                        '"surr" Symbolic regression is fitted on random samples and their performance estimated '
+                        'using the Gaussian process'
                         )
     args = parser.parse_args()
     run_type = args.run_type
