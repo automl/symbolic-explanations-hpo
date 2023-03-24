@@ -10,7 +10,7 @@ from utils.hpobench_utils import get_run_config, get_benchmark_dict, get_task_di
 
 if __name__ == "__main__":
     symb_dir_name = "parsimony0.0001"
-    dir_with_test_data = "results/runs_surr_hpobench"
+    dir_with_test_data = "" #"results/runs_surr_hpobench"
     n_optimized_params = 2
 
     labelsize = 12
@@ -20,16 +20,10 @@ if __name__ == "__main__":
 
     # Set up plot directories
     plot_dir = f"results/plots/combined_plots_hpobench_{symb_dir_name}"
-    complexity_plot_dir = f"{plot_dir}/complexity"
-    mse_plot_dir = f"{plot_dir}/mse"
     rmse_plot_dir = f"{plot_dir}/rmse"
-    kt_plot_dir = f"{plot_dir}/kt"
     if os.path.exists(plot_dir):
         shutil.rmtree(plot_dir)
-    os.makedirs(complexity_plot_dir)
-    os.makedirs(mse_plot_dir)
     os.makedirs(rmse_plot_dir)
-    os.makedirs(kt_plot_dir)
 
     logger = get_logger(filename=f"{plot_dir}/plot_log.log")
 
