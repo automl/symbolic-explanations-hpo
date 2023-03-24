@@ -1,4 +1,4 @@
-name: hpo_symb
+name: symb_expl
 channels:
   - conda-forge
 dependencies:

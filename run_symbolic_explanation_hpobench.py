@@ -22,7 +22,22 @@ if __name__ == "__main__":
     use_random_samples = False
     evaluate_on_surrogate = True
 
+    # number of HPs to optimize
+    n_optimized_params = 2
+    # number of HP combinations to consider per model
     max_hp_comb = 1
+
+    n_samples_spacing = np.linspace(20, 200, 10, dtype=int).tolist()
+    init_design_max_ratio = 0.25
+    init_design_n_configs_per_hyperparamter = 8
+
+    sampling_dir_name = "runs_sampling_hpobench"
+    dir_with_test_data = "learning_curves/runs_surr_hpobench"
+    n_test_samples = 100
+    n_seeds = 3
+    # allow fit of SR to run for at max 15 minutes
+    max_seconds_per_fit = 900
+
     parsimony_coefficient_space = [0.0001]
     # parsimony_coefficient_space = [
     #     0.000001, 0.0000025, 0.000005, 0.0000075,
@@ -33,17 +48,6 @@ if __name__ == "__main__":
     #     0.001, 0.0025, 0.005, 0.0075,
     #     0.01, 0.025, 0.05, 0.075
     # ]
-
-    sampling_dir_name = "runs_sampling_hpobench"
-    dir_with_test_data = "learning_curves/runs_surr_hpobench"
-    n_optimized_params = 2
-    n_samples_spacing = np.linspace(20, 200, 10, dtype=int).tolist()
-    n_seeds = 3
-    n_test_samples = 100
-    init_design_max_ratio = 0.25
-    init_design_n_configs_per_hyperparamter = 8
-    # allow fit of SR to run for at max 15 minutes
-    max_seconds_per_fit = 900
 
     run_conf = get_run_config(job_id=args.job_id, n_optimized_params=n_optimized_params,
                               parsimony_coefficient_space=parsimony_coefficient_space,

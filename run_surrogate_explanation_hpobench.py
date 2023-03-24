@@ -15,17 +15,20 @@ if __name__ == "__main__":
     parser.add_argument('--job_id')
     args = parser.parse_args()
 
+    # number of HPs to optimize
+    n_optimized_params = 2
+    # number of HP combinations to consider per model
     max_hp_comb = 1
-    parsimony_coefficient_space = [0.0001]
+
+    n_samples_spacing = np.linspace(20, 200, 10, dtype=int).tolist()
+    init_design_max_ratio = 0.25
+    init_design_n_configs_per_hyperparamter = 8
 
     sampling_dir_name = "runs_sampling_hpobench"
     # only for loading test data
     dir_with_test_data = ""
-    n_optimized_params = 2
-    n_samples_spacing = np.linspace(20, 200, 10, dtype=int).tolist()
     n_test_samples = 100
-    init_design_max_ratio = 0.25
-    init_design_n_configs_per_hyperparamter = 8
+    parsimony_coefficient_space = [0.0001]
 
     run_conf = get_run_config(job_id=args.job_id, n_optimized_params=n_optimized_params,
                               parsimony_coefficient_space=parsimony_coefficient_space,

@@ -31,14 +31,19 @@ if __name__ == "__main__":
 
     use_random_samples = False
     evaluate_on_surrogate = True
-    sampling_dir_name = "runs_sampling_hpobench"
+
+    # number of HPs to optimize
     n_optimized_params = 2
+    # number of HP combinations to consider per model
     max_hp_comb = 1
+
     n_samples_spacing = np.linspace(20, 200, 10, dtype=int).tolist()
-    n_seeds = 3
-    surrogate_n_samples = 400
     init_design_max_ratio = 0.25
     init_design_n_configs_per_hyperparamter = 8
+
+    sampling_dir_name = "runs_sampling_hpobench"
+    n_seeds = 5
+    surrogate_n_samples = 400
 
     run_conf = get_run_config(job_id=args.job_id, n_optimized_params=n_optimized_params, max_hp_comb=max_hp_comb)
 
