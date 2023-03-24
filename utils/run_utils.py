@@ -1,37 +1,14 @@
-import os
-import time
-
 import pandas as pd
 import sympy
 import numpy as np
 from scipy.stats import kendalltau
 from functools import partial
-from gplearn.genetic import SymbolicRegressor
 from gplearn import functions
-from symbolic_meta_model_wrapper import (
-    SymbolicMetaModelWrapper,
-    SymbolicPursuitModelWrapper,
-)
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
 import configparser as cfgparse
 from ConfigSpace import Configuration, UniformIntegerHyperparameter
 from smac.runhistory.encoder.encoder import convert_configurations_to_array
 from hpobench.dependencies.ml.ml_benchmark_template import MLBenchmark
-
-
-def get_output_dirs() -> [str, str, str]:
-    """
-    Create directory for current run as well as a plot and result subdirectory.
-    """
-    if not os.path.exists("../runs"):
-        os.makedirs("../runs")
-    run_dir = f"runs/run_{time.strftime('%Y%m%d-%H%M%S')}"
-    res_dir = f"{run_dir}/results"
-    plot_dir = f"{run_dir}/plots"
-    os.makedirs(run_dir)
-    os.makedirs(res_dir)
-    os.makedirs(plot_dir)
-    return run_dir, res_dir, plot_dir
 
 
 def convert_symb(symb, n_dim: int = None, n_decimals: int = None) -> sympy.core.expr:
@@ -50,36 +27,29 @@ def convert_symb(symb, n_dim: int = None, n_decimals: int = None) -> sympy.core.
     -------
     symb_conv: Converted mathematical expression.
     """
-    if isinstance(symb, SymbolicRegressor):
 
-        # sqrt is protected function in gplearn, always returning sqrt(abs(x))
-        sqrt_pos = []
-        prev_sqrt_inserts = 0
-        for i, f in enumerate(symb._program.program):
-            if isinstance(f, functions._Function) and f.name == "sqrt":
-                sqrt_pos.append(i)
-        for i in sqrt_pos:
-            symb._program.program.insert(i + prev_sqrt_inserts + 1, functions.abs1)
-            prev_sqrt_inserts += 1
+    # sqrt is protected function in gplearn, always returning sqrt(abs(x))
+    sqrt_pos = []
+    prev_sqrt_inserts = 0
+    for i, f in enumerate(symb._program.program):
+        if isinstance(f, functions._Function) and f.name == "sqrt":
+            sqrt_pos.append(i)
+    for i in sqrt_pos:
+        symb._program.program.insert(i + prev_sqrt_inserts + 1, functions.abs1)
+        prev_sqrt_inserts += 1
 
-        # log is protected function in gplearn, always returning sqrt(abs(x))
-        log_pos = []
-        prev_log_inserts = 0
-        for i, f in enumerate(symb._program.program):
-            if isinstance(f, functions._Function) and f.name == "log":
-                log_pos.append(i)
-        for i in log_pos:
-            symb._program.program.insert(i + prev_log_inserts + 1, functions.abs1)
-            prev_log_inserts += 1
+    # log is protected function in gplearn, always returning sqrt(abs(x))
+    log_pos = []
+    prev_log_inserts = 0
+    for i, f in enumerate(symb._program.program):
+        if isinstance(f, functions._Function) and f.name == "log":
+            log_pos.append(i)
+    for i in log_pos:
+        symb._program.program.insert(i + prev_log_inserts + 1, functions.abs1)
+        prev_log_inserts += 1
 
-        symb_str = str(symb._program)
+    symb_str = str(symb._program)
 
-    elif isinstance(symb, SymbolicMetaModelWrapper) or isinstance(
-        symb, SymbolicPursuitModelWrapper
-    ):
-        symb_str = str(symb.expression())
-    else:
-        raise Exception("Unknown symbolic model")
 
     converter = {
         "sub": lambda x, y: x - y,
@@ -105,12 +75,6 @@ def convert_symb(symb, n_dim: int = None, n_decimals: int = None) -> sympy.core.
         symb_conv = symb_conv.subs(X0, X1)
     symb_simpl = sympy.simplify(symb_conv)
 
-    if isinstance(symb, SymbolicPursuitModelWrapper):
-        proj = symb.metamodel.get_projections()
-        for i, p in enumerate(proj):
-            for a in sympy.preorder_traversal(symb_simpl):
-                if isinstance(a, sympy.core.Symbol) and str(a) == f"P{i+1}":
-                    symb_simpl = symb_simpl.subs(a, p)
     if n_decimals:
         # Make sure also floats deeper in the expression tree are rounded
         for a in sympy.preorder_traversal(symb_simpl):
@@ -118,53 +82,6 @@ def convert_symb(symb, n_dim: int = None, n_decimals: int = None) -> sympy.core.
                 symb_simpl = symb_simpl.subs(a, round(a, n_decimals))
 
     return symb_simpl
-
-
-def append_scores(
-    df_scores,
-    col_name,
-    symb_smac,
-    symb_comp,
-    X_train_smac,
-    y_train_smac,
-    X_train_comp,
-    y_train_comp,
-    comp_postfix,
-    X_test,
-    y_test,
-):
-    """
-    Append scores to Scores Dataframe.
-    """
-    df_scores[col_name] = {
-        "mae_train_smac": mean_absolute_error(
-            y_train_smac, symb_smac.predict(X_train_smac)
-        ),
-        f"mae_train_{comp_postfix}": mean_absolute_error(
-            y_train_comp, symb_comp.predict(X_train_comp)
-        ),
-        "mae_test_smac": mean_absolute_error(y_test, symb_smac.predict(X_test)),
-        f"mae_test_{comp_postfix}": mean_absolute_error(
-            y_test, symb_comp.predict(X_test)
-        ),
-        "mse_train_smac": mean_squared_error(
-            y_train_smac, symb_smac.predict(X_train_smac)
-        ),
-        f"mse_train_{comp_postfix}": mean_squared_error(
-            y_train_comp, symb_comp.predict(X_train_comp)
-        ),
-        "mse_test_smac": mean_squared_error(y_test, symb_smac.predict(X_test)),
-        f"mse_test_{comp_postfix}": mean_squared_error(
-            y_test, symb_comp.predict(X_test)
-        ),
-        "r2_train_smac": r2_score(y_train_smac, symb_smac.predict(X_train_smac)),
-        f"r2_train_{comp_postfix}": r2_score(
-            y_train_comp, symb_comp.predict(X_train_comp)
-        ),
-        "r2_test_smac": r2_score(y_test, symb_smac.predict(X_test)),
-        f"r2_test_{comp_postfix}": r2_score(y_test, symb_comp.predict(X_test)),
-    }
-    return df_scores
 
 
 def get_scores(
