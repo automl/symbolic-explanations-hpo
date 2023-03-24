@@ -135,4 +135,5 @@ dmypy.json
 .neptune
 smac3-output*
 runs/
+learning_curves/
 results/
