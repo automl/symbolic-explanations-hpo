@@ -32,7 +32,7 @@ if __name__ == "__main__":
     init_design_n_configs_per_hyperparamter = 8
 
     sampling_dir_name = "runs_sampling_hpobench"
-    dir_with_test_data = "learning_curves/runs_surr_hpobench"
+    dir_with_test_data = "" #"learning_curves/runs_surr_hpobench"
     n_test_samples = 100
     n_seeds = 3
     # allow fit of SR to run for at max 15 minutes
@@ -42,9 +42,7 @@ if __name__ == "__main__":
     # parsimony_coefficient_space = [
     #     0.000001, 0.0000025, 0.000005, 0.0000075,
     #     0.00001, 0.000025, 0.00005, 0.000075,
-    #     #0.0001, 
-    #     0.00025, 0.00075,
-    #     #0.0005
+    #     0.0001, 0.00025, 0.00075, 0.0005
     #     0.001, 0.0025, 0.005, 0.0075,
     #     0.01, 0.025, 0.05, 0.075
     # ]

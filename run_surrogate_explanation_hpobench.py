@@ -25,7 +25,6 @@ if __name__ == "__main__":
     init_design_n_configs_per_hyperparamter = 8
 
     sampling_dir_name = "runs_sampling_hpobench"
-    # only for loading test data
     dir_with_test_data = ""
     n_test_samples = 100
     parsimony_coefficient_space = [0.0001]
