@@ -30,7 +30,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     use_random_samples = False
-    evaluate_on_surrogate = True
+    evaluate_on_surrogate = False
 
     # number of HPs to optimize
     n_optimized_params = 2
@@ -129,7 +129,7 @@ if __name__ == "__main__":
                 configurations = np.array(
                     [list(i.get_dictionary().values()) for i in configurations]
                 ).T
-                with open(f"learning_curves/{sampling_dir_name}/smac/{run_name}/surrogates/n_eval{n_eval}"
+                with open(f"results/{sampling_dir_name}/smac/{run_name}/surrogates/n_eval{n_eval}"
                           f"_samples{n_samples}_seed{seed}.pkl", "rb") as surrogate_file:
                     surrogate_model = pickle.load(surrogate_file)
                 performances = np.array(get_surrogate_predictions(configurations.T, cs, surrogate_model))

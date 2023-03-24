@@ -20,7 +20,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     use_random_samples = False
-    evaluate_on_surrogate = True
+    evaluate_on_surrogate = False
 
     # number of HPs to optimize
     n_optimized_params = 2
