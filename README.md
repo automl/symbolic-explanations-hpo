@@ -16,18 +16,19 @@ To install HPOBench, please run the following after activating the environment:
 git clone https://github.com/automl/HPOBench.git
 cd HPOBench 
 pip install .
+cd ..
 ```
 
 ## Running Experiments
 
 In the following, we describe how to run the experiments. The overall process consists of the following steps: 
-1. Run the Bayesian Optimization-powered Hyperparameter Optimization tool SMAC and collect (a) the meta-data consisting of the evaluated configurations
+1. Run the Bayesian optimization-powered hyperparameter optimization tool SMAC and collect (a) the meta-data consisting of the evaluated configurations
 and their performance and (b) the final surrogate model.
 2. Learn a symbolic regression model on either (a) the collected meta-data, or (b) randomly sampled
 configurations, which are evaluated using the `True` cost function, or (c) randomly sampled
 configurations, whose performance is estimated using the Gaussian process.
 
-### Sample Collection
+### Collection of Training Samples for the Symbolic Regression
 
 Collecting the samples as described in step 1 can be run for a single model, hyperparameter-combination, and dataset, 
 by running
