@@ -17,10 +17,16 @@ from utils.hpobench_utils import get_run_config, get_benchmark_dict, get_task_di
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--job_id')
+    parser.add_argument('--run_type',
+                        choices=["smac", "rand", "surr"],
+                        help=
+                        '"smac": Symbolic regression is fitted on samples collected via Bayesian optimization, '
+                        '"rand": Symbolic regression is fitted on randomly sampled configurations and their performance'
+                        '"surr" Symbolic regression is fitted on random samples and their performance estimated '
+                        'using the Gaussian process'
+                        )
     args = parser.parse_args()
-
-    use_random_samples = False
-    evaluate_on_surrogate = True
+    run_type = args.run_type
 
     # number of HPs to optimize
     n_optimized_params = 2
@@ -32,7 +38,7 @@ if __name__ == "__main__":
     init_design_n_configs_per_hyperparamter = 8
 
     sampling_dir_name = "runs_sampling_hpobench"
-    dir_with_test_data = "" #"learning_curves/runs_surr_hpobench"
+    dir_with_test_data = "" #"results/runs_surr_hpobench"
     n_test_samples = 100
     n_seeds = 3
     # allow fit of SR to run for at max 15 minutes
@@ -40,9 +46,7 @@ if __name__ == "__main__":
 
     parsimony_coefficient_space = [0.0001]
     # parsimony_coefficient_space = [
-    #     0.000001, 0.0000025, 0.000005, 0.0000075,
-    #     0.00001, 0.000025, 0.00005, 0.000075,
-    #     0.0001, 0.00025, 0.00075, 0.0005
+    #     0.0001, 0.00025, 0.0005, 0.00075,
     #     0.001, 0.0025, 0.005, 0.0075,
     #     0.01, 0.025, 0.05, 0.075
     # ]
@@ -63,19 +67,12 @@ if __name__ == "__main__":
     # add only parameters to be optimized to configspace
     cs = b.get_configuration_space(seed=0, hyperparameters=optimized_parameters)
 
-    if use_random_samples:
-        run_type = "rand"
-    elif evaluate_on_surrogate:
-        run_type = "surr"
-    else:
-        run_type = "smac"
-
     run_name = f"{model_name.replace(' ', '_')}_{'_'.join(optimized_parameters)}{data_set_postfix}"
 
-    sampling_dir = f"learning_curves/{sampling_dir_name}/{run_type}"
+    sampling_dir = f"results/{sampling_dir_name}/{run_type}"
     sampling_run_dir = f"{sampling_dir}/{run_name}"
 
-    symb_dir = f"learning_curves/runs_symb_hpobench/{symb_dir_name}/{run_type}/{run_name}"
+    symb_dir = f"results/runs_symb_hpobench/{symb_dir_name}/{run_type}/{run_name}"
     if os.path.exists(symb_dir):
         shutil.rmtree(symb_dir)
     os.makedirs(f"{symb_dir}/symb_models")
@@ -132,7 +129,7 @@ if __name__ == "__main__":
             y_train_all_samples = df_train_samples.query(f"seed == {sampling_seed}")["cost"]
 
 
-            if evaluate_on_surrogate:
+            if run_type == "surr":
                 X_train = X_train_all_samples
                 y_train = y_train_all_samples
             else:
