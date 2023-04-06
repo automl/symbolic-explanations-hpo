@@ -23,8 +23,8 @@ ALL_TASKS = openml.tasks.list_tasks()
 
 def get_benchmark_dict():
     benchmark_dict = {
-        LRBenchmarkBBDefaultHP: "LR",
-        SVMBenchmarkBBDefaultHP: "SVM",
+        # LRBenchmarkBBDefaultHP: "LR",
+        # SVMBenchmarkBBDefaultHP: "SVM",
         RandomForestBenchmarkBBDefaultHP: "RF",
         XGBoostBenchmarkBBDefaultHP: "XGBoost",
         NNBenchmarkBBDefaultHP: "NN",
@@ -43,7 +43,7 @@ def get_run_config(n_optimized_params, max_hp_comb=None, job_id=None, parsimony_
     run_configs = []
     for benchmark in get_benchmark_dict().keys():
         hyperparams = benchmark.get_configuration_space().get_hyperparameter_names()
-        hp_comb = combinations(hyperparams, n_optimized_params)
+        hp_comb = combinations(hyperparams, min(len(hyperparams), n_optimized_params))
         if max_hp_comb:
             hpc = list(hp_comb)[:max_hp_comb]
         else:

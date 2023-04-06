@@ -40,7 +40,7 @@ if __name__ == "__main__":
     run_type = args.run_type
 
     # number of HPs to optimize
-    n_optimized_params = 2
+    n_optimized_params = 5
     # number of HP combinations to consider per model
     max_hp_comb = 1
 
@@ -76,7 +76,7 @@ if __name__ == "__main__":
             n_samples_to_eval = n_samples_spacing
         else:
             n_samples_to_eval = [n for n in n_samples_spacing if
-                                 init_design_max_ratio * n < n_optimized_params * init_design_n_configs_per_hyperparamter]
+                                 init_design_max_ratio * n < len(optimized_parameters) * init_design_n_configs_per_hyperparamter]
             if max(n_samples_spacing) not in n_samples_to_eval:
                 n_samples_to_eval.append(max(n_samples_spacing))
 
@@ -101,7 +101,7 @@ if __name__ == "__main__":
         logger.info(f"Start run to sample {n_samples} samples.")
 
         # required for surrogate evaluation
-        if init_design_max_ratio * n_samples < n_optimized_params * init_design_n_configs_per_hyperparamter:
+        if init_design_max_ratio * n_samples < len(optimized_parameters) * init_design_n_configs_per_hyperparamter:
             n_eval = n_samples
         else:
             n_eval = max(n_samples_spacing)
