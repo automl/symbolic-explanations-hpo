@@ -18,8 +18,18 @@ from hpobench.benchmarks.ml.xgboost_benchmark import XGBoostBenchmarkBB
 from hpobench.benchmarks.ml.nn_benchmark import NNBenchmarkBB
 
 
-ALL_TASKS = openml.tasks.list_tasks()
-
+#API is broken, thus add dict manually
+#ALL_TASKS = openml.tasks.list_tasks()
+ALL_TASKS = {
+    10101: {"name": 'blood-transfusion-service-center'},
+    53: {"name": 'vehicle'},
+    146818: {"name": 'Australian'},
+    146821: {"name": 'car'},
+    9952: {"name": 'phoneme'},
+    146822: {"name": 'segment'},
+    31: {"name": 'credit-g'},
+    3917: {"name": 'kc1'},
+}
 
 def get_benchmark_dict():
     benchmark_dict = {
