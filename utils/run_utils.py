@@ -113,9 +113,11 @@ def get_surrogate_predictions(X, cs, surrogate_model):
     optimized_parameters = cs.get_hyperparameters()
     for i in range(X.shape[0]):
         values = {}
+        X_transformed = []
         for n in range(len(optimized_parameters)):
-            X[i][n] = int(X[i][n]) if isinstance(optimized_parameters[n], UniformIntegerHyperparameter) else X[i][n]
-            values[optimized_parameters[n].name] = X[i][n]
+            X_transformed[n] = int(X[i][n]) if isinstance(optimized_parameters[n], UniformIntegerHyperparameter) else \
+            X[i][n]
+            values[optimized_parameters[n].name] = X_transformed[n]
         conf = Configuration(
             configuration_space=cs,
             values=values,
