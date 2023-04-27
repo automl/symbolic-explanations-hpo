@@ -69,7 +69,7 @@ if __name__ == "__main__":
             n_eval = max(n_samples_spacing)
         df_samples_smac = pd.read_csv(f"{sampling_dir_smac}/samples_{n_eval}.csv")
 
-        for sampling_seed in df_samples_smac.seed.unique()[:1]:
+        for sampling_seed in df_samples_smac.seed.unique():
             logger.info(f"Considering sampling seed {sampling_seed}.")
             df_sampling_seed_smac = df_samples_smac.copy()[df_samples_smac["seed"] == sampling_seed]
 
@@ -90,7 +90,7 @@ if __name__ == "__main__":
 
             X_train_smac = np.array(df_sampling_seed_smac[[optimized_parameters[0], optimized_parameters[1]]])[:n_samples]
 
-            for symb_seed in symb_seeds[:1]:
+            for symb_seed in symb_seeds:
                 logger.info(f"Considering symb seed {symb_seed}.")
 
                 predictions_test = {}
