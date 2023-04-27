@@ -152,10 +152,10 @@ if __name__ == "__main__":
                 y_test = y_test.reshape(X_test.shape[1], X_test.shape[2])
             except:
                 logger.info(f"No previous test data dir provided, create test data for {run_name}.")
-                y_test = get_pdp(X_test.T.reshape(-1, 2), cs, surrogate_model, idx, n_ice)
-            X_test_reshaped = X_test.reshape(len(optimized_parameters), -1).T
+                y_test = get_pdp(X_test.T.reshape(-1, len(idx)), cs, surrogate_model, idx, n_ice)
+            X_test_reshaped = X_test.reshape(len(idx), -1).T
             y_test_reshaped = y_test.reshape(-1)
-            pd.DataFrame(X_test_reshaped, columns=optimized_parameters).to_csv(f"{symb_dir}/x_test.csv", index=False)
+            pd.DataFrame(X_test_reshaped, columns=parameters_to_interpret).to_csv(f"{symb_dir}/x_test.csv", index=False)
             pd.DataFrame(y_test_reshaped).to_csv(f"{symb_dir}/y_test_seed{sampling_seed}.csv", header=False,
                                                  index=False)
 
@@ -189,11 +189,6 @@ if __name__ == "__main__":
                             # pickling all programs lead to huge files
                             delattr(symb_model, "_programs")
                             pickle.dump(symb_model, symb_model_file)
-
-                        X_test = X_train
-                        Y_test = y_train
-                        X_test_reshaped = X_test.reshape(2, -1).T
-                        y_test_reshaped = Y_test.reshape(-1)
 
                         df_metrics = get_scores(
                             y_train,

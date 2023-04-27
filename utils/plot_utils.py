@@ -65,15 +65,8 @@ def plot_symb2d_subplots(
     pred_test = []
     for i, model_name in enumerate(predictions_test):
         pred_test.append(predictions_test[model_name])
-    y_values = np.concatenate(
-        (
-            y_test.reshape(-1, 1),
-            pred_test[0].reshape(-1, 1),
-            pred_test[1].reshape(-1, 1),
-            pred_test[2].reshape(-1, 1),
-            pred_test[3].reshape(-1, 1),
-        )
-    )
+    y_values = np.concatenate([pred.reshape(-1, 1) for pred in pred_test])
+    y_values = np.concatenate((y_test.reshape(-1, 1), y_values))
     vmin, vmax = min(y_values), max(y_values)
 
     if parameters[0].log:
