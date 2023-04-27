@@ -35,15 +35,16 @@ def get_benchmark_dict():
     benchmark_dict = {
         # LRBenchmarkBBDefaultHP: "LR",
         # SVMBenchmarkBBDefaultHP: "SVM",
-        RandomForestBenchmarkBBDefaultHP: "RF",
-        XGBoostBenchmarkBBDefaultHP: "XGBoost",
+        # RandomForestBenchmarkBBDefaultHP: "RF",
+        # XGBoostBenchmarkBBDefaultHP: "XGBoost",
         NNBenchmarkBBDefaultHP: "NN",
     }
     return benchmark_dict
 
 
 def get_task_dict():
-    task_ids = [10101, 53, 146818, 146821, 9952, 146822, 31, 3917] # Datasets for faithfulness study
+    #task_ids = [10101, 53, 146818, 146821, 9952, 146822, 31, 3917] # Datasets for faithfulness study
+    task_ids = [3917]
     #task_ids = [10101, 146818] # Datasets for Parsimony study
     task_dict = {tid: ALL_TASKS[tid]["name"] for tid in task_ids}
     return task_dict
