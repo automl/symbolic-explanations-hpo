@@ -51,7 +51,7 @@ if __name__ == "__main__":
         # add only parameters to be optimized to configspace
         cs = b.get_configuration_space(hyperparameters=optimized_parameters)
 
-        parameters_to_interpret = ["max_depth", "max_features"]
+        parameters_to_interpret = ["alpha", "batch_size"]
         idx = [cs.get_idx_by_hyperparameter_name(hp) for hp in parameters_to_interpret]
 
         run_name = f"{model_name.replace(' ', '_')}_{'_'.join(optimized_parameters)}_{data_set}"
