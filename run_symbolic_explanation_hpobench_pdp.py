@@ -80,7 +80,7 @@ if __name__ == "__main__":
         shutil.rmtree(symb_dir)
     os.makedirs(f"{symb_dir}/symb_models")
     if not os.path.exists(dir_with_test_data):
-        os.makedirs(f"{symb_dir}/dir_with_test_data")
+        os.makedirs(f"{dir_with_test_data}")
 
     logger = get_logger(filename=f"{symb_dir}/symb_log.log")
 
@@ -156,8 +156,9 @@ if __name__ == "__main__":
             X_test_reshaped = X_test.reshape(len(idx), -1).T
             y_test = y_test.reshape(X_test.shape[1], X_test.shape[2]).T
             y_test_reshaped = y_test.reshape(-1)
-            pd.DataFrame(X_test_reshaped, columns=parameters_to_interpret).to_csv(f"{symb_dir}/x_test.csv", index=False)
-            pd.DataFrame(y_test_reshaped).to_csv(f"{symb_dir}/y_test_seed{sampling_seed}.csv", header=False,
+            pd.DataFrame(X_test_reshaped, columns=parameters_to_interpret).to_csv(f"{dir_with_test_data}/x_test.csv",
+                                                                                  index=False)
+            pd.DataFrame(y_test_reshaped).to_csv(f"{dir_with_test_data}/y_test_seed{sampling_seed}.csv", header=False,
                                                  index=False)
 
             configurations = cs.sample_configuration(size=n_random)
