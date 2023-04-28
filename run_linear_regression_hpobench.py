@@ -34,7 +34,7 @@ if __name__ == "__main__":
     init_design_n_configs_per_hyperparamter = 8
 
     sampling_dir_name = "runs_sampling_hpobench"
-    dir_with_test_data = "results/runs_surr_hpobench"
+    dir_with_test_data = "learning_curves/runs_surr_hpobench"
     n_test_samples = 100
 
     run_conf = get_run_config(job_id=args.job_id, n_optimized_params=n_optimized_params,
