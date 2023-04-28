@@ -126,5 +126,5 @@ if __name__ == "__main__":
                                     plot_dir=viz_plot_dir,
                                     filename=filename
                                 )
-        except:
-            logger.info(f"Could not create plot for {run_conf}.")
+        except Exception as e:
+            logger.info(f"Could not create plot for {run_conf}:\n {e}")
