@@ -136,7 +136,7 @@ def plot_symb2d_subplots(
     for handle in leg.legendHandles:
         handle.set_sizes([100])
     leg.get_frame().set_linewidth(0.0)
-    cbar_ax = fig.add_axes([0.8, 0.38, 0.06, 0.1])
+    cbar_ax = fig.add_axes([0.9, 0.4, 0.02, 0.8])
     cbar = fig.colorbar(im, ax=ax, cax=cbar_ax, shrink=0.4, orientation="vertical")
     cbar.set_label(metric_name, fontsize=TITLE_SIZE, labelpad=6)
     cbar.ax.tick_params(labelsize=LABEL_SIZE)
