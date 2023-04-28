@@ -4,7 +4,7 @@ import numpy as np
 import dill as pickle
 
 from utils.run_utils import get_surrogate_predictions, get_hpo_test_data
-from utils.plot_utils import plot_symb2d_subplots
+from utils.plot_utils_pdp import plot_symb2d_subplots
 from utils.logging_utils import get_logger
 
 from utils.hpobench_utils import get_run_config, get_benchmark_dict, get_task_dict
@@ -50,7 +50,7 @@ if __name__ == "__main__":
         # add only parameters to be optimized to configspace
         cs = b.get_configuration_space(hyperparameters=optimized_parameters)
 
-        parameters_to_interpret = ["max_depth", "min_samples_leaf"]
+        parameters_to_interpret = ["learning_rate_init", "width"]
         idx = [cs.get_idx_by_hyperparameter_name(hp) for hp in parameters_to_interpret]
 
         run_name = f"{model_name.replace(' ', '_')}_{'_'.join(optimized_parameters)}_{data_set}"
