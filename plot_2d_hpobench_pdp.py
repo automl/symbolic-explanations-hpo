@@ -86,7 +86,7 @@ if __name__ == "__main__":
             except:
                 logger.info(f"No previous test data dir provided, create test data for {run_name}.")
                 y_test = get_pdp(X_test.T.reshape(-1, len(idx)), cs, surrogate_model, idx, n_ice)
-            y_test = y_test.reshape(X_test.shape[1], X_test.shape[2])
+            y_test = y_test.reshape(X_test.shape[1], X_test.shape[2]).T
 
             X_train_smac = np.array(df_sampling_seed_smac[[optimized_parameters[0], optimized_parameters[1]]])[:n_samples]
 
