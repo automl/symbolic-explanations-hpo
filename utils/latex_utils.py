@@ -30,7 +30,9 @@ def generate_result_table(df, stddev_df, stddev: bool = False, decimal_places: i
     if show_avg:
         df_avg = df.mean()
 
-    df = df.drop(columns=["GP Baseline", "LR (GP-BO) Baseline"])
+    print(df.columns)
+    df = df.drop(columns=["GP Baseline"])
+    df = df.drop(columns=["LR (GP-BO) Baseline"])
 
     for k in range(len(df.index)):
         df.iloc[k] = df.iloc[k].apply(
