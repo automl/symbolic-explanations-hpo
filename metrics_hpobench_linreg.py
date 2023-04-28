@@ -80,8 +80,6 @@ if __name__ == "__main__":
                             else:
                                 symb_dir = f"learning_curves/runs_symb_hpobench/{symb_dir_name}/surr/{run_name}"
 
-                        logger.info(f"Process {sampling_type} for {run_name}.")
-
                         df_error_metrics = pd.read_csv(f"{symb_dir}/error_metrics.csv")
                         df_error_metrics["rmse_test"] = np.sqrt(df_error_metrics["mse_test"])
                         df_error_metrics["rmse_train"] = np.sqrt(df_error_metrics["mse_train"])
