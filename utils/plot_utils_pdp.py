@@ -100,9 +100,9 @@ def plot_symb2d_subplots(
     ax.grid(alpha=0)
 
     for ind, model_name in enumerate(predictions_test):
+        print(model_name)
         label = model_name
-        if model_name == "SR (BO-GP)":
-            i = 2
+        i = 2
         ax = plt.subplot(1, 2, i)
 
         im = ax.pcolormesh(
