@@ -137,7 +137,7 @@ if __name__ == "__main__":
                     f"{sampling_seed}, skip.")
                 break
 
-            parameters_to_interpret = ["learning_rate_init", "width"]
+            parameters_to_interpret = ["max_depth", "max_features"]
             idx = [cs.get_idx_by_hyperparameter_name(hp) for hp in parameters_to_interpret]
 
             logger.info(f"Get PDPs for {run_name} ({run_type}).")
