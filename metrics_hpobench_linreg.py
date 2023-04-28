@@ -74,7 +74,7 @@ if __name__ == "__main__":
                                 symb_dir = f"learning_curves/runs_symb_hpobench/{symb_dir_name}/smac/{run_name}"
                             elif sampling_type == "SR (Random)":
                                 symb_dir = f"learning_curves/runs_symb_hpobench/{symb_dir_name}/rand/{run_name}"
-                            elif sampling_type == "LR Baseline":
+                            elif sampling_type == "LR (BO)":
                                 symb_dir = f"results/runs_linreg_hpobench/linreg/smac/{run_name}"
                             else:
                                 symb_dir = f"learning_curves/runs_symb_hpobench/{symb_dir_name}/surr/{run_name}"
