@@ -33,11 +33,11 @@ ALL_TASKS = {
 
 def get_benchmark_dict():
     benchmark_dict = {
-        LRBenchmarkBBDefaultHP: "LR",
-        SVMBenchmarkBBDefaultHP: "SVM",
+        # LRBenchmarkBBDefaultHP: "LR",
+        # SVMBenchmarkBBDefaultHP: "SVM",
         RandomForestBenchmarkBBDefaultHP: "RF",
-        XGBoostBenchmarkBBDefaultHP: "XGBoost",
-        NNBenchmarkBBDefaultHP: "NN",
+        # XGBoostBenchmarkBBDefaultHP: "XGBoost",
+        # NNBenchmarkBBDefaultHP: "NN",
     }
     return benchmark_dict
 
