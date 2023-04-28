@@ -107,7 +107,7 @@ if __name__ == "__main__":
                 symb_pred_smac = symb_smac.predict(
                         X_test.T.reshape(X_test.shape[1] * X_test.shape[2], X_test.shape[0])
                     ).reshape(X_test.shape[2], X_test.shape[1]).T
-                predictions_test[f"SR (BO)"] = symb_pred_smac
+                predictions_test[f"SR (BO, Partial Dependence)"] = symb_pred_smac
 
                 X_train_list = [None, None, X_train_smac.T, None]
 
