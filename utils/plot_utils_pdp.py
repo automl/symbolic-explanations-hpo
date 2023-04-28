@@ -80,7 +80,7 @@ def plot_symb2d_subplots(
 
     fig = plt.figure(figsize=(15, 6))
 
-    ax = plt.subplot(1, 2, 1)
+    ax = plt.subplot(2, 2, 1)
     im = ax.pcolormesh(
         X0_test,
         X1_test,
