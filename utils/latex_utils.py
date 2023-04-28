@@ -24,9 +24,8 @@ def format_number(data, decimal_places: int = 2, maximum_length_before_comma: in
 def generate_result_table(df, stddev_df, stddev: bool = False, decimal_places: int = 3,
                           show_avg: bool = True):
     df_no_format = df.copy()
-    print(df.columns)
     df_decimal_format = df.copy()[["GP Baseline", "LR (BO-GP) Baseline"]]
-    df = df.drop(columns=["Model", "Hyperparameters", "Dataset"])
+    df = df.drop(columns=[["Model", "Hyperparameters", "Dataset"]])
 
     if show_avg:
         df_avg = df.mean()
