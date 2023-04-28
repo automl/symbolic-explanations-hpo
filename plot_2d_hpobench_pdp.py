@@ -17,13 +17,13 @@ if __name__ == "__main__":
     # number of HP combinations to consider per model
     max_hp_comb = 1
 
-    n_samples_spacing = np.linspace(60, 60, 10, dtype=int).tolist()
+    n_samples_spacing = np.linspace(80, 80, 10, dtype=int).tolist()
     init_design_max_ratio = 0.25
     init_design_n_configs_per_hyperparamter = 8
 
     n_test_samples = 100
     symb_dir_name = f"parsimony0.0001"
-    n_samples = 60
+    n_samples = 80
     symb_seeds = [0]
 
     n_ice = 200
@@ -50,7 +50,7 @@ if __name__ == "__main__":
         # add only parameters to be optimized to configspace
         cs = b.get_configuration_space(hyperparameters=optimized_parameters)
 
-        parameters_to_interpret = ["alpha", "batch_size"]
+        parameters_to_interpret = ["learning_rate_init", "width"]
         idx = [cs.get_idx_by_hyperparameter_name(hp) for hp in parameters_to_interpret]
 
         run_name = f"{model_name.replace(' ', '_')}_{'_'.join(optimized_parameters)}_{data_set}"
