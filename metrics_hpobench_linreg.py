@@ -66,7 +66,7 @@ if __name__ == "__main__":
 
                 run_count, run_rmse_mean, run_rmse_std = {}, {}, {}
 
-                for sampling_type in ["SR (BO)", "SR (Random)", "SR (BO-GP)", "LR (BO)", "GP Baseline"]:
+                for sampling_type in ["SR (BO)", "SR (Random)", "SR (BO-GP)", "GP Baseline", "LR (BO-GP) Baseline"]:
                     try:
                         if sampling_type == "GP Baseline":
                             symb_dir = f"learning_curves/runs_surr_hpobench/{run_name}"
@@ -75,8 +75,8 @@ if __name__ == "__main__":
                                 symb_dir = f"learning_curves/runs_symb_hpobench/{symb_dir_name}/smac/{run_name}"
                             elif sampling_type == "SR (Random)":
                                 symb_dir = f"learning_curves/runs_symb_hpobench/{symb_dir_name}/rand/{run_name}"
-                            elif sampling_type == "LR (BO)":
-                                symb_dir = f"results/runs_linreg_hpobench/linreg/smac/{run_name}"
+                            elif sampling_type == "LR (BO-GP) Baseline":
+                                symb_dir = f"results/runs_linreg_hpobench/linreg/surr/{run_name}"
                             else:
                                 symb_dir = f"learning_curves/runs_symb_hpobench/{symb_dir_name}/surr/{run_name}"
 
