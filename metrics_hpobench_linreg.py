@@ -80,14 +80,14 @@ if __name__ == "__main__":
                             else:
                                 symb_dir = f"learning_curves/runs_symb_hpobench/{symb_dir_name}/surr/{run_name}"
 
+                        logger.info(f"Process {sampling_type} for {run_name}.")
+
                         df_error_metrics = pd.read_csv(f"{symb_dir}/error_metrics.csv")
                         df_error_metrics["rmse_test"] = np.sqrt(df_error_metrics["mse_test"])
                         df_error_metrics["rmse_train"] = np.sqrt(df_error_metrics["mse_train"])
 
                         if eval_at_n_samples:
                             df_error_metrics = df_error_metrics[df_error_metrics["n_samples"] == eval_at_n_samples]
-                            if run_name == "RF_max_depth_max_features_credit-g":
-                                logger.info(f"{sampling_type}: {len(df_error_metrics)}")
 
                         run_count[sampling_type] = df_error_metrics["rmse_test"].count()
                         run_rmse_mean[sampling_type] = df_error_metrics["rmse_test"].mean(axis=0)
@@ -112,8 +112,11 @@ if __name__ == "__main__":
                 df_run_rmse_std_all = pd.concat((df_run_rmse_std_all, df_run_rmse_std))
                 df_run_rmse_std_all.to_csv(f"{metric_dir}/rmse_std{n_samples_postfix}.csv")
 
-                latex_out = generate_result_table(df_run_rmse_mean_all, df_run_rmse_std_all, stddev=True,
-                                                  show_avg=True)
-
             except Exception as e:
                 logger.warning(f"Could not process {run_name}: \n{e}")
+
+        latex_out = generate_result_table(df_run_rmse_mean_all, df_run_rmse_std_all, stddev=True,
+                                          show_avg=True)
+
+        with open(f"{metric_dir}/rmse_latex.txt", "w") as f:
+            f.write(latex_out)
