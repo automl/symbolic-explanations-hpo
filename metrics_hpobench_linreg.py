@@ -6,6 +6,7 @@ import numpy as np
 from utils.logging_utils import get_logger
 from utils.run_utils import get_hpo_test_data
 from utils.hpobench_utils import get_run_config, get_benchmark_dict, get_task_dict
+from utils.latex_utils import generate_result_table
 
 if __name__ == "__main__":
     # number of HPs to optimize
@@ -75,7 +76,7 @@ if __name__ == "__main__":
                             elif sampling_type == "SR (Random)":
                                 symb_dir = f"learning_curves/runs_symb_hpobench/{symb_dir_name}/rand/{run_name}"
                             elif sampling_type == "LR (BO)":
-                                symb_dir = f"results/runs_linreg_hpobench/linreg/surr/{run_name}"
+                                symb_dir = f"results/runs_linreg_hpobench/linreg/smac/{run_name}"
                             else:
                                 symb_dir = f"learning_curves/runs_symb_hpobench/{symb_dir_name}/surr/{run_name}"
 
@@ -110,6 +111,9 @@ if __name__ == "__main__":
                 df_run_rmse_std = pd.DataFrame(run_rmse_std, index=[f"{model_name} ({', '.join(optimized_parameters)}):{data_set}"])
                 df_run_rmse_std_all = pd.concat((df_run_rmse_std_all, df_run_rmse_std))
                 df_run_rmse_std_all.to_csv(f"{metric_dir}/rmse_std{n_samples_postfix}.csv")
+
+                latex_out = generate_result_table(df_run_rmse_mean_all, df_run_rmse_std_all, stddev=True,
+                                                  show_avg=True)
 
             except Exception as e:
                 logger.warning(f"Could not process {run_name}: \n{e}")
