@@ -17,13 +17,13 @@ if __name__ == "__main__":
     # number of HP combinations to consider per model
     max_hp_comb = 1
 
-    n_samples_spacing = np.linspace(200, 200, 10, dtype=int).tolist()
+    n_samples_spacing = np.linspace(100, 100, 1, dtype=int).tolist()
     init_design_max_ratio = 0.25
     init_design_n_configs_per_hyperparamter = 8
 
     n_test_samples = 100
     symb_dir_name = f"parsimony0.0001"
-    n_samples = 200
+    n_samples = 100
     symb_seeds = [0]
 
     n_ice = 200
