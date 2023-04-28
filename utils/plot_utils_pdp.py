@@ -78,9 +78,9 @@ def plot_symb2d_subplots(
     else:
         X1_test = X_test[1]
 
-    fig = plt.figure(figsize=(10, 8))
+    fig = plt.figure(figsize=(15, 4))
 
-    ax = plt.subplot(2, 1, 1)
+    ax = plt.subplot(1, 2, 1)
     im = ax.pcolormesh(
         X0_test,
         X1_test,
@@ -92,6 +92,7 @@ def plot_symb2d_subplots(
     )
     ax.set_title(f"GP Baseline (Partial Dependence)", fontsize=TITLE_SIZE)
     ax.set_ylabel(X1_name, fontsize=TITLE_SIZE, labelpad=5)
+    ax.set_xlabel(X0_name, fontsize=TITLE_SIZE)
     ax.set_xticks(dim_x)
     ax.set_yticks(dim_y)
     ax.set_xlim(X0_lower, X0_upper)
@@ -103,7 +104,7 @@ def plot_symb2d_subplots(
         print(model_name)
         label = model_name
         i = 2
-        ax = plt.subplot(2, 1, i)
+        ax = plt.subplot(1, 2, i)
 
         im = ax.pcolormesh(
             X0_test,
@@ -116,7 +117,6 @@ def plot_symb2d_subplots(
         )
         ax.set_title(f"Prediction: {label}", fontsize=TITLE_SIZE)
         ax.set_xlabel(X0_name, fontsize=TITLE_SIZE)
-        ax.set_ylabel(X1_name, fontsize=TITLE_SIZE, labelpad=5)
         ax.set_xticks(dim_x)
         ax.set_yticks(dim_y)
         ax.set_xlim(X0_lower, X0_upper)
@@ -136,11 +136,11 @@ def plot_symb2d_subplots(
     for handle in leg.legendHandles:
         handle.set_sizes([100])
     leg.get_frame().set_linewidth(0.0)
-    cbar_ax = fig.add_axes([0.38, 0.2, 0.5, 0.03])
+    cbar_ax = fig.add_axes([0.38, 0.2, 0.3, 0.06])
     cbar = fig.colorbar(im, ax=ax, cax=cbar_ax, shrink=0.4, orientation="horizontal")
     cbar.set_label(metric_name, fontsize=TITLE_SIZE, labelpad=6)
     cbar.ax.tick_params(labelsize=LABEL_SIZE)
-    plt.tight_layout(rect=(0, 0.1, 1, 1))
+    plt.tight_layout(rect=(0, 0.3, 1, 1))
     if plot_dir:
         if filename:
             plt.savefig(f"{plot_dir}/{filename}", dpi=800)
