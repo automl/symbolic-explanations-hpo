@@ -43,7 +43,7 @@ def generate_result_table(df, stddev_df, stddev: bool = False, decimal_places: i
             lambda data: format_number(data, decimal_places=decimal_places))
 
     df["GP Baseline"] = df_decimal_format["GP Baseline"]
-    df["LR (GP-BO) Baseline"] = df_decimal_format["LR (GP-BO) Baseline"]
+    df["LR (BO-GP) Baseline"] = df_decimal_format["LR (BO-GP) Baseline"]
 
     if stddev:
         for k in range(len(stddev_df.index)):
