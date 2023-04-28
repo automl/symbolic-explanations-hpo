@@ -130,7 +130,7 @@ def plot_symb2d_subplots(
                 X_train[1] = np.log(X_train[1])
     handles, labels = ax.get_legend_handles_labels()
     leg = fig.legend(
-        handles, labels, loc="lower right", bbox_to_anchor=(0.35, 0.03), fontsize=TITLE_SIZE, framealpha=0.0, handletextpad=0.05
+        handles, labels, loc="lower right", bbox_to_anchor=(0.5, 0.03), fontsize=TITLE_SIZE, framealpha=0.0, handletextpad=0.05
     )
     for handle in leg.legendHandles:
         handle.set_sizes([100])
