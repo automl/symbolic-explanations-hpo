@@ -33,7 +33,7 @@ if __name__ == "__main__":
     # number of HP combinations to consider per model
     max_hp_comb = 1
 
-    n_samples_spacing = np.linspace(200, 200, 1, dtype=int).tolist()
+    n_samples_spacing = np.linspace(100, 100, 1, dtype=int).tolist()
     init_design_max_ratio = 0.25
     init_design_n_configs_per_hyperparamter = 8
 
