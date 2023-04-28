@@ -33,13 +33,13 @@ if __name__ == "__main__":
     # number of HP combinations to consider per model
     max_hp_comb = 1
 
-    n_samples_spacing = np.linspace(80, 80, 1, dtype=int).tolist()
+    n_samples_spacing = np.linspace(200, 200, 1, dtype=int).tolist()
     init_design_max_ratio = 0.25
     init_design_n_configs_per_hyperparamter = 8
 
     sampling_dir_name = "runs_sampling_hpobench"
     n_test_samples = 100
-    n_seeds = 3
+    n_seeds = 2
     # allow fit of SR to run for at max 15 minutes
     max_seconds_per_fit = 900
 
@@ -137,7 +137,7 @@ if __name__ == "__main__":
                     f"{sampling_seed}, skip.")
                 break
 
-            parameters_to_interpret = ["learning_rate_init", "width"]
+            parameters_to_interpret = ["max_depth", "min_samples_leaf"]
             idx = [cs.get_idx_by_hyperparameter_name(hp) for hp in parameters_to_interpret]
 
             logger.info(f"Get PDPs for {run_name} ({run_type}).")
