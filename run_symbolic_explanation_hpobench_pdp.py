@@ -33,7 +33,7 @@ if __name__ == "__main__":
     # number of HP combinations to consider per model
     max_hp_comb = 1
 
-    n_samples_spacing = np.linspace(200, 200, 1, dtype=int).tolist()
+    n_samples_spacing = np.linspace(60, 60, 1, dtype=int).tolist()
     init_design_max_ratio = 0.25
     init_design_n_configs_per_hyperparamter = 8
 
@@ -137,7 +137,7 @@ if __name__ == "__main__":
                     f"{sampling_seed}, skip.")
                 break
 
-            parameters_to_interpret = ["max_depth", "max_features"]
+            parameters_to_interpret = ["alpha", "batch_size"]
             idx = [cs.get_idx_by_hyperparameter_name(hp) for hp in parameters_to_interpret]
 
             logger.info(f"Get PDPs for {run_name} ({run_type}).")

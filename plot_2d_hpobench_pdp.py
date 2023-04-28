@@ -17,14 +17,13 @@ if __name__ == "__main__":
     # number of HP combinations to consider per model
     max_hp_comb = 1
 
-    n_samples_spacing = np.linspace(200, 200, 10, dtype=int).tolist()
+    n_samples_spacing = np.linspace(60, 60, 10, dtype=int).tolist()
     init_design_max_ratio = 0.25
     init_design_n_configs_per_hyperparamter = 8
 
-    dir_with_test_data = "" #"learning_curves/runs_surr_hpobench"
     n_test_samples = 100
     symb_dir_name = f"parsimony0.0001"
-    n_samples = 200
+    n_samples = 60
     symb_seeds = [0]
 
     n_ice = 200
@@ -51,7 +50,7 @@ if __name__ == "__main__":
         # add only parameters to be optimized to configspace
         cs = b.get_configuration_space(hyperparameters=optimized_parameters)
 
-        parameters_to_interpret = ["max_depth", "max_features"]
+        parameters_to_interpret = ["alpha", "batch_size"]
         idx = [cs.get_idx_by_hyperparameter_name(hp) for hp in parameters_to_interpret]
 
         run_name = f"{model_name.replace(' ', '_')}_{'_'.join(optimized_parameters)}_{data_set}"
@@ -59,6 +58,7 @@ if __name__ == "__main__":
 
         sampling_dir_smac = f"results/runs_sampling_hpobench/smac/{run_name}"
         symb_dir_smac = f"results/runs_symb_hpobench/{symb_dir_name}/smac/{run_name}/symb_models"
+        dir_with_test_data = f"results/runs_symb_hpobench/{symb_dir_name}/test/{run_name}"
 
         # Get specific surrogate file for each sample size for which the number of initial designs differs from
         # the maximum number of initial designs (number of hyperparameters * init_design_n_configs_per_hyperparamter)
