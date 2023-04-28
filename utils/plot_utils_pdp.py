@@ -78,9 +78,9 @@ def plot_symb2d_subplots(
     else:
         X1_test = X_test[1]
 
-    fig = plt.figure(figsize=(15, 4))
+    fig = plt.figure(figsize=(10, 8))
 
-    ax = plt.subplot(1, 2, 1)
+    ax = plt.subplot(2, 1, 1)
     im = ax.pcolormesh(
         X0_test,
         X1_test,
@@ -104,7 +104,7 @@ def plot_symb2d_subplots(
         print(model_name)
         label = model_name
         i = 2
-        ax = plt.subplot(1, 2, i)
+        ax = plt.subplot(2, 1, i)
 
         im = ax.pcolormesh(
             X0_test,
