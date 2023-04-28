@@ -25,7 +25,7 @@ def generate_result_table(df, stddev_df, stddev: bool = False, decimal_places: i
                           show_avg: bool = True):
     df_no_format = df.copy()
     df_decimal_format = df.copy()[["GP Baseline", "LR (BO-GP) Baseline"]]
-    df = df.drop(columns=[["Model", "Hyperparameters", "Dataset"]])
+    df = df.drop(columns=["Model", "Hyperparameters", "Dataset"])
 
     if show_avg:
         df_avg = df.mean()
