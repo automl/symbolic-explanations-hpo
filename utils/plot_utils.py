@@ -20,7 +20,7 @@ def plot_symb2d_subplots(
     function and the functions fitted by symbolic models evaluated on a 2D grid.
     """
 
-    LABEL_SIZE = 12
+    LABEL_SIZE = 13
     TITLE_SIZE = 15
     X0_name = (
         "X0"
@@ -129,6 +129,8 @@ def plot_symb2d_subplots(
             ax.set_ylabel(X1_name, fontsize=TITLE_SIZE, labelpad=5)
         ax.set_xticks(dim_x)
         ax.set_yticks(dim_y)
+        ax.xaxis.set_major_formatter(FormatStrFormatter('%.1f'))
+        ax.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
         ax.set_xlim(X0_lower, X0_upper)
         ax.set_ylim(X1_lower, X1_upper)
         ax.tick_params(axis="both", which="major", labelsize=LABEL_SIZE)
