@@ -37,8 +37,8 @@ def plot_symb2d_subplots(
         else f"{parameters[1].name}"
     )
     if parameters[0].log:
-        X0_upper = parameters[0].upper
-        X0_lower = parameters[0].lower
+        X0_upper = np.log(parameters[0].upper)
+        X0_lower = np.log(parameters[0].lower)
     else:
         X0_upper = parameters[0].upper
         X0_lower = parameters[0].lower
@@ -51,6 +51,8 @@ def plot_symb2d_subplots(
         if parameters[0].log:
             dim_x = np.arange(np.log(np.min(X_test[0])), np.log(np.max(X_test[0])) + step_x / 2, step_x)
             dim_x = [np.exp(x) for x in dim_x]
+            X0_upper = np.exp(X0_upper)
+            X0_lower = np.exp(X0_lower)
         else:
             dim_x = np.arange(np.min(X_test[0]), np.max(X_test[0]) + step_x / 2, step_x)
     if parameters[1].log:
