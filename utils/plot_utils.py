@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.ticker import FormatStrFormatter
+from matplotlib import ticker
 from ConfigSpace import UniformIntegerHyperparameter
 
 
@@ -94,8 +94,8 @@ def plot_symb2d_subplots(
     ax.set_title(f"Ground Truth", fontsize=TITLE_SIZE)
     ax.set_xticks(dim_x)
     ax.set_yticks(dim_y)
-    ax.xaxis.set_major_formatter(FormatStrFormatter('%.1f'))
-    ax.yaxis.set_major_formatter(FormatStrFormatter('%.1f'))
+    ax.xaxis.set_major_formatter(ticker.FormatStrFormatter('%.1f'))
+    ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.1f'))
     ax.set_xlim(X0_lower, X0_upper)
     ax.set_ylim(X1_lower, X1_upper)
     ax.tick_params(axis="both", which="major", labelsize=LABEL_SIZE)
@@ -161,7 +161,6 @@ def plot_symb2d_subplots(
     cbar = fig.colorbar(im, ax=ax, cax=cbar_ax, shrink=0.4, orientation="horizontal")
     cbar.set_label(metric_name, fontsize=TITLE_SIZE, labelpad=6)
     cbar.ax.tick_params(labelsize=LABEL_SIZE)
-    from matplotlib import ticker
     tick_locator = ticker.MaxNLocator(nbins=10)
     cbar.locator = tick_locator
     cbar.update_ticks()
