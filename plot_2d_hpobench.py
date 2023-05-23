@@ -51,12 +51,12 @@ if __name__ == "__main__":
         run_name = f"{model_name.replace(' ', '_')}_{'_'.join(optimized_parameters)}_{data_set}"
         logger.info(f"Create plot for {run_name}.")
 
-        sampling_dir_smac = f"results/runs_sampling_hpobench/smac/{run_name}"
-        sampling_dir_rand = f"results/runs_sampling_hpobench/rand/{run_name}"
+        sampling_dir_smac = f"learning_curves/runs_sampling_hpobench/smac/{run_name}"
+        sampling_dir_rand = f"learning_curves/runs_sampling_hpobench/rand/{run_name}"
 
-        symb_dir_surr = f"results/runs_symb_hpobench/{symb_dir_name}/surr/{run_name}/symb_models"
-        symb_dir_smac = f"results/runs_symb_hpobench/{symb_dir_name}/smac/{run_name}/symb_models"
-        symb_dir_rand = f"results/runs_symb_hpobench/{symb_dir_name}/rand/{run_name}/symb_models"
+        symb_dir_surr = f"learning_curves/runs_symb_hpobench/{symb_dir_name}/surr/{run_name}/symb_models"
+        symb_dir_smac = f"learning_curves/runs_symb_hpobench/{symb_dir_name}/smac/{run_name}/symb_models"
+        symb_dir_rand = f"learning_curves/runs_symb_hpobench/{symb_dir_name}/rand/{run_name}/symb_models"
 
         # Get specific surrogate file for each sample size for which the number of initial designs differs from
         # the maximum number of initial designs (number of hyperparameters * init_design_n_configs_per_hyperparamter)
@@ -107,7 +107,7 @@ if __name__ == "__main__":
                         X_test.T.reshape(X_test.shape[1] * X_test.shape[2], X_test.shape[0])
                     ).reshape(X_test.shape[2], X_test.shape[1]).T
                 predictions_test[f"SR (BO-GP)"] = symb_pred_surr
-                surr_dir = f"results/runs_surr/{run_name}"
+                surr_dir = f"learning_curves/runs_surr/{run_name}"
                 with open(
                         f"{symb_dir_smac}/n_samples{n_samples}_sampling_seed{sampling_seed}_symb_seed{symb_seed}.pkl",
                         "rb") as symb_model_file_smac:
