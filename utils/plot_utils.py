@@ -20,7 +20,7 @@ def plot_symb2d_subplots(
     function and the functions fitted by symbolic models evaluated on a 2D grid.
     """
 
-    LABEL_SIZE = 13
+    LABEL_SIZE = 14
     TITLE_SIZE = 15
     X0_name = (
         "X0"
