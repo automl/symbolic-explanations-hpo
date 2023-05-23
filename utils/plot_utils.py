@@ -50,6 +50,7 @@ def plot_symb2d_subplots(
         step_x = (X0_upper - X0_lower) / X_test.shape[2]
         if parameters[0].log:
             dim_x = np.arange(np.log(np.min(X_test[0])), np.log(np.max(X_test[0])) + step_x / 2, step_x)
+            dim_x = np.exp(dim_x)
         else:
             dim_x = np.arange(np.min(X_test[0]), np.max(X_test[0]) + step_x / 2, step_x)
     if parameters[1].log:
@@ -161,6 +162,7 @@ def plot_symb2d_subplots(
     cbar = fig.colorbar(im, ax=ax, cax=cbar_ax, shrink=0.4, orientation="horizontal")
     cbar.set_label(metric_name, fontsize=TITLE_SIZE, labelpad=6)
     cbar.ax.tick_params(labelsize=LABEL_SIZE)
+    cbar.ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f'))
     plt.tight_layout()
     if plot_dir:
         if filename:
