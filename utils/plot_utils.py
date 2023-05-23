@@ -37,8 +37,8 @@ def plot_symb2d_subplots(
         else f"{parameters[1].name}"
     )
     if parameters[0].log:
-        X0_upper = np.log(parameters[0].upper)
-        X0_lower = np.log(parameters[0].lower)
+        X0_upper = parameters[0].upper
+        X0_lower = parameters[0].lower
     else:
         X0_upper = parameters[0].upper
         X0_lower = parameters[0].lower
