@@ -50,9 +50,6 @@ def plot_symb2d_subplots(
         step_x = (X0_upper - X0_lower) / X_test.shape[2]
         if parameters[0].log:
             dim_x = np.arange(np.log(np.min(X_test[0])), np.log(np.max(X_test[0])) + step_x / 2, step_x)
-            dim_x = [np.exp(x) for x in dim_x]
-            X0_upper = np.exp(X0_upper)
-            X0_lower = np.exp(X0_lower)
         else:
             dim_x = np.arange(np.min(X_test[0]), np.max(X_test[0]) + step_x / 2, step_x)
     if parameters[1].log:
@@ -155,7 +152,7 @@ def plot_symb2d_subplots(
             )
     handles, labels = ax.get_legend_handles_labels()
     leg = fig.legend(
-        handles, labels, loc="lower right", bbox_to_anchor=(0.3, 0.03), fontsize=TITLE_SIZE, framealpha=0.0, handletextpad=0.05
+        handles, labels, loc="lower right", bbox_to_anchor=(0.34, 0.03), fontsize=TITLE_SIZE, framealpha=0.0, handletextpad=0.05
     )
     for handle in leg.legendHandles:
         handle.set_sizes([100])
