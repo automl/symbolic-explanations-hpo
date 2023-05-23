@@ -162,7 +162,7 @@ def plot_symb2d_subplots(
     cbar.set_label(metric_name, fontsize=TITLE_SIZE, labelpad=6)
     cbar.ax.tick_params(labelsize=LABEL_SIZE)
     from matplotlib import ticker
-    tick_locator = ticker.MaxNLocator(nbins=7)
+    tick_locator = ticker.MaxNLocator(nbins=10)
     cbar.locator = tick_locator
     cbar.update_ticks()
     plt.tight_layout()
