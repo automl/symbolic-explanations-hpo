@@ -161,7 +161,6 @@ def plot_symb2d_subplots(
     cbar = fig.colorbar(im, ax=ax, cax=cbar_ax, shrink=0.4, orientation="horizontal")
     cbar.set_label(metric_name, fontsize=TITLE_SIZE, labelpad=6)
     cbar.ax.tick_params(labelsize=LABEL_SIZE)
-    cbar.ax.xaxis.set_major_formatter(FormatStrFormatter('%.2f'))
     plt.tight_layout()
     if plot_dir:
         if filename:
