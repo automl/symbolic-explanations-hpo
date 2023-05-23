@@ -20,7 +20,7 @@ if __name__ == "__main__":
     init_design_max_ratio = 0.25
     init_design_n_configs_per_hyperparamter = 8
 
-    dir_with_test_data = "" #"learning_curves/runs_surr_hpobench"
+    dir_with_test_data = "learning_curves/runs_surr_hpobench"
     n_test_samples = 100
     symb_dir_name = f"parsimony0.0001"
     n_samples = 200
