@@ -96,7 +96,7 @@ def plot_symb2d_subplots(
     ax.set_yticks(dim_y)
     ax.xaxis.set_major_formatter(ticker.FormatStrFormatter('%.1f'))
     ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.1f'))
-    ax.set_xlim(X0_lower, X0_upper)
+    #ax.set_xlim(X0_lower, X0_upper)
     ax.set_ylim(X1_lower, X1_upper)
     ax.tick_params(axis="both", which="major", labelsize=LABEL_SIZE)
     ax.grid(alpha=0)
