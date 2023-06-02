@@ -99,7 +99,7 @@ def plot_symb2d_subplots(
     #ax.xaxis.set_major_formatter(ticker.FormatStrFormatter('%.1f'))
     ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.1f'))
     ax.set_xlim(X0_test.min(), X0_test.max())
-    ax.set_xlim(X1_test.min(), X1_test.max())
+    ax.set_ylim(X1_test.min(), X1_test.max())
     ax.tick_params(axis="both", which="major", labelsize=LABEL_SIZE)
     ax.grid(alpha=0)
 
@@ -125,7 +125,7 @@ def plot_symb2d_subplots(
         #ax.xaxis.set_major_formatter(ticker.FormatStrFormatter('%.1f'))
         ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.1f'))
         ax.set_xlim(X0_test.min(), X0_test.max())
-        ax.set_xlim(X1_test.min(), X1_test.max())
+        ax.set_ylim(X1_test.min(), X1_test.max())
         ax.tick_params(axis="both", which="major", labelsize=LABEL_SIZE)
         ax.grid(alpha=0)
         X_train = X_train_list[ind]
