@@ -87,19 +87,19 @@ def plot_symb2d_subplots(
         X1_test,
         y_test,
         cmap="summer",
-        shading="auto",
+        shading="gouraud",
         vmin=vmin,
         vmax=vmax,
     )
     ax.set_title(f"GP Baseline (Partial Dependence)", fontsize=TITLE_SIZE)
     ax.set_ylabel(X1_name, fontsize=TITLE_SIZE, labelpad=5)
     ax.set_xlabel(X0_name, fontsize=TITLE_SIZE)
-    ax.set_xticks(dim_x)
+    #ax.set_xticks(dim_x)
     ax.set_yticks(dim_y)
-    ax.xaxis.set_major_formatter(ticker.FormatStrFormatter('%.1f'))
+    #ax.xaxis.set_major_formatter(ticker.FormatStrFormatter('%.1f'))
     ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.1f'))
-    ax.set_xlim(X0_lower, X0_upper)
-    ax.set_ylim(X1_lower, X1_upper)
+    ax.set_xlim(X0_test.min(), X0_test.max())
+    ax.set_xlim(X1_test.min(), X1_test.max())
     ax.tick_params(axis="both", which="major", labelsize=LABEL_SIZE)
     ax.grid(alpha=0)
 
@@ -125,7 +125,7 @@ def plot_symb2d_subplots(
         #ax.xaxis.set_major_formatter(ticker.FormatStrFormatter('%.1f'))
         ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.1f'))
         ax.set_xlim(X0_test.min(), X0_test.max())
-        ax.set_ylim(X1_lower, X1_upper)
+        ax.set_xlim(X1_test.min(), X1_test.max())
         ax.tick_params(axis="both", which="major", labelsize=LABEL_SIZE)
         ax.grid(alpha=0)
         X_train = X_train_list[ind]
