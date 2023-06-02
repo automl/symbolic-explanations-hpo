@@ -94,7 +94,7 @@ def plot_symb2d_subplots(
     ax.set_title(f"Ground Truth", fontsize=TITLE_SIZE)
     #ax.set_xticks(dim_x)
     ax.set_yticks(dim_y)
-    ax.xaxis.set_major_formatter(ticker.FormatStrFormatter('%.1f'))
+    #ax.xaxis.set_major_formatter(ticker.FormatStrFormatter('%.1f'))
     ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.1f'))
     #ax.set_xlim(X0_lower, X0_upper)
     ax.set_ylim(X1_lower, X1_upper)
@@ -118,7 +118,7 @@ def plot_symb2d_subplots(
             X1_test,
             pred_test[ind],
             cmap="summer",
-            shading="auto",
+            shading="gouraud",
             vmin=vmin,
             vmax=vmax,
         )
@@ -127,11 +127,11 @@ def plot_symb2d_subplots(
             ax.set_xlabel(X0_name, fontsize=TITLE_SIZE)
         if i == 3:
             ax.set_ylabel(X1_name, fontsize=TITLE_SIZE, labelpad=5)
-        ax.set_xticks(dim_x)
+        #ax.set_xticks(dim_x)
         ax.set_yticks(dim_y)
-        ax.xaxis.set_major_formatter(ticker.FormatStrFormatter('%.1f'))
+        #ax.xaxis.set_major_formatter(ticker.FormatStrFormatter('%.1f'))
         ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.1f'))
-        ax.set_xlim(X0_lower, X0_upper)
+        #ax.set_xlim(X0_lower, X0_upper)
         ax.set_ylim(X1_lower, X1_upper)
         ax.tick_params(axis="both", which="major", labelsize=LABEL_SIZE)
         ax.grid(alpha=0)
