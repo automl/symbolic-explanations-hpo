@@ -114,10 +114,9 @@ def plot_symb2d_subplots(
         ax = plt.subplot(3, 2, i)
 
         from scipy.interpolate import interp2d
-        data = np.random.random((30, 30))
         f = interp2d(X0_test, X1_test, pred_test[ind], kind='cubic')
-        xnew = np.arange(0, 30, .1)
-        ynew = np.arange(0, 30, .1)
+        xnew = np.arange(X0_lower, X0_upper, .1)
+        ynew = np.arange(X1_lower, X1_upper, .1)
         data1 = f(xnew, ynew)
         Xn, Yn = np.meshgrid(xnew, ynew)
 
