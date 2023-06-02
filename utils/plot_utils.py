@@ -113,12 +113,20 @@ def plot_symb2d_subplots(
             i = 6
         ax = plt.subplot(3, 2, i)
 
+        from scipy.interpolate import interp2d
+        data = np.random.random((30, 30))
+        f = interp2d(X0_test, X1_test, pred_test[ind], kind='cubic')
+        xnew = np.arange(0, 30, .1)
+        ynew = np.arange(0, 30, .1)
+        data1 = f(xnew, ynew)
+        Xn, Yn = np.meshgrid(xnew, ynew)
+
         im = ax.pcolormesh(
-            X0_test,
-            X1_test,
-            pred_test[ind],
+            Xn,
+            Yn,
+            data1,
             cmap="summer",
-            shading="gouraud",
+            shading="auto",
             vmin=vmin,
             vmax=vmax,
         )
@@ -127,11 +135,11 @@ def plot_symb2d_subplots(
             ax.set_xlabel(X0_name, fontsize=TITLE_SIZE)
         if i == 3:
             ax.set_ylabel(X1_name, fontsize=TITLE_SIZE, labelpad=5)
-        #ax.set_xticks(dim_x)
+        ax.set_xticks(dim_x)
         ax.set_yticks(dim_y)
-        #ax.xaxis.set_major_formatter(ticker.FormatStrFormatter('%.1f'))
+        ax.xaxis.set_major_formatter(ticker.FormatStrFormatter('%.1f'))
         ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.1f'))
-        #ax.set_xlim(X0_lower, X0_upper)
+        ax.set_xlim(X0_lower, X0_upper)
         ax.set_ylim(X1_lower, X1_upper)
         ax.tick_params(axis="both", which="major", labelsize=LABEL_SIZE)
         ax.grid(alpha=0)
