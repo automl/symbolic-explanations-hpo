@@ -87,7 +87,7 @@ def plot_symb2d_subplots(
         X1_test,
         y_test,
         cmap="summer",
-        shading="auto",
+        shading="gouraud",
         vmin=vmin,
         vmax=vmax,
     )
