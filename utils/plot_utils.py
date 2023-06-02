@@ -87,7 +87,8 @@ def plot_symb2d_subplots(
         X1_test,
         y_test,
         cmap="summer",
-        shading="gouraud",
+        shading="auto",
+        interpolation='bilinear',
         vmin=vmin,
         vmax=vmax,
     )
