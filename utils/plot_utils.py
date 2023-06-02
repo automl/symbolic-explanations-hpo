@@ -114,7 +114,7 @@ def plot_symb2d_subplots(
         ax = plt.subplot(3, 2, i)
 
         from scipy.interpolate import interp2d
-        f = interp2d(X0_test, X1_test, pred_test[ind], kind='cubic')
+        f = interp2d(X0_test, X1_test, pred_test[ind], kind='linear')
         xnew = np.arange(X0_lower, X0_upper, .01)
         ynew = np.arange(X1_lower, X1_upper, .01)
         data1 = f(xnew, ynew)
