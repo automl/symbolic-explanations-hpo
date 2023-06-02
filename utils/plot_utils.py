@@ -93,7 +93,7 @@ def plot_symb2d_subplots(
         vmax=vmax,
     )
     ax.set_title(f"Ground Truth", fontsize=TITLE_SIZE)
-    ax.set_xticks(dim_x)
+    #ax.set_xticks(dim_x)
     ax.set_yticks(dim_y)
     ax.xaxis.set_major_formatter(ticker.FormatStrFormatter('%.1f'))
     ax.yaxis.set_major_formatter(ticker.FormatStrFormatter('%.1f'))
