@@ -142,7 +142,7 @@ if __name__ == "__main__":
             elif elbow_type == "parallel_lines":
                 y_lower_right = df_sorted.iloc[0]["rmse_test"]
                 y_upper_left = df_sorted.iloc[-1]["rmse_test"]
-                plt.plot([x_upper_left, x_lower_right], [y_upper_left, y_lower_right], color='orange')
+                plt.plot([x_upper_left, x_lower_right], [y_upper_left, y_lower_right], color='red')
 
             elif elbow_type == "parallel_lines_curve":
                 from scipy.optimize import curve_fit
@@ -164,7 +164,7 @@ if __name__ == "__main__":
 
                 complexity_ls = np.linspace(x_upper_left, x_lower_right, 100)
                 plt.plot(complexity_ls, objective(complexity_ls, a, b), color="black")
-                plt.plot([x_upper_left, x_lower_right], [y_upper_left, y_lower_right], color='orange')
+                plt.plot([x_upper_left, x_lower_right], [y_upper_left, y_lower_right], color='red')
             else:
                     raise ValueError(f"Unknown elbow type: {elbow_type}")
             if elbow_type in ("parallel_lines", "parallel_lines_curve"):
@@ -185,7 +185,7 @@ if __name__ == "__main__":
                 if selected_point is not None:
                     line_start_y = slope * (x_upper_left - selected_point["complexity"]) + selected_point["rmse_test"]
                     line_end_x = (y_lower_right - selected_point["rmse_test"]) / slope + selected_point["complexity"]
-                    plt.plot([x_upper_left, line_end_x], [line_start_y, y_lower_right], color='red')
+                    plt.plot([x_upper_left, line_end_x], [line_start_y, y_lower_right], color='darkorange')
 
             if selected_point is not None:
                 h = ax.scatter(selected_point["complexity"], selected_point["rmse_test"], color='darkorange',
