@@ -24,7 +24,7 @@ if __name__ == "__main__":
     titlesize=18
 
     perform_elbow = True
-    elbow_type = "increase_limit"  # "increase_limit", "parallel_lines", "parallel_lines_curve"
+    elbow_type = "parallel_lines"  # "increase_limit", "parallel_lines", "parallel_lines_curve"
 
     run_configs = get_run_config(n_optimized_params=n_optimized_params, max_hp_comb=1)
 
@@ -125,12 +125,12 @@ if __name__ == "__main__":
         plt.xticks(np.arange(0, 24, 4.0), fontsize=labelsize-2)
         plt.legend([], [], frameon=False)
 
+        selected_point = None
         if perform_elbow:
             df_sorted = df_joined_all.sort_values('complexity')
             df_sorted = df_sorted.sort_values('rmse_test')
             x_lower_right = df_sorted.iloc[0]["complexity"]
             x_upper_left = df_sorted.iloc[-1]["complexity"]
-            selected_point = None
 
             if elbow_type == "increase_limit":
                 for index in reversed(range(len(df_sorted) - 1)):
@@ -138,13 +138,11 @@ if __name__ == "__main__":
                             df_sorted.iloc[index - 1]["complexity"] - df_sorted.iloc[index]["complexity"] > 2:
                         selected_point = df_sorted.iloc[index]
                         break
-                if selected_point is not None:
-                    plt.plot(selected_point["complexity"], selected_point["rmse_test"], 'P', color='red')
 
             elif elbow_type == "parallel_lines":
                 y_lower_right = df_sorted.iloc[0]["rmse_test"]
                 y_upper_left = df_sorted.iloc[-1]["rmse_test"]
-                plt.plot([x_upper_left, x_lower_right], [y_upper_left, y_lower_right], color='red')
+                plt.plot([x_upper_left, x_lower_right], [y_upper_left, y_lower_right], color='orange')
 
             elif elbow_type == "parallel_lines_curve":
                 from scipy.optimize import curve_fit
@@ -189,7 +187,14 @@ if __name__ == "__main__":
                     line_end_x = (y_lower_right - selected_point["rmse_test"]) / slope + selected_point["complexity"]
                     plt.plot([x_upper_left, line_end_x], [line_start_y, y_lower_right], color='red')
 
+            if selected_point is not None:
+                h = ax.scatter(selected_point["complexity"], selected_point["rmse_test"], color='darkorange',
+                               marker="*", s=50, label='Stop-Point')
+
     handles, labels = ax.get_legend_handles_labels()
+    if selected_point is not None:
+        handles.append(h.axes.collections[-1])
+        labels.append('Stop-Point')
     legend = fig.legend(handles, labels, loc='center right', title="Parsimony", frameon=False, fontsize=titlesize)
     legend.get_title().set_fontsize(titlesize)
     for handle in legend.legendHandles:
