@@ -24,6 +24,7 @@ if __name__ == "__main__":
     titlesize=18
 
     perform_elbow = True
+    elbow_type = "increase_limit"  # "increase_limit", "parallel_lines", "parallel_lines_curve"
 
     run_configs = get_run_config(n_optimized_params=n_optimized_params, max_hp_comb=1)
 
@@ -129,29 +130,64 @@ if __name__ == "__main__":
             df_sorted = df_sorted.sort_values('rmse_test')
             x_lower_right = df_sorted.iloc[0]["complexity"]
             x_upper_left = df_sorted.iloc[-1]["complexity"]
-            y_lower_right = df_sorted.iloc[0]["rmse_test"]
-            y_upper_left = df_sorted.iloc[-1]["rmse_test"]
-            plt.plot([x_upper_left, x_lower_right], [y_upper_left, y_lower_right], color='red')
-
-            slope = (y_lower_right - y_upper_left) / (x_lower_right - x_upper_left)
             selected_point = None
 
-            for index1, row1 in df_joined_all.iterrows():
-                points_below = False
-                for index2, row2 in df_joined_all.iterrows():
-                    line_y = slope * (row2["complexity"] - row1["complexity"]) + row1["rmse_test"]
-                    if row2['rmse_test'] < line_y:
-                        points_below = True
+            if elbow_type == "increase_limit":
+                for index in reversed(range(len(df_sorted) - 1)):
+                    if df_sorted.iloc[index - 1]["rmse_test"] > 0.9 * df_sorted.iloc[index]["rmse_test"] and \
+                            df_sorted.iloc[index - 1]["complexity"] - df_sorted.iloc[index]["complexity"] > 2:
+                        selected_point = df_sorted.iloc[index]
                         break
-                if not points_below:
-                    selected_point = row1
-                    break
+                if selected_point is not None:
+                    plt.plot(selected_point["complexity"], selected_point["rmse_test"], 'P', color='red')
 
-            if selected_point is not None:
-                line_start_y = slope * (x_upper_left - selected_point["complexity"]) + selected_point["rmse_test"]
-                line_end_x = (y_lower_right - selected_point["rmse_test"]) / slope + selected_point["complexity"]
-                plt.plot(selected_point["complexity"], selected_point["rmse_test"], 'P', color='orange')
-                plt.plot([x_upper_left, line_end_x], [line_start_y, y_lower_right], color='orange')
+            elif elbow_type == "parallel_lines":
+                y_lower_right = df_sorted.iloc[0]["rmse_test"]
+                y_upper_left = df_sorted.iloc[-1]["rmse_test"]
+                plt.plot([x_upper_left, x_lower_right], [y_upper_left, y_lower_right], color='red')
+
+            elif elbow_type == "parallel_lines_curve":
+                from scipy.optimize import curve_fit
+                from sklearn.metrics import r2_score
+
+                def objective(x, p_a, p_b):
+                    return p_a * (x+0.1)**(-p_b)
+
+                popt, _ = curve_fit(f=objective, xdata=df_joined_all["complexity"].values,
+                                    ydata=df_joined_all["rmse_test"].values)
+                a, b = popt
+
+                print(data_set)
+                print(classifier_title)
+                print(r2_score(df_joined_all["rmse_test"].values, objective(df_joined_all["complexity"].values, a, b)))
+
+                y_lower_right = objective(df_sorted.iloc[0]["complexity"], a, b)
+                y_upper_left = objective(df_sorted.iloc[-1]["complexity"], a, b)
+
+                complexity_ls = np.linspace(x_upper_left, x_lower_right, 100)
+                plt.plot(complexity_ls, objective(complexity_ls, a, b), color="black")
+                plt.plot([x_upper_left, x_lower_right], [y_upper_left, y_lower_right], color='orange')
+            else:
+                    raise ValueError(f"Unknown elbow type: {elbow_type}")
+            if elbow_type in ("parallel_lines", "parallel_lines_curve"):
+                slope = (y_lower_right - y_upper_left) / (x_lower_right - x_upper_left)
+                selected_point = None
+
+                for index1, row1 in df_joined_all.iterrows():
+                    points_below = False
+                    for index2, row2 in df_joined_all.iterrows():
+                        line_y = slope * (row2["complexity"] - row1["complexity"]) + row1["rmse_test"]
+                        if row2['rmse_test'] < line_y:
+                            points_below = True
+                            break
+                    if not points_below:
+                        selected_point = row1
+                        break
+
+                if selected_point is not None:
+                    line_start_y = slope * (x_upper_left - selected_point["complexity"]) + selected_point["rmse_test"]
+                    line_end_x = (y_lower_right - selected_point["rmse_test"]) / slope + selected_point["complexity"]
+                    plt.plot([x_upper_left, line_end_x], [line_start_y, y_lower_right], color='red')
 
     handles, labels = ax.get_legend_handles_labels()
     legend = fig.legend(handles, labels, loc='center right', title="Parsimony", frameon=False, fontsize=titlesize)
