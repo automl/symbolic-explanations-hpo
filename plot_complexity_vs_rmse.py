@@ -192,12 +192,12 @@ if __name__ == "__main__":
                                marker="*", s=50, label='Stop-Point')
 
     handles, labels = ax.get_legend_handles_labels()
-    if selected_point is not None:
+    if perform_elbow and elbow_type=="increase_limit":
         handles.append(h.axes.collections[-1])
         labels.append('Stop-Point')
     legend = fig.legend(handles, labels, loc='center right', title="Parsimony", frameon=False, fontsize=titlesize)
     legend.get_title().set_fontsize(titlesize)
-    for handle in legend.legendHandles:
+    for handle in legend.legend_handles:
         handle.set_sizes([60])
     plt.tight_layout(rect=(0, 0, 0.82, 0.95), h_pad=5)
     plt.savefig(f"{plot_dir}/pointplot.png", dpi=400)
