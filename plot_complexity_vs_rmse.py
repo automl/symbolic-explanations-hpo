@@ -24,7 +24,7 @@ if __name__ == "__main__":
     titlesize=18
 
     perform_elbow = True
-    elbow_type = "parallel_lines"  # "increase_limit", "parallel_lines", "parallel_lines_curve"
+    elbow_type = "increase_limit"  # "increase_limit", "parallel_lines", "parallel_lines_curve"
 
     run_configs = get_run_config(n_optimized_params=n_optimized_params, max_hp_comb=1)
 
@@ -133,6 +133,7 @@ if __name__ == "__main__":
             x_upper_left = df_sorted.iloc[-1]["complexity"]
 
             if elbow_type == "increase_limit":
+                df_sorted = df_joined_all.sort_values('Parsimony')
                 for index in reversed(range(len(df_sorted) - 1)):
                     if df_sorted.iloc[index - 1]["rmse_test"] > 0.9 * df_sorted.iloc[index]["rmse_test"] and \
                             df_sorted.iloc[index - 1]["complexity"] - df_sorted.iloc[index]["complexity"] > 2:
