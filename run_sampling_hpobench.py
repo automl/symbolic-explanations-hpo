@@ -116,7 +116,6 @@ if __name__ == "__main__":
             # add only parameters to be optimized to configspace
             cs = b.get_configuration_space(seed=seed, hyperparameters=optimized_parameters)
 
-            logger.info(f"Run: {run_name}")
             logger.info(f"Sample configs and train {model_name} with seed {seed}.")
 
             if run_type == "rand":
