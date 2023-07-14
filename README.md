@@ -69,7 +69,7 @@ hyperparameter-combinations, and datasets.
 
 By default, the experiments are run for one parsimony coefficient (0.0001). 
 To run the symbolic regression with multiple values for the parsimony coefficient, more values can be added to the 
-parameter `parsimony_coefficient_space` defined in the `run_symbolic_explanation_hpobench.py script.
+parameter `parsimony_coefficient_space` defined in the `run_symbolic_explanation_hpobench.py` script.
 
 ### Collection of Training Samples for the Symbolic Regression
 
@@ -101,8 +101,8 @@ will be fitted on the random samples with Gaussian process performance estimates
 
 ### Gaussian Process Baseline
 
-Furthermore, the predictions of the Gaussian process model can be obtained for a single model, hyperparameter-combination, 
-and dataset, by running:
+Furthermore, the predictions of the Gaussian process model can be obtained for a single model, 
+hyperparameter-combination, and dataset, by running:
 
 ```
 python run_surrogate_explanation_hpobench.py --job_id 0
@@ -111,7 +111,6 @@ python run_surrogate_explanation_hpobench.py --job_id 0
 ### Metrics
 
 To average metrics over different seeds for a single model, hyperparameter-combination, and dataset, run:
-hyperparameter-combinations, and datasets, run
 ```
 python metrics_hpobench.py --job_id 0
 ```
