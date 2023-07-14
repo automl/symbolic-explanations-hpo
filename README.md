@@ -1,12 +1,12 @@
 # Symbolic Explanations for Hyperparameter Optimization
 
 Symbolic explanations can provide explicit formulas quantifying the relation between hyperparameter values and model 
-performance by applying symbolic regression to meta-data collected with Bayesian optimization.
+performance by applying symbolic regression to meta-data collected with Bayesian optimization:
 ![Approach.](./figures/approach.png)
 
 ## Installation
 
-You can create an environment with the required packages using anaconda and the `environment.yml` 
+You can create an environment with all required packages using anaconda and the `environment.yml` 
 file as demonstrated in the following:
 
 ```
@@ -37,8 +37,8 @@ python run_surrogate_explanation_hpobench.py --job_id 0
 ```
 
 `--job_id 0` will run the experiments for logistic regression with hyperparameters `alpha` and `eta0` on the 
-dataset blood-transfusion-service-center. To reproduce the results for all models, hyperparameter combinations, 
-and datasets shown in the paper, the above commands need to be run for `job_id` between 0-39.
+dataset `blood-transfusion-service-center`. To reproduce the results for all models, hyperparameter combinations, 
+and datasets shown in the paper, the above commands need to be run with `job_id` between 0-39.
 
 After running the above commands, to calculate metrics and create plots, run:
 ```
@@ -50,25 +50,26 @@ python plot_2d_hpobench.py --job_id 0
 
 ## Details on Running the Experiments
 
-In the following, we describe how to run the experiments. The overall process consists of the following steps: 
-1. Run the Bayesian optimization-powered hyperparameter optimization tool SMAC and collect (a) the meta-data consisting of the evaluated configurations
-and their performance and (b) the final surrogate model.
+In the following, we describe how to run the experiments in more detail. The overall process consists of the 
+following steps: 
+1. Run the Bayesian optimization-powered hyperparameter optimization tool SMAC and collect (a) the meta-data 
+consisting of the evaluated configurations and their performance and (b) the final surrogate model.
 2. Learn a symbolic regression model on either (a) the collected meta-data, or (b) randomly sampled
 configurations, which are evaluated using the true cost function, or (c) randomly sampled
 configurations, whose performance is estimated using the Gaussian process.
 
 ### Run Settings
 
-Which models and datasets should be included in the experiments can be defined in `utils/hpobench_utils`. By default, 
-8 datasets and 5 models are included. For each model and dataset, one hyperparameter-combination is evaluated. This 
-can be adapted by modifying the parameter `max_hp_comb` inside the run scripts.
-
+Which models and datasets should be included in the experiments can be defined in `utils/hpobench_utils`. As done in 
+the paper, by default, 8 datasets and 5 models are included. 
+For each model and dataset, one hyperparameter-combination is evaluated. 
+This can be adapted by modifying the parameter `max_hp_comb` inside the run scripts. 
 The argument `job_id`, which can be passed to the run scripts, is an index to iterate over all models, 
 hyperparameter-combinations, and datasets.
 
-By default, the experiments are run for one parsimony coefficient (0.0001). To run the symbolic explanation with 
-multiple values for the parsimony coefficient, more values can be added to the `parsimony_coefficient_space` 
-defined in the run script.
+By default, the experiments are run for one parsimony coefficient (0.0001). 
+To run the symbolic regression with multiple values for the parsimony coefficient, more values can be added to the 
+parameter `parsimony_coefficient_space` defined in the `run_symbolic_explanation_hpobench.py script.
 
 ### Collection of Training Samples for the Symbolic Regression
 
