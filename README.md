@@ -36,10 +36,6 @@ python run_symbolic_explanation_hpobench.py --job_id 0 --run_type surr
 python run_surrogate_explanation_hpobench.py --job_id 0
 ```
 
-`--job_id 0` will run the experiments for logistic regression with hyperparameters `alpha` and `eta0` on the 
-dataset `blood-transfusion-service-center`. To reproduce the results for all models, hyperparameter combinations, 
-and datasets shown in the paper, the above commands need to be run with `job_id` between 0-39.
-
 After running the above commands, to calculate metrics and create plots, run:
 ```
 python metrics_hpobench.py --job_id 0
@@ -47,6 +43,10 @@ python plot_learning_curves_hpobench.py --job_id 0
 python plot_complexity_vs_rmse.py --job_id 0
 python plot_2d_hpobench.py --job_id 0
 ```
+
+`--job_id 0` will run the experiments for logistic regression with hyperparameters `alpha` and `eta0` on the 
+dataset `blood-transfusion-service-center`. To reproduce the results for all models, hyperparameter combinations, 
+and datasets shown in the paper, the above commands need to be run with `job_id` between 0-39.
 
 ## Details on Running the Experiments
 
@@ -61,20 +61,20 @@ configurations, whose performance is estimated using the Gaussian process.
 ### Run Settings
 
 Which models and datasets should be included in the experiments can be defined in `utils/hpobench_utils`. As done in 
-the paper, by default, 8 datasets and 5 models are included. 
+the paper, by default 8 datasets and 5 models are included. 
 For each model and dataset, one hyperparameter-combination is evaluated. 
 This can be adapted by modifying the parameter `max_hp_comb` inside the run scripts. 
 The argument `job_id`, which can be passed to the run scripts, is an index to iterate over all models, 
 hyperparameter-combinations, and datasets.
 
 By default, the experiments are run for one parsimony coefficient (0.0001). 
-To run the symbolic regression with multiple values for the parsimony coefficient, more values can be added to the 
+To run the symbolic regression with multiple values for the parsimony coefficient, more values can be added via the 
 parameter `parsimony_coefficient_space` defined in the `run_symbolic_explanation_hpobench.py` script.
 
 ### Collection of Training Samples for the Symbolic Regression
 
 Collecting the samples as described in step 1 can be run for a single model, hyperparameter-combination, and dataset, 
-by running
+by running:
 
 ```
 python run_sampling_hpobench.py --job_id 0 --run_type smac
@@ -88,13 +88,13 @@ beforehand to provide the Gaussian process models.
 ### Symbolic Regression
 
 Fitting the symbolic regression model as described in step 2 can be run for a single model, hyperparameter-combination, 
-and dataset, by running
+and dataset, by running:
 
 ```
 python run_symbolic_explanation_hpobench.py --job_id 0 --run_type smac
 ```
 
-This way, the symbolic regression will be fitted on the samples collected during Bayesian Optimization (a).
+This way, the symbolic regression will be fitted on the samples collected during Bayesian optimization (a).
 By setting `run_type` to `rand`, the symbolic regression will be fitted on the randomly 
 sampled configurations (b). When setting `run_type` to `surr`, the symbolic regression
 will be fitted on the random samples with Gaussian process performance estimates (c). 
@@ -114,28 +114,28 @@ To average metrics over different seeds for a single model, hyperparameter-combi
 ```
 python metrics_hpobench.py --job_id 0
 ```
-Omitting `--job_id 0` will run the script for all all models, hyperparameter combinations, and datasets and combine 
-the metrics in a table. Thus, the experiments described above need to be run for all of them beforehand.
+Omitting `--job_id 0` will run the script for all all models, hyperparameter combinations, and datasets, and combine 
+the resulting metrics in a table. In this case, the experiments described above need to be run for all of them beforehand.
 
 ### Plots
 
 With the commands shown below, plots can be created for a single model, hyperparameter-combination, and dataset. 
-Omitting `--job_id 0` will create one plot for each model, hyperparameter combination, and dataset. Thus, the 
+Omitting `--job_id 0` will create one plot for each model, hyperparameter combination, and dataset. In this case, the 
 experiments described above need to be run for all of them beforehand.
 
-To create a plot showing several representations of the HPO loss landscape, run
+To create a plot showing several representations of the HPO loss landscape, run:
 ```
 python plot_2d_hpobench.py --job_id 0
 ```
 
 To create a plot showing the RMSE between the cost predicted by the symbolic regression and the true cost for
-different numbers of samples, run
+different numbers of samples, run:
 ```
 python plot_learning_curves_hpobench.py --job_id 0
 ```
 
 To create a plot showing the RMSE between the cost predicted by the symbolic regression and the true cost for different
-values of the parsimony coefficient, run
+values of the parsimony coefficient, run:
 ```
 python plot_complexity_vs_rmse.py --job_id 0
 ```
