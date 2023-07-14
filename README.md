@@ -155,4 +155,4 @@ If you use Symbolic Explanations in your research, please cite our paper:
 }
 ```
 
-The experiments for this paper were conducted with the code in version 0.1.0.
+The experiments for this paper were conducted with the code in version `0.1.0`.
