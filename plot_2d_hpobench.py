@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 import numpy as np
+import argparse
 import dill as pickle
 
 from utils.run_utils import get_surrogate_predictions, get_hpo_test_data
@@ -9,8 +10,11 @@ from utils.logging_utils import get_logger
 
 from utils.hpobench_utils import get_run_config, get_benchmark_dict, get_task_dict
 
-
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--job_id')
+    args = parser.parse_args()
+
     # number of HPs to optimize
     n_optimized_params = 2
     # number of HP combinations to consider per model
@@ -26,7 +30,11 @@ if __name__ == "__main__":
     n_samples = 200
     symb_seeds = [0]
 
-    run_configs = get_run_config(n_optimized_params=n_optimized_params, max_hp_comb=max_hp_comb)
+    if args.job_id:
+        run_configs = [
+            get_run_config(job_id=args.job_id, n_optimized_params=n_optimized_params, max_hp_comb=max_hp_comb)]
+    else:
+        run_configs = get_run_config(n_optimized_params=n_optimized_params, max_hp_comb=max_hp_comb)
 
     # set up directories
     plot_dir = f"results/plots"

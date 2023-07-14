@@ -4,19 +4,30 @@ import shutil
 import matplotlib.pyplot as plt
 import seaborn as sns
 import numpy as np
+import argparse
 
 from utils.logging_utils import get_logger
 from utils.hpobench_utils import get_run_config, get_benchmark_dict, get_task_dict
 
 if __name__ == "__main__":
-    symb_dir_name = "parsimony0.0001"
-    dir_with_test_data = "" #"results/runs_surr_hpobench"
-    n_optimized_params = 2
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--job_id')
+    args = parser.parse_args()
 
+    # number of HPs to optimize
+    n_optimized_params = 2
+    # number of HP combinations to consider per model
+    max_hp_comb = 1
+
+    symb_dir_name = "parsimony0.0001"
     labelsize = 12
     titlesize=13
 
-    run_configs = get_run_config(n_optimized_params=n_optimized_params)
+    if args.job_id:
+        run_configs = [
+            get_run_config(job_id=args.job_id, n_optimized_params=n_optimized_params, max_hp_comb=max_hp_comb)]
+    else:
+        run_configs = get_run_config(n_optimized_params=n_optimized_params, max_hp_comb=max_hp_comb)
 
     # Set up plot directories
     plot_dir = f"results/plots/combined_plots_hpobench_{symb_dir_name}"
@@ -30,7 +41,6 @@ if __name__ == "__main__":
     logger.info(f"Save plots to {plot_dir}.")
 
     for run_conf in run_configs:
-
         task_dict = get_task_dict()
         data_set = f"{task_dict[run_conf['task_id']]}"
         optimized_parameters = list(run_conf["hp_conf"])
@@ -45,14 +55,6 @@ if __name__ == "__main__":
         logger.info(f"Create plot for {run_name}.")
 
         try:
-            # Load test data
-            logger.info(f"Get test data.")
-            X_test = np.array(pd.read_csv(f"{dir_with_test_data}/{run_name}/x_test.csv"))
-            y_test = np.array(pd.read_csv(f"{dir_with_test_data}/{run_name}/y_test.csv"))
-
-            avg_cost = y_test.mean()
-            std_cost = y_test.std()
-
             df_error_metrics_all = pd.DataFrame()
             df_complexity_all = pd.DataFrame()
 
@@ -80,8 +82,6 @@ if __name__ == "__main__":
                     df_error_metrics_all = pd.concat((df_error_metrics_all, df_error_metrics))
                 except Exception as e:
                     logger.warning(f"Could not process {sampling_type} for {run_name}: \n{e}")
-
-                logger.info(f"Create plots.")
 
                 classifier_title = model_name
 
