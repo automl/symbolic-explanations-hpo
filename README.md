@@ -16,10 +16,7 @@ conda activate symb_expl
 
 To install HPOBench, please run the following after activating the environment:
 ```
-git clone https://github.com/automl/HPOBench.git
-cd HPOBench 
-pip install .
-cd ..
+pip install git+https://github.com/automl/HPOBench.git
 ```
 
 ## tl;dr: Summary of Commands to Reproduce the Results
